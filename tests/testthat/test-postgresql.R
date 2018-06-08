@@ -93,10 +93,18 @@ test_that("delete all works", {
   expect_equal(res, exp)
 })
 
+test_that("insert batch size works", {
+  res <- dbxInsert(con, "orders", orders, batch_size=1)
+  expect_equal(res, orders)
+})
+
 test_that("connect with url works", {
   library(urltools)
   con2 <- dbxConnect(url="postgres://localhost/dbx_test")
   res <- dbxSelect(con2, "SELECT 1 AS hi")
+  DBI::dbDisconnect(con2)
   exp <- data.frame(hi=c(1))
   expect_equal(res, exp)
 })
+
+DBI::dbDisconnect(con)

@@ -75,9 +75,11 @@ dbxSelect <- function(conn, statement) {
 #' @param table The table name to insert
 #' @param records A data frame of records to insert
 #' @export
-dbxInsert <- function(conn, table, records) {
-  sql <- insertClause(conn, table, records)
-  selectOrExecute(conn, sql, records)
+dbxInsert <- function(conn, table, records, batch_size=NULL) {
+  inBatches(records, batch_size, function(batch) {
+    sql <- insertClause(conn, table, batch)
+    selectOrExecute(conn, sql, batch)
+  })
 }
 
 #' Update records
@@ -246,5 +248,24 @@ execute <- function(conn, statement) {
 log <- function(statement) {
   if (any(getOption("dbx_verbose"))) {
     message(statement)
+  }
+}
+
+inBatches <- function(records, batch_size, f) {
+  if (is.null(batch_size)) {
+    f(records)
+  } else {
+    row_count <- nrow(records)
+    batch_count <- row_count / batch_size
+    ret <- data.frame()
+    for(i in 1:batch_count) {
+      start <- ((i - 1) * batch_size) + 1
+      end <- start + batch_size - 1
+      if (end > row_count) {
+        end <- row_count
+      }
+      ret <- rbind(ret, f(records[start:end,, drop=FALSE]))
+    }
+    ret
   }
 }
