@@ -4,7 +4,7 @@
 \alias{dbxDelete}
 \title{Delete records}
 \usage{
-dbxDelete(conn, table, where = NULL)
+dbxDelete(conn, table, where = NULL, batch_size = NULL)
 }
 \arguments{
 \item{conn}{A DBIConnection object}
@@ -12,6 +12,8 @@ dbxDelete(conn, table, where = NULL)
 \item{table}{The table name to delete records from}
 
 \item{where}{A data frame of records to delete}
+
+\item{batch_size}{The number of records to delete in a single statement (defaults to all)}
 }
 \description{
 Delete records

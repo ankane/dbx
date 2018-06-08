@@ -74,6 +74,7 @@ dbxSelect <- function(conn, statement) {
 #' @param conn A DBIConnection object
 #' @param table The table name to insert
 #' @param records A data frame of records to insert
+#' @param batch_size The number of records to insert in a single statement (defaults to all)
 #' @export
 dbxInsert <- function(conn, table, records, batch_size=NULL) {
   inBatches(records, batch_size, function(batch) {
@@ -88,6 +89,7 @@ dbxInsert <- function(conn, table, records, batch_size=NULL) {
 #' @param table The table name to update
 #' @param records A data frame of records to insert
 #' @param where_cols The columns to use for WHERE clause
+#' @param batch_size The number of records to update in a single transaction (defaults to all)
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
 dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
@@ -119,6 +121,7 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @param table The table name to upsert
 #' @param records A data frame of records to upsert
 #' @param where_cols The columns to use for WHERE clause
+#' @param batch_size The number of records to upsert in a single transaction (defaults to all)
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
 dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
@@ -161,6 +164,7 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @param conn A DBIConnection object
 #' @param table The table name to delete records from
 #' @param where A data frame of records to delete
+#' @param batch_size The number of records to delete in a single statement (defaults to all)
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
 dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
@@ -248,6 +252,7 @@ selectOrExecute <- function(conn, sql, records) {
   }
 }
 
+#' @importFrom DBI dbExecute
 execute <- function(conn, statement) {
   log(statement)
   dbExecute(conn, statement)

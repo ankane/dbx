@@ -4,7 +4,7 @@
 \alias{dbxInsert}
 \title{Insert records}
 \usage{
-dbxInsert(conn, table, records)
+dbxInsert(conn, table, records, batch_size = NULL)
 }
 \arguments{
 \item{conn}{A DBIConnection object}
@@ -12,6 +12,8 @@ dbxInsert(conn, table, records)
 \item{table}{The table name to insert}
 
 \item{records}{A data frame of records to insert}
+
+\item{batch_size}{The number of records to insert in a single statement (defaults to all)}
 }
 \description{
 Insert records

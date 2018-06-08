@@ -4,7 +4,7 @@
 \alias{dbxUpsert}
 \title{Upsert records}
 \usage{
-dbxUpsert(conn, table, records, where_cols)
+dbxUpsert(conn, table, records, where_cols, batch_size = NULL)
 }
 \arguments{
 \item{conn}{A DBIConnection object}
@@ -14,6 +14,8 @@ dbxUpsert(conn, table, records, where_cols)
 \item{records}{A data frame of records to upsert}
 
 \item{where_cols}{The columns to use for WHERE clause}
+
+\item{batch_size}{The number of records to upsert in a single transaction (defaults to all)}
 }
 \description{
 Upsert records
