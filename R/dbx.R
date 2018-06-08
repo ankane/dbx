@@ -62,7 +62,7 @@ dbxConnect <- function(adapter=NULL, url=NULL, ...) {
 #' @importFrom DBI dbSendQuery dbFetch dbClearResult
 #' @export
 dbxSelect <- function(conn, statement) {
-  log(statement)
+  statement <- processStatement(statement)
   res <- dbSendQuery(conn, statement)
   ret <- dbFetch(res)
   dbClearResult(res)
@@ -254,14 +254,21 @@ selectOrExecute <- function(conn, sql, records) {
 
 #' @importFrom DBI dbExecute
 execute <- function(conn, statement) {
-  log(statement)
+  statement <- processStatement(statement)
   dbExecute(conn, statement)
 }
 
-log <- function(statement) {
+processStatement <- function(statement) {
+  if (any(getOption("dbx_origin"))) {
+    script <- sub(".*=", "", commandArgs()[4])
+    statement <- paste0(statement, " /*script:", script, "*/")
+  }
+
   if (any(getOption("dbx_verbose"))) {
     message(statement)
   }
+
+  statement
 }
 
 inBatches <- function(records, batch_size, f) {

@@ -153,6 +153,20 @@ Log all SQL queries with:
 options(dbx_verbose=TRUE)
 ```
 
+## Origin [github]
+
+Add comments to queries to make it easier to see where time-consuming queries are comming from.
+
+```r
+options(dbx_origin=TRUE)
+```
+
+The comment will be appended to queries, like:
+
+```sql
+SELECT * FROM users /*script:forecast.R*/
+```
+
 ## Batching [github]
 
 By default, operations are performed in a single statement or transaction. This better for performance and prevents partial writes on failures. However, when working with large data frames on production systems, it can be better to break writes into batches. Use the `batch_size` option to do this.
