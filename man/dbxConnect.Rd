@@ -18,14 +18,14 @@ Create a database connection
 }
 \examples{
 # Postgres
-con <- dbxConnect(adapter="postgres", dbname="mydb")
+conn <- dbxConnect(adapter="postgres", dbname="mydb")
 
 # MySQL
-con <- dbxConnect(adapter="mysql", dbname="mydb")
+conn <- dbxConnect(adapter="mysql", dbname="mydb")
 
 # SQLite
-con <- dbxConnect(adapter="sqlite", dbname=":memory:")
+conn <- dbxConnect(adapter="sqlite", dbname=":memory:")
 
 # Others
-con <- dbxConnect(adapter=odbc::odbc(), database="mydb")
+conn <- dbxConnect(adapter=odbc::odbc(), database="mydb")
 }

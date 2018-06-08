@@ -8,16 +8,16 @@
 #' @export
 #' @examples
 #' # Postgres
-#' con <- dbxConnect(adapter="postgres", dbname="mydb")
+#' conn <- dbxConnect(adapter="postgres", dbname="mydb")
 #'
 #' # MySQL
-#' con <- dbxConnect(adapter="mysql", dbname="mydb")
+#' conn <- dbxConnect(adapter="mysql", dbname="mydb")
 #'
 #' # SQLite
-#' con <- dbxConnect(adapter="sqlite", dbname=":memory:")
+#' conn <- dbxConnect(adapter="sqlite", dbname=":memory:")
 #'
 #' # Others
-#' con <- dbxConnect(adapter=odbc::odbc(), database="mydb")
+#' conn <- dbxConnect(adapter=odbc::odbc(), database="mydb")
 dbxConnect <- function(adapter=NULL, url=NULL, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
@@ -73,7 +73,7 @@ dbxConnect <- function(adapter=NULL, url=NULL, ...) {
 #' @importFrom DBI dbDisconnect
 #' @export
 #' @examples
-#' dbxDisconnect(con)
+#' dbxDisconnect(conn)
 dbxDisconnect <- function(conn) {
   dbDisconnect(conn)
 }
@@ -85,7 +85,7 @@ dbxDisconnect <- function(conn) {
 #' @importFrom DBI dbSendQuery dbFetch dbClearResult
 #' @export
 #' @examples
-#' records <- dbxSelect(con, "SELECT * FROM forecasts")
+#' records <- dbxSelect(conn, "SELECT * FROM forecasts")
 dbxSelect <- function(conn, statement) {
   statement <- processStatement(statement)
   res <- dbSendQuery(conn, statement)
@@ -104,7 +104,7 @@ dbxSelect <- function(conn, statement) {
 #' @examples
 #' table <- "forecasts"
 #' records <- data.frame(temperature=c(32, 25))
-#' inserts <- dbxInsert(con, table, records)
+#' inserts <- dbxInsert(conn, table, records)
 dbxInsert <- function(conn, table, records, batch_size=NULL) {
   inBatches(records, batch_size, function(batch) {
     sql <- insertClause(conn, table, batch)
@@ -123,7 +123,7 @@ dbxInsert <- function(conn, table, records, batch_size=NULL) {
 #' @export
 #' @examples
 #' records <- data.frame(id=c(1, 2), temperature=c(16, 13))
-#' dbxUpdate(con, table, records, where_cols=c("id"))
+#' dbxUpdate(conn, table, records, where_cols=c("id"))
 dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
   cols <- colnames(records)
 
@@ -158,7 +158,7 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @export
 #' @examples
 #' records <- data.frame(id=c(2, 3), temperature=c(20, 25))
-#' upserts <- dbxUpsert(con, table, records, where_cols=c("id"))
+#' upserts <- dbxUpsert(conn, table, records, where_cols=c("id"))
 dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
   cols <- colnames(records)
 
@@ -205,10 +205,10 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @examples
 #' # Delete specific records
 #' bad_records <- data.frame(id=c(1, 2))
-#' dbxDelete(con, table, where=bad_records)
+#' dbxDelete(conn, table, where=bad_records)
 #'
 #' # Delete all records
-#' dbxDelete(con, table)
+#' dbxDelete(conn, table)
 dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   quoted_table <- dbQuoteIdentifier(conn, table)
 

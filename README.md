@@ -35,7 +35,7 @@ And use:
 ```r
 library(dbx)
 
-con <- dbxConnect(adapter="postgres", dbname="mydb")
+conn <- dbxConnect(adapter="postgres", dbname="mydb")
 ```
 
 You can also pass `user`, `password`, `host`, `port`, and `url`.
@@ -53,7 +53,7 @@ And use:
 ```r
 library(dbx)
 
-con <- dbxConnect(adapter="mysql", dbname="mydb")
+conn <- dbxConnect(adapter="mysql", dbname="mydb")
 ```
 
 You can also pass `user`, `password`, `host`, `port`, and `url`.
@@ -71,7 +71,7 @@ And use:
 ```r
 library(dbx)
 
-con <- dbxConnect(adapter="sqlite", dbname=":memory:")
+conn <- dbxConnect(adapter="sqlite", dbname=":memory:")
 ```
 
 ### Others
@@ -79,7 +79,7 @@ con <- dbxConnect(adapter="sqlite", dbname=":memory:")
 Install the appropriate R package and use:
 
 ```r
-con <- dbxConnect(adapter=odbc::odbc(), database="mydb")
+conn <- dbxConnect(adapter=odbc::odbc(), database="mydb")
 ```
 
 ## Operations
@@ -89,7 +89,7 @@ con <- dbxConnect(adapter=odbc::odbc(), database="mydb")
 Create a data frame of records from a SQL query
 
 ```r
-records <- dbxSelect(con, "SELECT * FROM forecasts")
+records <- dbxSelect(conn, "SELECT * FROM forecasts")
 ```
 
 ### Insert
@@ -99,7 +99,7 @@ Insert records
 ```r
 table <- "forecasts"
 records <- data.frame(temperature=c(32, 25))
-inserts <- dbxInsert(con, table, records)
+inserts <- dbxInsert(conn, table, records)
 ```
 
 Returns a data frame of inserted rows. For Postgres, this includes auto-incremented primary keys.
@@ -110,7 +110,7 @@ Update records
 
 ```r
 records <- data.frame(id=c(1, 2), temperature=c(16, 13))
-dbxUpdate(con, table, records, where_cols=c("id"))
+dbxUpdate(conn, table, records, where_cols=c("id"))
 ```
 
 Use `where_cols` to specify the columns used for lookup. Other columns are written to the table.
@@ -121,7 +121,7 @@ Use `where_cols` to specify the columns used for lookup. Other columns are writt
 
 ```r
 records <- data.frame(id=c(2, 3), temperature=c(20, 25))
-upserts <- dbxUpsert(con, table, records, where_cols=c("id"))
+upserts <- dbxUpsert(conn, table, records, where_cols=c("id"))
 ```
 
 Returns a data frame of upserted rows. For Postgres, this includes auto-incremented primary keys.
@@ -136,13 +136,13 @@ Delete specific records
 
 ```r
 bad_records <- data.frame(id=c(1, 2))
-dbxDelete(con, table, where=bad_records)
+dbxDelete(conn, table, where=bad_records)
 ```
 
 Delete all records (uses `TRUNCATE` when possible for performance)
 
 ```r
-dbxDelete(con, table)
+dbxDelete(conn, table)
 ```
 
 ## Logging [github]
@@ -166,7 +166,7 @@ DATABASE_URL=postgres://user:pass@host/dbname
 And use:
 
 ```r
-con <- dbxConnect()
+conn <- dbxConnect()
 ```
 
 ## Batching [github]
@@ -174,10 +174,10 @@ con <- dbxConnect()
 By default, operations are performed in a single statement or transaction. This better for performance and prevents partial writes on failures. However, when working with large data frames on production systems, it can be better to break writes into batches. Use the `batch_size` option to do this.
 
 ```r
-dbxInsert(con, table, records, batch_size=1000)
-dbxUpdate(con, table, records, where_cols, batch_size=1000)
-dbxUpsert(con, table, records, where_cols, batch_size=1000)
-dbxDelete(con, table, records, where, batch_size=1000)
+dbxInsert(conn, table, records, batch_size=1000)
+dbxUpdate(conn, table, records, where_cols, batch_size=1000)
+dbxUpsert(conn, table, records, where_cols, batch_size=1000)
+dbxDelete(conn, table, records, where, batch_size=1000)
 ```
 
 ## Origin [github]
@@ -199,13 +199,13 @@ SELECT * FROM users /*script:forecast.R*/
 To close a connection, use: [github]
 
 ```r
-dbxDisconnect(con)
+dbxDisconnect(conn)
 ```
 
 All connections are simply [DBI](https://cran.r-project.org/package=DBI) connections, so you can use them with DBI functions as well.
 
 ```r
-dbGetInfo(con)
+dbGetInfo(conn)
 ```
 
 ## Contributing
