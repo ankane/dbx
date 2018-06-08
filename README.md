@@ -4,6 +4,8 @@
 
 Supports Postgres, MySQL, SQLite, and more
 
+[![Build Status](https://travis-ci.org/ankane/dbx.svg?branch=master)](https://travis-ci.org/ankane/dbx)
+
 ## Installation
 
 Install dbx
