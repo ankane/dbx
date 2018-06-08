@@ -145,6 +145,25 @@ Delete all records (uses `TRUNCATE` when possible for performance)
 dbxDelete(con, table)
 ```
 
+## Logging [master]
+
+Log all SQL queries with:
+
+```r
+options(dbx_verbose=TRUE)
+```
+
+## Batching [master]
+
+By default, operations are performed in a single statement or transaction. This better for performance and prevents partial writes on failures. However, when working with really large data frames on production systems, it can be better to break writes into batches. Use the `batch_size` option to do this.
+
+```r
+dbxInsert(con, table, records, batch_size=1000)
+dbxUpdate(con, table, records, where_cols, batch_size=1000)
+dbxUpsert(con, table, records, where_cols, batch_size=1000)
+dbxDelete(con, table, records, where, batch_size=1000)
+```
+
 ## Database Credentials
 
 Environment variables are a good way to store database credentials. This keeps them outside your source control. It’s also how platforms like [Heroku](https://www.heroku.com) store them.
@@ -167,15 +186,6 @@ All connections are simply [DBI](https://cran.r-project.org/package=DBI) connect
 
 ```r
 dbGetInfo(con)
-```
-
-By default, operations are performed in a single statement or transaction. This prevents partial writes on failures. However, for really large data frames, it can be better to break writes into batches on production systems. Use the `batch_size` option to do this. [master]
-
-```r
-dbxInsert(con, table, records, batch_size=1000)
-dbxUpdate(con, table, records, where_cols, batch_size=1000)
-dbxUpsert(con, table, records, where_cols, batch_size=1000)
-dbxDelete(con, table, records, where, batch_size=1000)
 ```
 
 ## Contributing
