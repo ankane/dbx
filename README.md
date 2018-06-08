@@ -169,6 +169,15 @@ All connections are simply [DBI](https://cran.r-project.org/package=DBI) connect
 dbGetInfo(con)
 ```
 
+By default, operations are performed in a single statement or transaction. This prevents partial writes on failures. However, for really large data frames, it can be better to break writes into batches on production systems. Use the `batch_size` option to do this. [master]
+
+```r
+dbxInsert(con, table, records, batch_size=1000)
+dbxUpdate(con, table, records, where_cols, batch_size=1000)
+dbxUpsert(con, table, records, where_cols, batch_size=1000)
+dbxDelete(con, table, records, where, batch_size=1000)
+```
+
 ## Contributing
 
 Everyone is encouraged to help improve this project. Here are a few ways you can help:
