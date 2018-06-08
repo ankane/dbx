@@ -18,11 +18,3 @@ dbxDelete(conn, table, where = NULL, batch_size = NULL)
 \description{
 Delete records
 }
-\examples{
-# Delete specific records
-bad_records <- data.frame(id=c(1, 2))
-dbxDelete(db, table, where=bad_records)
-
-# Delete all records
-dbxDelete(db, table)
-}
