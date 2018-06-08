@@ -167,16 +167,24 @@ dbxDelete <- function(conn, table, where=NULL) {
       sql <- paste("DELETE FROM", quoted_table)
     }
     dbExecute(conn, sql)
+  } else if (length(where) == 0) {
+    # do nothing
+  } else if (length(where) == 1) {
+    quoted_col <- colnames(where)[1]
+    sql <- paste("DELETE FROM", quoted_table, "WHERE", quoted_col, "IN", singleValuesRow(conn, where[, 1]))
+    dbExecute(conn, sql)
   } else {
     cols <- colnames(where)
 
-    dbWithTransaction(conn, {
-      for (i in 1:nrow(where)) {
-        row <- where[i,, drop=FALSE]
-        sql <- paste("DELETE FROM", quoted_table, whereClause(conn, row[cols]))
-        dbExecute(conn, sql)
-      }
-    })
+    clauses <- c()
+    for (i in 1:nrow(where)) {
+      row <- where[i,, drop=FALSE]
+      clauses <- c(clauses, paste0("(", paste(equalClause(conn, row), collapse=" AND "), ")"))
+    }
+
+    sql <- paste("DELETE FROM", quoted_table, "WHERE", paste(clauses, collapse=" OR "))
+    print(sql)
+    dbExecute(conn, sql)
   }
 
   TRUE
@@ -196,11 +204,15 @@ setClause <- function(conn, row) {
 }
 
 whereClause <- function(conn, row) {
-  paste("WHERE", paste(equalClause(conn, row), collapse="AND"))
+  paste("WHERE", paste(equalClause(conn, row), collapse=" AND "))
+}
+
+singleValuesRow <- function(conn, row) {
+  paste0("(", paste0(lapply(row, function(y) { dbQuoteLiteral(conn, as.character(y)) }), collapse=", "), ")")
 }
 
 valuesClause <- function(conn, records) {
-  paste0(apply(records, 1, function(x) { paste0("(", paste0(lapply(x, function(y) { dbQuoteLiteral(conn, as.character(y)) }), collapse=", "), ")") }), collapse=", ")
+  paste0(apply(records, 1, function(x) { singleValuesRow(conn, x) }), collapse=", ")
 }
 
 insertClause <- function(conn, table, records) {

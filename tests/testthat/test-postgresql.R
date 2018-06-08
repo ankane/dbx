@@ -62,7 +62,7 @@ test_that("upsert missing column raises error", {
 })
 
 test_that("delete works", {
-  delete_orders <- data.frame(id=c(3))
+  delete_orders <- data.frame(id=c(3, 10))
   dbxDelete(con, "orders", where=delete_orders)
   res <- dbxSelect(con, "SELECT * FROM orders ORDER BY id ASC")
   exp <- rbind(orders, new_orders)[c(1, 2, 4), ]
