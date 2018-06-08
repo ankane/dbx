@@ -112,6 +112,8 @@ forecasts <- data.frame(id=c(1, 2), temperature=c(16, 13))
 dbxUpdate(con, "forecasts", forecasts, where_cols=c("id"))
 ```
 
+Use `where_cols` to specify the columns used for lookup. Other columns are written to the table.
+
 ### Upsert
 
 *Atomically* insert if they don’t exist, otherwise update them
@@ -123,7 +125,7 @@ upserted <- dbxUpsert(con, "forecasts", forecasts, where_cols=c("id"))
 
 Returns a data frame of upserted rows. For Postgres, this includes auto-incremented primary keys.
 
-There must be a unique index on the where columns, or an error will be thrown.
+Use `where_cols` to specify the columns used for lookup. There must be a unique index on them, or an error will be thrown.
 
 *Only available for PostgreSQL 9.5+, MySQL 5.5+, and SQLite 3.24+*
 
