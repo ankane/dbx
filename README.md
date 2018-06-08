@@ -141,7 +141,7 @@ dbxDelete(con, table="forecasts", where=bad_records)
 Delete all records
 
 ```r
-dbxDelete(con, "forecasts")
+dbxDelete(con, table="forecasts")
 ```
 
 ## Database Credentials
