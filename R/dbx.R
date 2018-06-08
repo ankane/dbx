@@ -49,7 +49,7 @@ dbxConnect <- function(adapter=NULL, url=NULL, ...) {
     requireLib("RSQLite")
     obj <- RSQLite::SQLite()
   } else {
-    stop("Unknown scheme")
+    stop("Unknown adapter")
   }
 
   do.call(dbConnect, c(obj, params))
