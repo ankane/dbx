@@ -145,7 +145,7 @@ Delete all records (uses `TRUNCATE` when possible for performance)
 dbxDelete(con, table)
 ```
 
-## Logging [master]
+## Logging [github]
 
 Log all SQL queries with:
 
@@ -153,7 +153,7 @@ Log all SQL queries with:
 options(dbx_verbose=TRUE)
 ```
 
-## Batching [master]
+## Batching [github]
 
 By default, operations are performed in a single statement or transaction. This better for performance and prevents partial writes on failures. However, when working with large data frames on production systems, it can be better to break writes into batches. Use the `batch_size` option to do this.
 
