@@ -185,7 +185,7 @@ dbxDelete(db, table, records, where, batch_size=1000)
 Add comments to queries to make it easier to see where time-consuming queries are coming from.
 
 ```r
-options(dbx_comments=TRUE)
+options(dbx_comment=TRUE)
 ```
 
 The comment will be appended to queries, like:
