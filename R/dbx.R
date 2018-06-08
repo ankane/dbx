@@ -90,7 +90,7 @@ dbxInsert <- function(conn, table, records, batch_size=NULL) {
 #' @param where_cols The columns to use for WHERE clause
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
-dbxUpdate <- function(conn, table, records, where_cols) {
+dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
   cols <- colnames(records)
 
   if (!identical(intersect(cols, where_cols), where_cols)) {
@@ -100,12 +100,14 @@ dbxUpdate <- function(conn, table, records, where_cols) {
   update_cols <- setdiff(cols, where_cols)
   quoted_table <- dbQuoteIdentifier(conn, table)
 
-  dbWithTransaction(conn, {
-    for (i in 1:nrow(records)) {
-      row <- records[i,, drop=FALSE]
-      sql <- paste("UPDATE", quoted_table, "SET", setClause(conn, row[update_cols]), whereClause(conn, row[where_cols]))
-      execute(conn, sql)
-    }
+  inBatches(records, batch_size, function(batch) {
+    dbWithTransaction(conn, {
+      for (i in 1:nrow(batch)) {
+        row <- batch[i,, drop=FALSE]
+        sql <- paste("UPDATE", quoted_table, "SET", setClause(conn, row[update_cols]), whereClause(conn, row[where_cols]))
+        execute(conn, sql)
+      }
+    })
   })
 
   TRUE
@@ -119,7 +121,7 @@ dbxUpdate <- function(conn, table, records, where_cols) {
 #' @param where_cols The columns to use for WHERE clause
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
-dbxUpsert <- function(conn, table, records, where_cols) {
+dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
   cols <- colnames(records)
 
   if (!identical(intersect(cols, where_cols), where_cols)) {
@@ -128,28 +130,30 @@ dbxUpsert <- function(conn, table, records, where_cols) {
 
   update_cols <- setdiff(cols, where_cols)
 
-  ret <- data.frame()
+  inBatches(records, batch_size, function(batch) {
+    ret <- data.frame()
 
-  dbWithTransaction(conn, {
-    for (i in 1:nrow(records)) {
-      row <- records[i,, drop=FALSE]
-      sql <- insertClause(conn, table, records)
-      set_sql <- setClause(conn, row[update_cols])
-      conflict_target <- paste0(lapply(where_cols, function(y) { dbQuoteIdentifier(conn, as.character(y)) }), collapse=", ")
+    dbWithTransaction(conn, {
+      for (i in 1:nrow(batch)) {
+        row <- batch[i,, drop=FALSE]
+        sql <- insertClause(conn, table, batch)
+        set_sql <- setClause(conn, row[update_cols])
+        conflict_target <- paste0(lapply(where_cols, function(y) { dbQuoteIdentifier(conn, as.character(y)) }), collapse=", ")
 
-      if (class(conn) == "PostgreSQLConnection") {
-        sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
-      } else if (class(conn) == "MySQLConnection") {
-        sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
-      } else {
-        sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
+        if (class(conn) == "PostgreSQLConnection") {
+          sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
+        } else if (class(conn) == "MySQLConnection") {
+          sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
+        } else {
+          sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
+        }
+
+        ret <- rbind(ret, selectOrExecute(conn, sql, row))
       }
+    })
 
-      ret <- rbind(ret, selectOrExecute(conn, sql, row))
-    }
+    ret
   })
-
-  ret
 }
 
 #' Delete records
@@ -159,7 +163,7 @@ dbxUpsert <- function(conn, table, records, where_cols) {
 #' @param where A data frame of records to delete
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
-dbxDelete <- function(conn, table, where=NULL) {
+dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   quoted_table <- dbQuoteIdentifier(conn, table)
 
   if (is.null(where)) {
@@ -171,21 +175,25 @@ dbxDelete <- function(conn, table, where=NULL) {
     execute(conn, sql)
   } else if (length(where) == 0) {
     # do nothing
-  } else if (length(where) == 1) {
-    quoted_col <- colnames(where)[1]
-    sql <- paste("DELETE FROM", quoted_table, "WHERE", quoted_col, "IN", singleValuesRow(conn, where[, 1]))
-    execute(conn, sql)
   } else {
-    cols <- colnames(where)
+    inBatches(where, batch_size, function(batch_where) {
+      if (length(batch_where) == 1) {
+        quoted_col <- colnames(batch_where)[1]
+        sql <- paste("DELETE FROM", quoted_table, "WHERE", quoted_col, "IN", singleValuesRow(conn, where[, 1]))
+        execute(conn, sql)
+      } else {
+        cols <- colnames(batch_where)
 
-    clauses <- c()
-    for (i in 1:nrow(where)) {
-      row <- where[i,, drop=FALSE]
-      clauses <- c(clauses, paste0("(", paste(equalClause(conn, row), collapse=" AND "), ")"))
-    }
+        clauses <- c()
+        for (i in 1:nrow(batch_where)) {
+          row <- batch_where[i,, drop=FALSE]
+          clauses <- c(clauses, paste0("(", paste(equalClause(conn, row), collapse=" AND "), ")"))
+        }
 
-    sql <- paste("DELETE FROM", quoted_table, "WHERE", paste(clauses, collapse=" OR "))
-    execute(conn, sql)
+        sql <- paste("DELETE FROM", quoted_table, "WHERE", paste(clauses, collapse=" OR "))
+        execute(conn, sql)
+      }
+    })
   }
 
   TRUE
