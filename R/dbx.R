@@ -268,9 +268,13 @@ execute <- function(conn, statement) {
 }
 
 processStatement <- function(statement) {
-  if (any(getOption("dbx_comment"))) {
-    script <- sub(".*=", "", commandArgs()[4])
-    statement <- paste0(statement, " /*script:", script, "*/")
+  comment <- getOption("dbx_comment")
+
+  if (!is.null(comment)) {
+    if (identical(comment, TRUE)) {
+      comment <- paste0("script:", sub(".*=", "", commandArgs()[4]))
+    }
+    statement <- paste0(statement, " /*", comment, "*/")
   }
 
   if (any(getOption("dbx_verbose"))) {

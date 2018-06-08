@@ -194,6 +194,12 @@ The comment will be appended to queries, like:
 SELECT * FROM users /*script:forecast.R*/
 ```
 
+Or set a custom comment
+
+```r
+options(dbx_comment="hi")
+```
+
 ## Reference
 
 To close a connection, use: [github]
