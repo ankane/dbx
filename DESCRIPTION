@@ -4,7 +4,7 @@ Title: Easy Database Operations
 Version: 0.1.0
 Date: 2018-06-07
 Authors@R: person("Andrew", "Kane", email = "andrew@chartkick.com", role = c("aut", "cre"))
-Description: Provides select, insert, update, upsert, and delete database operations. Supports Postgres, MySQL, SQLite, and more, and plays nicely with DBI.
+Description: Provides select, insert, update, upsert, and delete database operations. Supports 'PostgreSQL', 'MySQL', 'SQLite', and more, and plays nicely with the 'DBI' package.
 License: MIT + file LICENSE
 LazyData: TRUE
 RoxygenNote: 6.0.1
