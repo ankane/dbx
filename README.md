@@ -155,7 +155,7 @@ options(dbx_verbose=TRUE)
 
 ## Batching [master]
 
-By default, operations are performed in a single statement or transaction. This better for performance and prevents partial writes on failures. However, when working with really large data frames on production systems, it can be better to break writes into batches. Use the `batch_size` option to do this.
+By default, operations are performed in a single statement or transaction. This better for performance and prevents partial writes on failures. However, when working with large data frames on production systems, it can be better to break writes into batches. Use the `batch_size` option to do this.
 
 ```r
 dbxInsert(con, table, records, batch_size=1000)
