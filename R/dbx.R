@@ -62,6 +62,7 @@ dbxConnect <- function(adapter=NULL, url=NULL, ...) {
 #' @importFrom DBI dbSendQuery dbFetch dbClearResult
 #' @export
 dbxSelect <- function(conn, statement) {
+  log(statement)
   res <- dbSendQuery(conn, statement)
   ret <- dbFetch(res)
   dbClearResult(res)
@@ -73,7 +74,6 @@ dbxSelect <- function(conn, statement) {
 #' @param conn A DBIConnection object
 #' @param table The table name to insert
 #' @param records A data frame of records to insert
-#' @importFrom DBI dbSendQuery dbFetch dbClearResult dbQuoteLiteral
 #' @export
 dbxInsert <- function(conn, table, records) {
   sql <- insertClause(conn, table, records)
@@ -86,7 +86,7 @@ dbxInsert <- function(conn, table, records) {
 #' @param table The table name to update
 #' @param records A data frame of records to insert
 #' @param where_cols The columns to use for WHERE clause
-#' @importFrom DBI dbExecute dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
+#' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
 dbxUpdate <- function(conn, table, records, where_cols) {
   cols <- colnames(records)
@@ -102,7 +102,7 @@ dbxUpdate <- function(conn, table, records, where_cols) {
     for (i in 1:nrow(records)) {
       row <- records[i,, drop=FALSE]
       sql <- paste("UPDATE", quoted_table, "SET", setClause(conn, row[update_cols]), whereClause(conn, row[where_cols]))
-      dbExecute(conn, sql)
+      execute(conn, sql)
     }
   })
 
@@ -115,7 +115,7 @@ dbxUpdate <- function(conn, table, records, where_cols) {
 #' @param table The table name to upsert
 #' @param records A data frame of records to upsert
 #' @param where_cols The columns to use for WHERE clause
-#' @importFrom DBI dbExecute dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
+#' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
 dbxUpsert <- function(conn, table, records, where_cols) {
   cols <- colnames(records)
@@ -155,7 +155,7 @@ dbxUpsert <- function(conn, table, records, where_cols) {
 #' @param conn A DBIConnection object
 #' @param table The table name to delete records from
 #' @param where A data frame of records to delete
-#' @importFrom DBI dbExecute dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
+#' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
 dbxDelete <- function(conn, table, where=NULL) {
   quoted_table <- dbQuoteIdentifier(conn, table)
@@ -166,13 +166,13 @@ dbxDelete <- function(conn, table, where=NULL) {
     } else {
       sql <- paste("DELETE FROM", quoted_table)
     }
-    dbExecute(conn, sql)
+    execute(conn, sql)
   } else if (length(where) == 0) {
     # do nothing
   } else if (length(where) == 1) {
     quoted_col <- colnames(where)[1]
     sql <- paste("DELETE FROM", quoted_table, "WHERE", quoted_col, "IN", singleValuesRow(conn, where[, 1]))
-    dbExecute(conn, sql)
+    execute(conn, sql)
   } else {
     cols <- colnames(where)
 
@@ -183,7 +183,7 @@ dbxDelete <- function(conn, table, where=NULL) {
     }
 
     sql <- paste("DELETE FROM", quoted_table, "WHERE", paste(clauses, collapse=" OR "))
-    dbExecute(conn, sql)
+    execute(conn, sql)
   }
 
   TRUE
@@ -233,7 +233,18 @@ selectOrExecute <- function(conn, sql, records) {
     sql <- paste(sql, "RETURNING *")
     dbxSelect(conn, sql)
   } else {
-    dbExecute(conn, sql)
+    execute(conn, sql)
     records
+  }
+}
+
+execute <- function(conn, statement) {
+  log(statement)
+  dbExecute(conn, statement)
+}
+
+log <- function(statement) {
+  if (any(getOption("dbx_verbose"))) {
+    message(statement)
   }
 }
