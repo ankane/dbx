@@ -2,6 +2,9 @@ language: r
 r: 3.5.0
 sudo: false
 cache: packages
+before_install:
+  - mysql -e 'create database dbx_test;'
+  - psql -c 'create database dbx_test;' -U postgres
 notifications:
   email:
     on_success: never
