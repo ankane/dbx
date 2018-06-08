@@ -7,9 +7,16 @@
 #' @importFrom DBI dbConnect
 #' @export
 #' @examples
+#' # Postgres
 #' con <- dbxConnect(adapter="postgres", dbname="mydb")
+#'
+#' # MySQL
 #' con <- dbxConnect(adapter="mysql", dbname="mydb")
+#'
+#' # SQLite
 #' con <- dbxConnect(adapter="sqlite", dbname=":memory:")
+#'
+#' # Others
 #' con <- dbxConnect(adapter=odbc::odbc(), database="mydb")
 dbxConnect <- function(adapter=NULL, url=NULL, ...) {
   if (is.null(adapter) && is.null(url)) {
@@ -196,9 +203,11 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
 #' @examples
+#' # Delete specific records
 #' bad_records <- data.frame(id=c(1, 2))
 #' dbxDelete(con, table, where=bad_records)
 #'
+#' # Delete all records
 #' dbxDelete(con, table)
 dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   quoted_table <- dbQuoteIdentifier(conn, table)
