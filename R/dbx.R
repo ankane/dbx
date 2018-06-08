@@ -268,7 +268,7 @@ execute <- function(conn, statement) {
 }
 
 processStatement <- function(statement) {
-  if (any(getOption("dbx_origin"))) {
+  if (any(getOption("dbx_comments"))) {
     script <- sub(".*=", "", commandArgs()[4])
     statement <- paste0(statement, " /*script:", script, "*/")
   }

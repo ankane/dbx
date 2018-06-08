@@ -180,12 +180,12 @@ dbxUpsert(db, table, records, where_cols, batch_size=1000)
 dbxDelete(db, table, records, where, batch_size=1000)
 ```
 
-## Origin [github]
+## Query Comments [github]
 
-Add comments to queries to make it easier to see where time-consuming queries are coming from on production systems.
+Add comments to queries to make it easier to see where time-consuming queries are coming from.
 
 ```r
-options(dbx_origin=TRUE)
+options(dbx_comments=TRUE)
 ```
 
 The comment will be appended to queries, like:
