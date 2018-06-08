@@ -61,11 +61,27 @@ test_that("upsert missing column raises error", {
   expect_error(dbxUpsert(con, "orders", update_orders, where_cols=c("missing")), "where_cols not in records")
 })
 
-test_that("delete works", {
-  delete_orders <- data.frame(id=c(3, 10))
+test_that("delete empty does not delete rows", {
+  delete_orders <- data.frame(id=c())
+  dbxDelete(con, "orders", where=delete_orders)
+  res <- dbxSelect(con, "SELECT COUNT(*) AS count FROM orders")
+  exp <- data.frame(count=4)
+  expect_equal(res, exp)
+})
+
+test_that("delete one column works", {
+  delete_orders <- data.frame(id=c(3))
   dbxDelete(con, "orders", where=delete_orders)
   res <- dbxSelect(con, "SELECT * FROM orders ORDER BY id ASC")
   exp <- rbind(orders, new_orders)[c(1, 2, 4), ]
+  rownames(exp) <- NULL
+  expect_equal(res, exp)
+})
+
+test_that("delete multiple columns works", {
+  dbxDelete(con, "orders", where=orders)
+  res <- dbxSelect(con, "SELECT * FROM orders ORDER BY id ASC")
+  exp <- new_orders[c(2), ]
   rownames(exp) <- NULL
   expect_equal(res, exp)
 })

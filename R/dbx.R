@@ -183,7 +183,6 @@ dbxDelete <- function(conn, table, where=NULL) {
     }
 
     sql <- paste("DELETE FROM", quoted_table, "WHERE", paste(clauses, collapse=" OR "))
-    print(sql)
     dbExecute(conn, sql)
   }
 
