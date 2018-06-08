@@ -98,7 +98,7 @@ Insert records
 
 ```r
 forecasts <- data.frame(temperature=c(32, 25))
-inserted <- dbxInsert(con, "forecasts", forecasts)
+inserted <- dbxInsert(con, table="forecasts", records=forecasts)
 ```
 
 Returns a data frame of inserted rows. For Postgres, this includes auto-incremented primary keys.
@@ -109,7 +109,7 @@ Update records
 
 ```r
 forecasts <- data.frame(id=c(1, 2), temperature=c(16, 13))
-dbxUpdate(con, "forecasts", forecasts, where_cols=c("id"))
+dbxUpdate(con, table="forecasts", records=forecasts, where_cols=c("id"))
 ```
 
 Use `where_cols` to specify the columns used for lookup. Other columns are written to the table.
@@ -120,7 +120,7 @@ Use `where_cols` to specify the columns used for lookup. Other columns are writt
 
 ```r
 forecasts <- data.frame(id=c(2, 3), temperature=c(20, 25))
-upserted <- dbxUpsert(con, "forecasts", forecasts, where_cols=c("id"))
+upserted <- dbxUpsert(con, table="forecasts", records=forecasts, where_cols=c("id"))
 ```
 
 Returns a data frame of upserted rows. For Postgres, this includes auto-incremented primary keys.
@@ -135,7 +135,7 @@ Delete specific records
 
 ```r
 forecasts <- data.frame(id=c(1, 2))
-dbxDelete(con, "forecasts", where=forecasts)
+dbxDelete(con, table="forecasts", where=forecasts)
 ```
 
 Delete all records
