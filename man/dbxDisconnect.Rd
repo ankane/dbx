@@ -13,5 +13,5 @@ dbxDisconnect(conn)
 Close a database connection
 }
 \examples{
-dbxDisconnect(conn)
+dbxDisconnect(db)
 }

@@ -21,8 +21,8 @@ Delete records
 \examples{
 # Delete specific records
 bad_records <- data.frame(id=c(1, 2))
-dbxDelete(conn, table, where=bad_records)
+dbxDelete(db, table, where=bad_records)
 
 # Delete all records
-dbxDelete(conn, table)
+dbxDelete(db, table)
 }

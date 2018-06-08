@@ -21,5 +21,5 @@ Insert records
 \examples{
 table <- "forecasts"
 records <- data.frame(temperature=c(32, 25))
-inserts <- dbxInsert(conn, table, records)
+inserts <- dbxInsert(db, table, records)
 }

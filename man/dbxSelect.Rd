@@ -15,5 +15,5 @@ dbxSelect(conn, statement)
 Select records
 }
 \examples{
-records <- dbxSelect(conn, "SELECT * FROM forecasts")
+records <- dbxSelect(db, "SELECT * FROM forecasts")
 }
