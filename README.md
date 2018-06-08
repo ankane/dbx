@@ -99,7 +99,7 @@ Insert records
 ```r
 table <- "forecasts"
 records <- data.frame(temperature=c(32, 25))
-inserted <- dbxInsert(con, table, records)
+inserts <- dbxInsert(con, table, records)
 ```
 
 Returns a data frame of inserted rows. For Postgres, this includes auto-incremented primary keys.
@@ -121,7 +121,7 @@ Use `where_cols` to specify the columns used for lookup. Other columns are writt
 
 ```r
 records <- data.frame(id=c(2, 3), temperature=c(20, 25))
-upserted <- dbxUpsert(con, table, records, where_cols=c("id"))
+upserts <- dbxUpsert(con, table, records, where_cols=c("id"))
 ```
 
 Returns a data frame of upserted rows. For Postgres, this includes auto-incremented primary keys.
@@ -139,7 +139,7 @@ bad_records <- data.frame(id=c(1, 2))
 dbxDelete(con, table, where=bad_records)
 ```
 
-Delete all records
+Delete all records (uses `TRUNCATE` when possible for performance)
 
 ```r
 dbxDelete(con, table)
