@@ -153,31 +153,6 @@ Log all SQL queries with:
 options(dbx_verbose=TRUE)
 ```
 
-## Origin [github]
-
-Add comments to queries to make it easier to see where time-consuming queries are comming from.
-
-```r
-options(dbx_origin=TRUE)
-```
-
-The comment will be appended to queries, like:
-
-```sql
-SELECT * FROM users /*script:forecast.R*/
-```
-
-## Batching [github]
-
-By default, operations are performed in a single statement or transaction. This better for performance and prevents partial writes on failures. However, when working with large data frames on production systems, it can be better to break writes into batches. Use the `batch_size` option to do this.
-
-```r
-dbxInsert(con, table, records, batch_size=1000)
-dbxUpdate(con, table, records, where_cols, batch_size=1000)
-dbxUpsert(con, table, records, where_cols, batch_size=1000)
-dbxDelete(con, table, records, where, batch_size=1000)
-```
-
 ## Database Credentials
 
 Environment variables are a good way to store database credentials. This keeps them outside your source control. It’s also how platforms like [Heroku](https://www.heroku.com) store them.
@@ -192,6 +167,35 @@ And use:
 
 ```r
 con <- dbxConnect()
+```
+
+## Production Systems
+
+This library has a number of features to make it friendly to use on production systems.
+
+### Batching [github]
+
+By default, operations are performed in a single statement or transaction. This better for performance and prevents partial writes on failures. However, when working with large data frames on production systems, it can be better to break writes into batches. Use the `batch_size` option to do this.
+
+```r
+dbxInsert(con, table, records, batch_size=1000)
+dbxUpdate(con, table, records, where_cols, batch_size=1000)
+dbxUpsert(con, table, records, where_cols, batch_size=1000)
+dbxDelete(con, table, records, where, batch_size=1000)
+```
+
+### Origin [github]
+
+Add comments to queries to make it easier to see where time-consuming queries are coming from.
+
+```r
+options(dbx_origin=TRUE)
+```
+
+The comment will be appended to queries, like:
+
+```sql
+SELECT * FROM users /*script:forecast.R*/
 ```
 
 ## Reference
