@@ -89,7 +89,7 @@ con <- dbxConnect(adapter=odbc::odbc(), database="mydb")
 Create a data frame of records from a SQL query
 
 ```r
-forecasts <- dbxSelect(con, "SELECT * FROM forecasts")
+records <- dbxSelect(con, "SELECT * FROM forecasts")
 ```
 
 ### Insert
@@ -97,8 +97,8 @@ forecasts <- dbxSelect(con, "SELECT * FROM forecasts")
 Insert records
 
 ```r
-forecasts <- data.frame(temperature=c(32, 25))
-inserted <- dbxInsert(con, table="forecasts", records=forecasts)
+records <- data.frame(temperature=c(32, 25))
+inserted <- dbxInsert(con, table="forecasts", records=records)
 ```
 
 Returns a data frame of inserted rows. For Postgres, this includes auto-incremented primary keys.
@@ -108,8 +108,8 @@ Returns a data frame of inserted rows. For Postgres, this includes auto-incremen
 Update records
 
 ```r
-forecasts <- data.frame(id=c(1, 2), temperature=c(16, 13))
-dbxUpdate(con, table="forecasts", records=forecasts, where_cols=c("id"))
+records <- data.frame(id=c(1, 2), temperature=c(16, 13))
+dbxUpdate(con, table="forecasts", records=records, where_cols=c("id"))
 ```
 
 Use `where_cols` to specify the columns used for lookup. Other columns are written to the table.
@@ -119,8 +119,8 @@ Use `where_cols` to specify the columns used for lookup. Other columns are writt
 *Atomically* insert if they don’t exist, otherwise update them
 
 ```r
-forecasts <- data.frame(id=c(2, 3), temperature=c(20, 25))
-upserted <- dbxUpsert(con, table="forecasts", records=forecasts, where_cols=c("id"))
+records <- data.frame(id=c(2, 3), temperature=c(20, 25))
+upserted <- dbxUpsert(con, table="forecasts", records=records, where_cols=c("id"))
 ```
 
 Returns a data frame of upserted rows. For Postgres, this includes auto-incremented primary keys.
@@ -134,8 +134,8 @@ Use `where_cols` to specify the columns used for lookup. There must be a unique 
 Delete specific records
 
 ```r
-forecasts <- data.frame(id=c(1, 2))
-dbxDelete(con, table="forecasts", where=forecasts)
+bad_records <- data.frame(id=c(1, 2))
+dbxDelete(con, table="forecasts", where=bad_records)
 ```
 
 Delete all records
