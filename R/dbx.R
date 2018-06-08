@@ -55,6 +55,15 @@ dbxConnect <- function(adapter=NULL, url=NULL, ...) {
   do.call(dbConnect, c(obj, params))
 }
 
+#' Close a database connection
+#'
+#' @param conn A DBIConnection object
+#' @importFrom DBI dbDisconnect
+#' @export
+dbxDisconnect <- function(conn) {
+  dbDisconnect(conn)
+}
+
 #' Select records
 #'
 #' @param conn A DBIConnection object

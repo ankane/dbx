@@ -196,6 +196,12 @@ SELECT * FROM users /*script:forecast.R*/
 
 ## Reference
 
+To close a connection, use: [github]
+
+```r
+dbxDisconnect(con)
+```
+
 All connections are simply [DBI](https://cran.r-project.org/package=DBI) connections, so you can use them with DBI functions as well.
 
 ```r
