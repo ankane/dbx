@@ -1,5 +1,7 @@
 context("postgresql")
 
+skip_on_cran()
+
 con <- dbxConnect(adapter="postgres", dbname="dbx_test")
 
 orders <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
