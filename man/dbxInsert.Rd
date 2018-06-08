@@ -18,3 +18,8 @@ dbxInsert(conn, table, records, batch_size = NULL)
 \description{
 Insert records
 }
+\examples{
+table <- "forecasts"
+records <- data.frame(temperature=c(32, 25))
+inserts <- dbxInsert(con, table, records)
+}

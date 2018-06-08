@@ -14,3 +14,6 @@ dbxSelect(conn, statement)
 \description{
 Select records
 }
+\examples{
+records <- dbxSelect(con, "SELECT * FROM forecasts")
+}

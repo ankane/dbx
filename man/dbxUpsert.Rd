@@ -20,3 +20,7 @@ dbxUpsert(conn, table, records, where_cols, batch_size = NULL)
 \description{
 Upsert records
 }
+\examples{
+records <- data.frame(id=c(2, 3), temperature=c(20, 25))
+upserts <- dbxUpsert(con, table, records, where_cols=c("id"))
+}
