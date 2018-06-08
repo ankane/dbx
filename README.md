@@ -194,7 +194,7 @@ The comment will be appended to queries, like:
 SELECT * FROM users /*script:forecast.R*/
 ```
 
-Or set a custom comment
+Set a custom comment with:
 
 ```r
 options(dbx_comment="hi")
