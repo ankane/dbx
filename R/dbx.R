@@ -1,12 +1,12 @@
 #' Create a database connection
 #'
-#' @param adapter The database adapter to use
 #' @param url A database URL
+#' @param adapter The database adapter to use
 #' @param ... Arguments to pass to dbConnect
 #' @importFrom urltools url_parse get_credentials
 #' @importFrom DBI dbConnect
 #' @export
-dbxConnect <- function(adapter=NULL, url=NULL, ...) {
+dbxConnect <- function(url=NULL, adapter=NULL, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
   }
