@@ -163,15 +163,7 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
           sql <- insertClause(conn, table, row)
           set_sql <- setClause(conn, row[update_cols])
           conflict_target <- paste0(lapply(where_cols, function(y) { dbQuoteIdentifier(conn, as.character(y)) }), collapse=", ")
-
-          if (isPostgres(conn)) {
-            sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
-          } else if (class(conn) == "MySQLConnection") {
-            sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
-          } else {
-            sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
-          }
-
+          sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
           ret <- rbind(ret, selectOrExecute(conn, sql, row))
         }
       })
