@@ -149,28 +149,35 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
   update_cols <- setdiff(cols, where_cols)
 
   inBatches(records, batch_size, function(batch) {
-    ret <- data.frame()
+    if (class(conn) == "MySQLConnection") {
+      sql <- insertClause(conn, table, batch)
+      set_sql <- upsertSetClause(conn, update_cols)
+      sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
+      selectOrExecute(conn, sql, row)
+    } else {
+      ret <- data.frame()
 
-    dbWithTransaction(conn, {
-      for (i in 1:nrow(batch)) {
-        row <- batch[i,, drop=FALSE]
-        sql <- insertClause(conn, table, batch)
-        set_sql <- setClause(conn, row[update_cols])
-        conflict_target <- paste0(lapply(where_cols, function(y) { dbQuoteIdentifier(conn, as.character(y)) }), collapse=", ")
+      dbWithTransaction(conn, {
+        for (i in 1:nrow(batch)) {
+          row <- batch[i,, drop=FALSE]
+          sql <- insertClause(conn, table, row)
+          set_sql <- setClause(conn, row[update_cols])
+          conflict_target <- paste0(lapply(where_cols, function(y) { dbQuoteIdentifier(conn, as.character(y)) }), collapse=", ")
 
-        if (isPostgres(conn)) {
-          sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
-        } else if (class(conn) == "MySQLConnection") {
-          sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
-        } else {
-          sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
+          if (isPostgres(conn)) {
+            sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
+          } else if (class(conn) == "MySQLConnection") {
+            sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
+          } else {
+            sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
+          }
+
+          ret <- rbind(ret, selectOrExecute(conn, sql, row))
         }
+      })
 
-        ret <- rbind(ret, selectOrExecute(conn, sql, row))
-      }
-    })
-
-    ret
+      ret
+    }
   })
 }
 
@@ -225,6 +232,13 @@ equalClause <- function(conn, row) {
     set <- c(set, paste(dbQuoteIdentifier(conn, i), "=", dbQuoteLiteral(conn, as.character(row[i][[1]]))))
   }
   set
+}
+
+upsertSetClause <- function(conn, cols) {
+  paste0(lapply(cols, function(x) {
+    col <- dbQuoteIdentifier(conn, as.character(x))
+    paste0(col, " = VALUES(", col, ")")
+  }), collapse=", ")
 }
 
 setClause <- function(conn, row) {

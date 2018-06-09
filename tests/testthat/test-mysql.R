@@ -45,15 +45,10 @@ test_that("update missing column raises error", {
 })
 
 test_that("upsert works", {
-  upsert_orders <- data.frame(id=c(3), city=c("Boston"))
+  upsert_orders <- data.frame(id=c(3, 5), city=c("Boston", "Chicago"))
   dbxUpsert(db, "orders", upsert_orders, where_cols=c("id"))
-  res <- dbxSelect(db, "SELECT city FROM orders WHERE id = 3")
-  expect_equal(c("Boston"), res$city)
-
-  upsert_orders <- data.frame(id=c(5), city=c("Chicago"))
-  dbxUpsert(db, "orders", upsert_orders, where_cols=c("id"))
-  res <- dbxSelect(db, "SELECT city FROM orders WHERE id = 5")
-  expect_equal(c("Chicago"), res$city)
+  res <- dbxSelect(db, "SELECT city FROM orders WHERE id IN (3, 5)")
+  expect_equal(c("Boston", "Chicago"), res$city)
   dbxDelete(db, "orders", data.frame(id=c(5)))
 })
 
