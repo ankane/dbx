@@ -60,7 +60,7 @@ test_that("delete empty does not delete rows", {
   delete_orders <- data.frame(id=c())
   dbxDelete(db, "orders", where=delete_orders)
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM orders")
-  expect_equal(4, as.integer(res$count))
+  expect_equal(4, res$count)
 })
 
 test_that("delete one column works", {
@@ -83,7 +83,7 @@ test_that("delete multiple columns works", {
 test_that("delete all works", {
   dbxDelete(db, "orders")
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM orders")
-  expect_equal(0, as.integer(res$count))
+  expect_equal(0, res$count)
 })
 
 test_that("insert batch size works", {
