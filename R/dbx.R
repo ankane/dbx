@@ -221,8 +221,8 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
 equalClause <- function(conn, row) {
   cols <- colnames(row)
   set <- c()
-  for (c in cols) {
-    set <- c(set, paste(dbQuoteIdentifier(conn, c), "=", dbQuoteLiteral(conn, as.character(row[c][[1]]))))
+  for (i in cols) {
+    set <- c(set, paste(dbQuoteIdentifier(conn, i), "=", dbQuoteLiteral(conn, as.character(row[i][[1]]))))
   }
   set
 }
