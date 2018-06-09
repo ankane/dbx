@@ -146,7 +146,7 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
   update_cols <- setdiff(cols, where_cols)
 
   inBatches(records, batch_size, function(batch) {
-    if (class(conn) == "MySQLConnection") {
+    if (isMySQL(conn)) {
       sql <- insertClause(conn, table, batch)
       set_sql <- upsertSetClause(conn, update_cols)
       sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
@@ -173,7 +173,7 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   quoted_table <- dbQuoteIdentifier(conn, table)
 
   if (is.null(where)) {
-    if (isPostgres(conn) || class(conn) == "MySQLConnection") {
+    if (isPostgres(conn) || isMySQL(conn)) {
       sql <- paste("TRUNCATE", quoted_table)
     } else {
       sql <- paste("DELETE FROM", quoted_table)
@@ -264,6 +264,10 @@ requireLib <- function(name) {
 
 isPostgres <- function(conn) {
   class(conn) == "PostgreSQLConnection" || class(conn) == "PqConnection"
+}
+
+isMySQL <- function(conn) {
+  class(conn) == "MySQLConnection"
 }
 
 selectOrExecute <- function(conn, sql, records) {
