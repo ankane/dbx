@@ -154,7 +154,7 @@ Delete all records (uses `TRUNCATE` when possible for performance)
 dbxDelete(db, table)
 ```
 
-## Logging [github]
+## Logging
 
 Log all SQL queries with:
 
@@ -178,7 +178,7 @@ And use:
 db <- dbxConnect()
 ```
 
-## Batching [github]
+## Batching
 
 By default, operations are performed in a single statement or transaction. This better for performance and prevents partial writes on failures. However, when working with large data frames on production systems, it can be better to break writes into batches. Use the `batch_size` option to do this.
 
@@ -189,7 +189,7 @@ dbxUpsert(db, table, records, where_cols, batch_size=1000)
 dbxDelete(db, table, records, where, batch_size=1000)
 ```
 
-## Query Comments [github]
+## Query Comments
 
 Add comments to queries to make it easier to see where time-consuming queries are coming from.
 
@@ -211,7 +211,7 @@ options(dbx_comment="hi")
 
 ## Reference
 
-To close a connection, use: [github]
+To close a connection, use:
 
 ```r
 dbxDisconnect(db)

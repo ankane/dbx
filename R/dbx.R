@@ -40,14 +40,8 @@ dbxConnect <- function(adapter=NULL, url=NULL, ...) {
   if (!is.character(adapter)) {
     obj <- adapter
   } else if (grepl("postgres", adapter)) {
-    # prefer RPostgres
-    if (requireNamespace("RPostgres", quietly=TRUE)) {
-      obj <- RPostgres::Postgres()
-    } else if (requireNamespace("RPostgreSQL", quietly=TRUE)) {
-      obj <- RPostgreSQL::PostgreSQL()
-    } else {
-      stop("Could not load adapter: RPostgres")
-    }
+    requireLib("RPostgres")
+    obj <- RPostgres::Postgres()
   } else if (grepl("mysql", adapter)) {
     requireLib("RMySQL")
     obj <- RMySQL::MySQL()
