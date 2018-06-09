@@ -11,12 +11,14 @@ dbxConnect <- function(adapter=NULL, url=NULL, ...) {
     url <- Sys.getenv("DATABASE_URL")
   }
 
+  params <- list(...)
+
   if (!is.null(url)) {
     uri <- url_parse(url)
     creds <- get_credentials(url)
     adapter <- uri$scheme
 
-    params <- list(dbname=uri$path)
+    params$dbname <- uri$path
 
     if (!is.na(uri$domain)) {
       params$host <- uri$domain
@@ -33,8 +35,6 @@ dbxConnect <- function(adapter=NULL, url=NULL, ...) {
     if (!is.na(creds$authentication)) {
       params$password <- creds$authentication
     }
-  } else {
-    params <- list(...)
   }
 
   if (!is.character(adapter)) {
@@ -42,6 +42,9 @@ dbxConnect <- function(adapter=NULL, url=NULL, ...) {
   } else if (grepl("postgres", adapter)) {
     requireLib("RPostgres")
     obj <- RPostgres::Postgres()
+    if (is.null(params$bigint)) {
+      params$bigint <- "numeric"
+    }
   } else if (grepl("mysql", adapter)) {
     requireLib("RMySQL")
     obj <- RMySQL::MySQL()
