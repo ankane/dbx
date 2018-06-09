@@ -155,17 +155,16 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
       sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
       selectOrExecute(conn, sql, batch)
     } else if (isPostgres(conn)) {
-      conflict_target <- paste0(lapply(where_cols, function(y) { dbQuoteIdentifier(conn, as.character(y)) }), collapse=", ")
+      conflict_target <- colsClause(conn, where_cols)
       sql <- insertClause(conn, table, batch)
       set_sql <- upsertSetClausePostgres(conn, update_cols)
       sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
       selectOrExecute(conn, sql, batch)
     } else {
       ret <- data.frame()
+      conflict_target <- colsClause(conn, where_cols)
 
       dbWithTransaction(conn, {
-        conflict_target <- paste0(lapply(where_cols, function(y) { dbQuoteIdentifier(conn, as.character(y)) }), collapse=", ")
-
         for (i in 1:nrow(batch)) {
           row <- batch[i,, drop=FALSE]
           sql <- insertClause(conn, table, row)
@@ -247,6 +246,10 @@ upsertSetClausePostgres <- function(conn, cols) {
   }), collapse=", ")
 }
 
+colsClause <- function(conn, cols) {
+   paste0(lapply(cols, function(y) { dbQuoteIdentifier(conn, y) }), collapse=", ")
+}
+
 setClause <- function(conn, row) {
   paste0(equalClause(conn, row), collapse=", ")
 }
@@ -266,9 +269,9 @@ valuesClause <- function(conn, records) {
 insertClause <- function(conn, table, records) {
   cols <- colnames(records)
   quoted_table <- dbQuoteIdentifier(conn, table)
-  quoted_cols <- lapply(cols, function(x) { dbQuoteIdentifier(conn, as.character(x)) })
+  quoted_cols <- colsClause(conn, cols)
   records_sql <- valuesClause(conn, records)
-  paste0("INSERT INTO ", quoted_table, " (", paste0(quoted_cols, collapse=", "), ") VALUES ", records_sql)
+  paste0("INSERT INTO ", quoted_table, " (", quoted_cols, ") VALUES ", records_sql)
 }
 
 requireLib <- function(name) {
