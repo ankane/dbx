@@ -153,16 +153,23 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
       sql <- insertClause(conn, table, batch)
       set_sql <- upsertSetClause(conn, update_cols)
       sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
-      selectOrExecute(conn, sql, row)
+      selectOrExecute(conn, sql, batch)
+    } else if (isPostgres(conn)) {
+      conflict_target <- paste0(lapply(where_cols, function(y) { dbQuoteIdentifier(conn, as.character(y)) }), collapse=", ")
+      sql <- insertClause(conn, table, batch)
+      set_sql <- upsertSetClausePostgres(conn, update_cols)
+      sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
+      selectOrExecute(conn, sql, batch)
     } else {
       ret <- data.frame()
 
       dbWithTransaction(conn, {
+        conflict_target <- paste0(lapply(where_cols, function(y) { dbQuoteIdentifier(conn, as.character(y)) }), collapse=", ")
+
         for (i in 1:nrow(batch)) {
           row <- batch[i,, drop=FALSE]
           sql <- insertClause(conn, table, row)
           set_sql <- setClause(conn, row[update_cols])
-          conflict_target <- paste0(lapply(where_cols, function(y) { dbQuoteIdentifier(conn, as.character(y)) }), collapse=", ")
           sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
           ret <- rbind(ret, selectOrExecute(conn, sql, row))
         }
@@ -230,6 +237,13 @@ upsertSetClause <- function(conn, cols) {
   paste0(lapply(cols, function(x) {
     col <- dbQuoteIdentifier(conn, as.character(x))
     paste0(col, " = VALUES(", col, ")")
+  }), collapse=", ")
+}
+
+upsertSetClausePostgres <- function(conn, cols) {
+  paste0(lapply(cols, function(x) {
+    col <- dbQuoteIdentifier(conn, as.character(x))
+    paste0(col, " = excluded.", col)
   }), collapse=", ")
 }
 
