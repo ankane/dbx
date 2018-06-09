@@ -148,27 +148,12 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
       set_sql <- upsertSetClause(conn, update_cols)
       sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
       selectOrExecute(conn, sql, batch)
-    } else if (isPostgres(conn)) {
+    } else {
       conflict_target <- colsClause(conn, where_cols)
       sql <- insertClause(conn, table, batch)
       set_sql <- upsertSetClausePostgres(conn, update_cols)
       sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
       selectOrExecute(conn, sql, batch)
-    } else {
-      ret <- data.frame()
-      conflict_target <- colsClause(conn, where_cols)
-
-      dbWithTransaction(conn, {
-        for (i in 1:nrow(batch)) {
-          row <- batch[i,, drop=FALSE]
-          sql <- insertClause(conn, table, row)
-          set_sql <- setClause(conn, row[update_cols])
-          sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
-          ret <- rbind(ret, selectOrExecute(conn, sql, row))
-        }
-      })
-
-      ret
     }
   })
 }
