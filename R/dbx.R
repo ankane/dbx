@@ -40,8 +40,14 @@ dbxConnect <- function(adapter=NULL, url=NULL, ...) {
   if (!is.character(adapter)) {
     obj <- adapter
   } else if (grepl("postgres", adapter)) {
-    requireLib("RPostgreSQL")
-    obj <- RPostgreSQL::PostgreSQL()
+    # prefer RPostgres
+    if (requireNamespace("RPostgres", quietly=TRUE)) {
+      obj <- RPostgres::Postgres()
+    } else if (requireNamespace("RPostgreSQL", quietly=TRUE)) {
+      obj <- RPostgreSQL::PostgreSQL()
+    } else {
+      stop("Could not load adapter: RPostgres")
+    }
   } else if (grepl("mysql", adapter)) {
     requireLib("RMySQL")
     obj <- RMySQL::MySQL()
@@ -152,7 +158,7 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
         set_sql <- setClause(conn, row[update_cols])
         conflict_target <- paste0(lapply(where_cols, function(y) { dbQuoteIdentifier(conn, as.character(y)) }), collapse=", ")
 
-        if (class(conn) == "PostgreSQLConnection") {
+        if (isPostgres(conn)) {
           sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
         } else if (class(conn) == "MySQLConnection") {
           sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
@@ -180,7 +186,7 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   quoted_table <- dbQuoteIdentifier(conn, table)
 
   if (is.null(where)) {
-    if (class(conn) == "PostgreSQLConnection" || class(conn) == "MySQLConnection") {
+    if (isPostgres(conn) || class(conn) == "MySQLConnection") {
       sql <- paste("TRUNCATE", quoted_table)
     } else {
       sql <- paste("DELETE FROM", quoted_table)
@@ -251,8 +257,12 @@ requireLib <- function(name) {
   }
 }
 
+isPostgres <- function(conn) {
+  class(conn) == "PostgreSQLConnection" || class(conn) == "PqConnection"
+}
+
 selectOrExecute <- function(conn, sql, records) {
-  if (class(conn) == "PostgreSQLConnection") {
+  if (isPostgres(conn)) {
     sql <- paste(sql, "RETURNING *")
     dbxSelect(conn, sql)
   } else {

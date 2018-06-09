@@ -27,7 +27,7 @@ And follow the instructions for your database library
 Install the R package
 
 ```r
-install.packages("RPostgreSQL")
+install.packages("RPostgres")
 ```
 
 And use:

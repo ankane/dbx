@@ -65,7 +65,7 @@ test_that("delete empty does not delete rows", {
   delete_orders <- data.frame(id=c())
   dbxDelete(db, "orders", where=delete_orders)
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM orders")
-  exp <- data.frame(count=4)
+  exp <- data.frame(count=bit64::as.integer64(4))
   expect_equal(res, exp)
 })
 
@@ -89,7 +89,7 @@ test_that("delete multiple columns works", {
 test_that("delete all works", {
   dbxDelete(db, "orders")
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM orders")
-  exp <- data.frame(count=0)
+  exp <- data.frame(count=bit64::as.integer64(0))
   expect_equal(res, exp)
 })
 
