@@ -1,6 +1,15 @@
 # dbx
 
-:fire: Easy database operations for R, including upsert
+:fire: A fast, easy-to-use database library for R
+
+- Intuitive functions
+- High performance batch operations where possible
+- Safe inserts, updates, and deletes without writing SQL
+- Upserts!!
+- Plays nicely with auto-incrementing primary keys
+- Built on top of [DBI](https://cran.r-project.org/package=DBI)
+
+Designed for both research and production environments
 
 Supports Postgres, MySQL, SQLite, and more
 
