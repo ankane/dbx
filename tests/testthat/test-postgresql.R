@@ -8,16 +8,16 @@ orders <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFac
 new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFactors=FALSE)
 
 dbExecute(db, "DROP TABLE IF EXISTS orders")
-dbExecute(db, "CREATE TABLE orders (id SERIAL PRIMARY KEY, city text)")
+dbExecute(db, "CREATE TABLE orders (id SERIAL PRIMARY KEY, city text, other text)")
 dbxInsert(db, "orders", orders[c("city")])
 
 test_that("select works", {
-  res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
+  res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC")
   expect_equal(res, orders)
 })
 
 test_that("select order works", {
-  res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id DESC")
+  res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id DESC")
   expect_equal(res, reverse(orders))
 })
 
@@ -67,7 +67,7 @@ test_that("delete empty does not delete rows", {
 test_that("delete one column works", {
   delete_orders <- data.frame(id=c(3))
   dbxDelete(db, "orders", where=delete_orders)
-  res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
+  res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC")
   exp <- rbind(orders, new_orders)[c(1, 2, 4), ]
   rownames(exp) <- NULL
   expect_equal(res, exp)
@@ -75,7 +75,7 @@ test_that("delete one column works", {
 
 test_that("delete multiple columns works", {
   dbxDelete(db, "orders", where=orders)
-  res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
+  res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC")
   exp <- new_orders[c(2), ]
   rownames(exp) <- NULL
   expect_equal(res, exp)

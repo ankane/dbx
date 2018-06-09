@@ -284,7 +284,16 @@ isPostgres <- function(conn) {
 selectOrExecute <- function(conn, sql, records) {
   if (isPostgres(conn)) {
     sql <- paste(sql, "RETURNING *")
-    dbxSelect(conn, sql)
+    ret <- dbxSelect(conn, sql)
+
+    ret_cols <- c()
+    for (i in colnames(ret)) {
+      if (i %in% colnames(records) || !all(is.na(ret[i]))) {
+        ret_cols <- c(ret_cols, i)
+      }
+    }
+
+    ret[, ret_cols]
   } else {
     execute(conn, sql)
     records
