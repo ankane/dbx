@@ -6,6 +6,20 @@
 #' @importFrom urltools url_parse get_credentials
 #' @importFrom DBI dbConnect
 #' @export
+#' @examples \dontrun{
+#'
+#' # Postgres
+#' db <- dbxConnect(adapter="postgres", dbname="mydb")
+#'
+#' # MySQL
+#' db <- dbxConnect(adapter="mysql", dbname="mydb")
+#'
+#' # SQLite
+#' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
+#'
+#' # Others
+#' db <- dbxConnect(adapter=odbc(), database="mydb")
+#' }
 dbxConnect <- function(url=NULL, adapter=NULL, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
@@ -63,6 +77,10 @@ dbxConnect <- function(url=NULL, adapter=NULL, ...) {
 #' @param conn A DBIConnection object
 #' @importFrom DBI dbDisconnect
 #' @export
+#' @examples \dontrun{
+#'
+#' dbxDisconnect(db)
+#' }
 dbxDisconnect <- function(conn) {
   dbDisconnect(conn)
 }
@@ -73,6 +91,11 @@ dbxDisconnect <- function(conn) {
 #' @param statement The SQL statement to use
 #' @importFrom DBI dbSendQuery dbFetch dbClearResult
 #' @export
+#' @examples \dontrun{
+#'
+#' records <- dbxSelect(db, "SELECT * FROM forecasts")
+#'
+#' }
 dbxSelect <- function(conn, statement) {
   statement <- processStatement(statement)
   res <- dbSendQuery(conn, statement)
@@ -88,6 +111,12 @@ dbxSelect <- function(conn, statement) {
 #' @param records A data frame of records to insert
 #' @param batch_size The number of records to insert in a single statement (defaults to all)
 #' @export
+#' @examples \dontrun{
+#'
+#' table <- "forecasts"
+#' records <- data.frame(temperature=c(32, 25))
+#' inserts <- dbxInsert(db, table, records)
+#' }
 dbxInsert <- function(conn, table, records, batch_size=NULL) {
   inBatches(records, batch_size, function(batch) {
     sql <- insertClause(conn, table, batch)
@@ -104,6 +133,11 @@ dbxInsert <- function(conn, table, records, batch_size=NULL) {
 #' @param batch_size The number of records to update in a single transaction (defaults to all)
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
+#' @examples \dontrun{
+#'
+#' records <- data.frame(id=c(1, 2), temperature=c(16, 13))
+#' dbxUpdate(db, table, records, where_cols=c("id"))
+#' }
 dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
   cols <- colnames(records)
 
@@ -136,6 +170,11 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @param batch_size The number of records to upsert in a single transaction (defaults to all)
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
+#' @examples \dontrun{
+#'
+#' records <- data.frame(id=c(2, 3), temperature=c(20, 25))
+#' upserts <- dbxUpsert(db, table, records, where_cols=c("id"))
+#' }
 dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
   cols <- colnames(records)
 
@@ -169,6 +208,15 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @param batch_size The number of records to delete in a single statement (defaults to all)
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
+#' @examples \dontrun{
+#'
+#' # Delete specific records
+#' bad_records <- data.frame(id=c(1, 2))
+#' dbxDelete(db, table, where=bad_records)
+#'
+#' # Delete all records
+#' dbxDelete(db, table)
+#' }
 dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   quoted_table <- dbQuoteIdentifier(conn, table)
 

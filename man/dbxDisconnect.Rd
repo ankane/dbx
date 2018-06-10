@@ -12,3 +12,9 @@ dbxDisconnect(conn)
 \description{
 Close a database connection
 }
+\examples{
+\dontrun{
+
+dbxDisconnect(db)
+}
+}

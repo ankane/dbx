@@ -16,3 +16,19 @@ dbxConnect(url = NULL, adapter = NULL, ...)
 \description{
 Create a database connection
 }
+\examples{
+\dontrun{
+
+# Postgres
+db <- dbxConnect(adapter="postgres", dbname="mydb")
+
+# MySQL
+db <- dbxConnect(adapter="mysql", dbname="mydb")
+
+# SQLite
+db <- dbxConnect(adapter="sqlite", dbname=":memory:")
+
+# Others
+db <- dbxConnect(adapter=odbc(), database="mydb")
+}
+}

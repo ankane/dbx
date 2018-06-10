@@ -14,3 +14,10 @@ dbxSelect(conn, statement)
 \description{
 Select records
 }
+\examples{
+\dontrun{
+
+records <- dbxSelect(db, "SELECT * FROM forecasts")
+
+}
+}
