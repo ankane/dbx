@@ -4,12 +4,12 @@
 \alias{dbxConnect}
 \title{Create a database connection}
 \usage{
-dbxConnect(adapter = NULL, url = NULL, ...)
+dbxConnect(url = NULL, adapter = NULL, ...)
 }
 \arguments{
-\item{adapter}{The database adapter to use}
-
 \item{url}{A database URL}
+
+\item{adapter}{The database adapter to use}
 
 \item{...}{Arguments to pass to dbConnect}
 }
