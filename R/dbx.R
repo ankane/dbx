@@ -158,7 +158,7 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
     })
   })
 
-  TRUE
+  invisible()
 }
 
 #' Upsert records
@@ -250,7 +250,7 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
     })
   }
 
-  TRUE
+  invisible()
 }
 
 equalClause <- function(conn, row) {
@@ -330,10 +330,10 @@ selectOrExecute <- function(conn, sql, records) {
       }
     }
 
-    ret[, ret_cols]
+    invisible(ret[, ret_cols])
   } else {
     execute(conn, sql)
-    records
+    invisible(records)
   }
 }
 
