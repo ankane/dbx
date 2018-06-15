@@ -33,8 +33,6 @@ And follow the instructions for your database library
 - [SQLite](#sqlite)
 - [Others](#others)
 
-### Jetpack
-
 To install with [Jetpack](https://github.com/ankane/jetpack), use:
 
 ```sh
