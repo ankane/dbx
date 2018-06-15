@@ -2,7 +2,7 @@ Package: dbx
 Type: Package
 Title: A Fast, Easy-to-Use Database Interface
 Version: 0.1.0
-Date: 2018-06-07
+Date: 2018-06-15
 Authors@R: person("Andrew", "Kane", email = "andrew@chartkick.com", role = c("aut", "cre"))
 Description: Provides select, insert, update, upsert, and delete database operations. Supports 'PostgreSQL', 'MySQL', 'SQLite', and more, and plays nicely with the 'DBI' package.
 URL: https://github.com/ankane/dbx
