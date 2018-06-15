@@ -167,7 +167,7 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @param table The table name to upsert
 #' @param records A data frame of records to upsert
 #' @param where_cols The columns to use for WHERE clause
-#' @param batch_size The number of records to upsert in a single transaction (defaults to all)
+#' @param batch_size The number of records to upsert in a single statement (defaults to all)
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
 #' @examples \dontrun{

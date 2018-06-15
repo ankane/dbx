@@ -15,7 +15,7 @@ dbxUpsert(conn, table, records, where_cols, batch_size = NULL)
 
 \item{where_cols}{The columns to use for WHERE clause}
 
-\item{batch_size}{The number of records to upsert in a single transaction (defaults to all)}
+\item{batch_size}{The number of records to upsert in a single statement (defaults to all)}
 }
 \description{
 Upsert records
