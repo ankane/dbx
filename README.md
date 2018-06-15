@@ -219,6 +219,17 @@ Set a custom comment with:
 options(dbx_comment="hi")
 ```
 
+## Transactions
+
+To perform multiple operations in a single transaction, use:
+
+```r
+DBI::dbWithTransaction(db, {
+  dbxInsert(db, ...)
+  dbxDelete(db, ...)
+})
+```
+
 ## Reference
 
 To close a connection, use:
