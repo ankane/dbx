@@ -1,6 +1,6 @@
 Package: dbx
 Type: Package
-Title: A Fast, Easy-to-Use Database Library
+Title: A Fast, Easy-to-Use Database Interface
 Version: 0.1.0
 Date: 2018-06-07
 Authors@R: person("Andrew", "Kane", email = "andrew@chartkick.com", role = c("aut", "cre"))
