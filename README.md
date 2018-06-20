@@ -57,6 +57,8 @@ db <- dbxConnect(adapter="postgres", dbname="mydb")
 
 You can also pass `user`, `password`, `host`, `port`, and `url`.
 
+> Works with RPostgreSQL as well
+
 ### MySQL
 
 Install the R package
