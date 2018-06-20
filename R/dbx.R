@@ -371,7 +371,10 @@ processStatement <- function(statement) {
     statement <- paste0(statement, " /*", comment, "*/")
   }
 
-  if (any(getOption("dbx_verbose"))) {
+  verbose <- getOption("dbx_verbose")
+  if (is.function(verbose)) {
+    verbose(statement)
+  } else if (any(verbose)) {
     message(statement)
   }
 
