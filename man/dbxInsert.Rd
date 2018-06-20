@@ -19,10 +19,11 @@ dbxInsert(conn, table, records, batch_size = NULL)
 Insert records
 }
 \examples{
-\dontrun{
-
+\donttest{
+db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 table <- "forecasts"
 records <- data.frame(temperature=c(32, 25))
+
 inserts <- dbxInsert(db, table, records)
 }
 }

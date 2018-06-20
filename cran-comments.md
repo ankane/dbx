@@ -2,8 +2,7 @@
 
 This is a resubmission. In this version I have:
 
-* Changed "Library" to "Interface" in the title
-* Added examples
+* Improved examples
 
 ## Test environments
 

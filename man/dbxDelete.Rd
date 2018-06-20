@@ -19,7 +19,9 @@ dbxDelete(conn, table, where = NULL, batch_size = NULL)
 Delete records
 }
 \examples{
-\dontrun{
+\donttest{
+db <- dbxConnect(adapter="sqlite", dbname=":memory:")
+table <- "forecasts"
 
 # Delete specific records
 bad_records <- data.frame(id=c(1, 2))

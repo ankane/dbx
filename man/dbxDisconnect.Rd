@@ -13,7 +13,8 @@ dbxDisconnect(conn)
 Close a database connection
 }
 \examples{
-\dontrun{
+\donttest{
+db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 
 dbxDisconnect(db)
 }
