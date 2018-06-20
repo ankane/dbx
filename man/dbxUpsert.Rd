@@ -21,7 +21,8 @@ dbxUpsert(conn, table, records, where_cols, batch_size = NULL)
 Upsert records
 }
 \examples{
-\donttest{
+\dontrun{
+
 db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 table <- "forecasts"
 records <- data.frame(id=c(2, 3), temperature=c(20, 25))

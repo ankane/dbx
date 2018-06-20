@@ -17,7 +17,8 @@ dbxConnect(url = NULL, adapter = NULL, ...)
 Create a database connection
 }
 \examples{
-\donttest{
+\dontrun{
+
 # Postgres
 db <- dbxConnect(adapter="postgres", dbname="mydb")
 

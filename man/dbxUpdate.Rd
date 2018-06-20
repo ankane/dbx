@@ -21,7 +21,8 @@ dbxUpdate(conn, table, records, where_cols, batch_size = NULL)
 Update records
 }
 \examples{
-\donttest{
+\dontrun{
+
 db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 table <- "forecasts"
 records <- data.frame(id=c(1, 2), temperature=c(16, 13))

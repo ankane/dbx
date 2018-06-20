@@ -6,7 +6,8 @@
 #' @importFrom urltools url_parse get_credentials
 #' @importFrom DBI dbConnect
 #' @export
-#' @examples \donttest{
+#' @examples \dontrun{
+#'
 #' # Postgres
 #' db <- dbxConnect(adapter="postgres", dbname="mydb")
 #'
@@ -76,7 +77,7 @@ dbxConnect <- function(url=NULL, adapter=NULL, ...) {
 #' @param conn A DBIConnection object
 #' @importFrom DBI dbDisconnect
 #' @export
-#' @examples \donttest{
+#' @examples
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 #'
 #' dbxDisconnect(db)
@@ -91,7 +92,8 @@ dbxDisconnect <- function(conn) {
 #' @param statement The SQL statement to use
 #' @importFrom DBI dbSendQuery dbFetch dbClearResult
 #' @export
-#' @examples \donttest{
+#' @examples \dontrun{
+#'
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 #'
 #' records <- dbxSelect(db, "SELECT * FROM forecasts")
@@ -112,7 +114,8 @@ dbxSelect <- function(conn, statement) {
 #' @param records A data frame of records to insert
 #' @param batch_size The number of records to insert in a single statement (defaults to all)
 #' @export
-#' @examples \donttest{
+#' @examples \dontrun{
+#'
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 #' table <- "forecasts"
 #' records <- data.frame(temperature=c(32, 25))
@@ -135,7 +138,8 @@ dbxInsert <- function(conn, table, records, batch_size=NULL) {
 #' @param batch_size The number of records to update in a single transaction (defaults to all)
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
-#' @examples \donttest{
+#' @examples \dontrun{
+#'
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 #' table <- "forecasts"
 #' records <- data.frame(id=c(1, 2), temperature=c(16, 13))
@@ -174,7 +178,8 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @param batch_size The number of records to upsert in a single statement (defaults to all)
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
-#' @examples \donttest{
+#' @examples \dontrun{
+#'
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 #' table <- "forecasts"
 #' records <- data.frame(id=c(2, 3), temperature=c(20, 25))
@@ -214,7 +219,8 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @param batch_size The number of records to delete in a single statement (defaults to all)
 #' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
-#' @examples \donttest{
+#' @examples \dontrun{
+#'
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 #' table <- "forecasts"
 #'
