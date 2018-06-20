@@ -81,7 +81,6 @@ dbxConnect <- function(url=NULL, adapter=NULL, ...) {
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 #'
 #' dbxDisconnect(db)
-#' }
 dbxDisconnect <- function(conn) {
   dbDisconnect(conn)
 }

@@ -12,3 +12,8 @@ dbxDisconnect(conn)
 \description{
 Close a database connection
 }
+\examples{
+db <- dbxConnect(adapter="sqlite", dbname=":memory:")
+
+dbxDisconnect(db)
+}
