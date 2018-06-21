@@ -314,7 +314,11 @@ singleValuesRow <- function(conn, row) {
 }
 
 valuesClause <- function(conn, records) {
-  paste0(apply(records, 1, function(x) { singleValuesRow(conn, x) }), collapse=", ")
+  quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
+  for (i in 1:ncol(records)) {
+    quoted_records[, i] <- dbQuoteLiteral(conn, records[, i])
+  }
+  paste0(apply(quoted_records, 1, function(x) { paste0("(", paste0(x, collapse=", "), ")") }), collapse=", ")
 }
 
 insertClause <- function(conn, table, records) {
