@@ -111,7 +111,7 @@ dbxSelect <- function(conn, statement) {
     ret[[length(ret) + 1]] <- dbFetch(res)
   }
   dbClearResult(res)
-  do.call(rbind, ret)
+  combineResults(ret)
 }
 
 #' Insert records
@@ -399,6 +399,15 @@ inBatches <- function(records, batch_size, f) {
       }
       ret[[length(ret) + 1]] <- f(records[start:end,, drop=FALSE])
     }
+    combineResults(ret)
+  }
+}
+
+# https://stackoverflow.com/questions/2851327/convert-a-list-of-data-frames-into-one-data-frame
+combineResults <- function(ret) {
+  if (requireNamespace("dplyr", quietly=TRUE)) {
+    dplyr::bind_rows(ret)
+  } else {
     do.call(rbind, ret)
   }
 }
