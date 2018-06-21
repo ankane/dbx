@@ -251,20 +251,17 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   } else if (length(where) == 0) {
     # do nothing
   } else {
+    cols <- colnames(where)
+    quoted_cols <- dbQuoteIdentifier(conn, cols)
+
     inBatches(where, batch_size, function(batch_where) {
       if (length(batch_where) == 1) {
-        quoted_col <- colnames(batch_where)[1]
+        quoted_col <- quoted_cols[1]
         sql <- paste("DELETE FROM", quoted_table, "WHERE", quoted_col, "IN", singleValuesRow(conn, where[, 1]))
         execute(conn, sql)
       } else {
-        cols <- colnames(batch_where)
-
-        clauses <- c()
-        for (i in 1:nrow(batch_where)) {
-          row <- batch_where[i,, drop=FALSE]
-          clauses <- c(clauses, paste0("(", paste(equalClause(conn, row), collapse=" AND "), ")"))
-        }
-
+        quoted_records <- quoteRecords(conn, batch_where)
+        clauses <- apply(quoted_records, 1, function(x) { paste0("(", paste0(multiValueRow(quoted_cols, x), collapse=" AND "), ")") })
         sql <- paste("DELETE FROM", quoted_table, "WHERE", paste(clauses, collapse=" OR "))
         execute(conn, sql)
       }
@@ -272,6 +269,10 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   }
 
   invisible()
+}
+
+multiValueRow <- function(quoted_cols, row) {
+  lapply(1:length(quoted_cols), function (i) { paste(quoted_cols[i] , "=", row[[i]]) })
 }
 
 equalClause <- function(conn, row) {
@@ -298,7 +299,7 @@ upsertSetClausePostgres <- function(conn, cols) {
 }
 
 colsClause <- function(conn, cols) {
-   paste0(lapply(cols, function(y) { dbQuoteIdentifier(conn, y) }), collapse=", ")
+   paste0(dbQuoteIdentifier(conn, cols), collapse=", ")
 }
 
 setClause <- function(conn, row) {
@@ -313,11 +314,16 @@ singleValuesRow <- function(conn, row) {
   paste0("(", paste0(dbQuoteLiteral(conn, row), collapse=", "), ")")
 }
 
-valuesClause <- function(conn, records) {
+quoteRecords <- function(conn, records) {
   quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
   for (i in 1:ncol(records)) {
     quoted_records[, i] <- dbQuoteLiteral(conn, records[, i])
   }
+  quoted_records
+}
+
+valuesClause <- function(conn, records) {
+  quoted_records <- quoteRecords(conn, records)
   paste0(apply(quoted_records, 1, function(x) { paste0("(", paste0(x, collapse=", "), ")") }), collapse=", ")
 }
 
