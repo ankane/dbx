@@ -78,6 +78,12 @@ test_that("insert batch size works", {
   expect_equal(res, orders)
 })
 
+test_that("empty insert works", {
+  empty_orders <- data.frame()
+  res <- dbxInsert(db, "orders", empty_orders)
+  expect_equal(res, empty_orders)
+})
+
 test_that("connect with url works", {
   library(urltools)
   con2 <- dbxConnect(url="sqlite:///:memory:")

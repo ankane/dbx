@@ -385,21 +385,25 @@ processStatement <- function(statement) {
 }
 
 inBatches <- function(records, batch_size, f) {
-  if (is.null(batch_size)) {
-    f(records)
-  } else {
-    row_count <- nrow(records)
-    batch_count <- row_count / batch_size
-    ret <- list()
-    for(i in 1:batch_count) {
-      start <- ((i - 1) * batch_size) + 1
-      end <- start + batch_size - 1
-      if (end > row_count) {
-        end <- row_count
+  if (nrow(records) > 0) {
+    if (is.null(batch_size)) {
+      f(records)
+    } else {
+      row_count <- nrow(records)
+      batch_count <- row_count / batch_size
+      ret <- list()
+      for(i in 1:batch_count) {
+        start <- ((i - 1) * batch_size) + 1
+        end <- start + batch_size - 1
+        if (end > row_count) {
+          end <- row_count
+        }
+        ret[[length(ret) + 1]] <- f(records[start:end,, drop=FALSE])
       }
-      ret[[length(ret) + 1]] <- f(records[start:end,, drop=FALSE])
+      combineResults(ret)
     }
-    combineResults(ret)
+  } else {
+    records
   }
 }
 
