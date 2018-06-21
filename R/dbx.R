@@ -94,7 +94,7 @@ dbxDisconnect <- function(conn) {
 #'
 #' @param conn A DBIConnection object
 #' @param statement The SQL statement to use
-#' @importFrom DBI dbSendQuery dbFetch dbClearResult
+#' @importFrom DBI dbSendQuery dbFetch dbClearResult dbHasCompleted
 #' @export
 #' @examples \dontrun{
 #'
@@ -106,7 +106,10 @@ dbxDisconnect <- function(conn) {
 dbxSelect <- function(conn, statement) {
   statement <- processStatement(statement)
   res <- dbSendQuery(conn, statement)
-  ret <- dbFetch(res)
+  ret <- data.frame()
+  while (!dbHasCompleted(res)) {
+    ret <- rbind(ret, dbFetch(res))
+  }
   dbClearResult(res)
   ret
 }
