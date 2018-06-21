@@ -106,13 +106,12 @@ dbxDisconnect <- function(conn) {
 dbxSelect <- function(conn, statement) {
   statement <- processStatement(statement)
   res <- dbSendQuery(conn, statement)
-  ret <- data.frame()
-  # TODO more performant concat
+  ret <- list()
   while (!dbHasCompleted(res)) {
-    ret <- rbind(ret, dbFetch(res))
+    ret[[length(ret) + 1]] <- dbFetch(res)
   }
   dbClearResult(res)
-  ret
+  do.call(rbind, ret)
 }
 
 #' Insert records
