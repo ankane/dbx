@@ -107,6 +107,7 @@ dbxSelect <- function(conn, statement) {
   statement <- processStatement(statement)
   res <- dbSendQuery(conn, statement)
   ret <- data.frame()
+  # TODO more performant concat
   while (!dbHasCompleted(res)) {
     ret <- rbind(ret, dbFetch(res))
   }
