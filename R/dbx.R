@@ -390,15 +390,15 @@ inBatches <- function(records, batch_size, f) {
   } else {
     row_count <- nrow(records)
     batch_count <- row_count / batch_size
-    ret <- data.frame()
+    ret <- list()
     for(i in 1:batch_count) {
       start <- ((i - 1) * batch_size) + 1
       end <- start + batch_size - 1
       if (end > row_count) {
         end <- row_count
       }
-      ret <- rbind(ret, f(records[start:end,, drop=FALSE]))
+      ret[[length(ret) + 1]] <- f(records[start:end,, drop=FALSE])
     }
-    ret
+    do.call(rbind, ret)
   }
 }
