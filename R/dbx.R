@@ -310,7 +310,7 @@ whereClause <- function(conn, row) {
 }
 
 singleValuesRow <- function(conn, row) {
-  paste0("(", paste0(lapply(row, function(y) { dbQuoteLiteral(conn, as.character(y)) }), collapse=", "), ")")
+  paste0("(", paste0(dbQuoteLiteral(conn, row), collapse=", "), ")")
 }
 
 valuesClause <- function(conn, records) {
