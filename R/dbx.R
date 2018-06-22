@@ -170,12 +170,12 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
   inBatches(records, batch_size, function(batch) {
     quoted_records <- quoteRecords(conn, batch)
     colnames(quoted_records) <- colnames(batch)
+    groups <- split(quoted_records, quoted_records[update_cols])
 
     dbWithTransaction(conn, {
-      # TODO batch updates with matching set clause
-      for (i in 1:nrow(quoted_records)) {
-        row <- quoted_records[i,, drop=FALSE]
-        sql <- paste("UPDATE", quoted_table, "SET", setClause(quoted_update_cols, row[update_cols]), "WHERE", whereClause(quoted_where_cols, row[where_cols]))
+      for (group in groups) {
+        row <- group[1,, drop=FALSE]
+        sql <- paste("UPDATE", quoted_table, "SET", setClause(quoted_update_cols, row[update_cols]), "WHERE", whereClause(quoted_where_cols, group[where_cols]))
         execute(conn, sql)
       }
     })
@@ -266,16 +266,8 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
 
     inBatches(where, batch_size, function(batch_where) {
       quoted_records <- quoteRecords(conn, batch_where)
-
-      if (length(batch_where) == 1) {
-        quoted_col <- quoted_cols[1]
-        sql <- paste0("DELETE FROM ", quoted_table, " WHERE ", quoted_col, " IN (", paste(quoted_records[, 1], collapse=", ") , ")")
-        execute(conn, sql)
-      } else {
-        clauses <- apply(quoted_records, 1, function(x) { paste0("(", whereClause(quoted_cols, x), ")") })
-        sql <- paste("DELETE FROM", quoted_table, "WHERE", paste(clauses, collapse=" OR "))
-        execute(conn, sql)
-      }
+      sql <- paste0("DELETE FROM ", quoted_table, " WHERE ", whereClause(quoted_cols, quoted_records))
+      execute(conn, sql)
     })
   }
 
@@ -306,7 +298,16 @@ setClause <- function(cols, row) {
   paste(equalClause(cols, row), collapse=", ")
 }
 
-whereClause <- function(cols, row) {
+whereClause <- function(cols, records) {
+  if (length(cols) == 1) {
+    paste0(cols[1], " IN (", paste(records[, 1], collapse=", ") , ")")
+  } else {
+    clauses <- apply(records, 1, function(x) { paste0("(", whereClause2(cols, x), ")") })
+    paste(clauses, collapse=" OR ")
+  }
+}
+
+whereClause2 <- function(cols, row) {
   paste(equalClause(cols, row), collapse=" AND ")
 }
 
