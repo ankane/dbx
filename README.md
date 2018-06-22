@@ -186,7 +186,7 @@ options(dbx_verbose=logQuery)
 
 ## Database Credentials
 
-Environment variables are a good way to store database credentials. This keeps them outside your source control. It’s also how platforms like [Heroku](https://www.heroku.com) store them.
+Environment variables are a convenient way to store database credentials. This keeps them outside your source control. It’s also how platforms like [Heroku](https://www.heroku.com) store them.
 
 Create an `.Renviron` file in your home directory with:
 
