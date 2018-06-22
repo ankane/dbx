@@ -309,15 +309,6 @@ whereClause <- function(cols, row) {
   paste(equalClause(cols, row), collapse=" AND ")
 }
 
-#' @importFrom DBI dbQuoteLiteral
-quoteRecords <- function(conn, records) {
-  quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
-  for (i in 1:ncol(records)) {
-    quoted_records[, i] <- dbQuoteLiteral(conn, records[, i])
-  }
-  quoted_records
-}
-
 valuesClause <- function(conn, records) {
   quoted_records <- quoteRecords(conn, records)
   paste(apply(quoted_records, 1, function(x) { paste0("(", paste(x, collapse=", "), ")") }), collapse=", ")
@@ -429,4 +420,13 @@ combineResults <- function(ret) {
 #' @importFrom DBI dbQuoteIdentifier
 quoteIdent <- function(conn, cols) {
   as.character(dbQuoteIdentifier(conn, cols))
+}
+
+#' @importFrom DBI dbQuoteLiteral
+quoteRecords <- function(conn, records) {
+  quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
+  for (i in 1:ncol(records)) {
+    quoted_records[, i] <- dbQuoteLiteral(conn, records[, i])
+  }
+  quoted_records
 }
