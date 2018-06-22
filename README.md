@@ -77,6 +77,8 @@ db <- dbxConnect(adapter="mysql", dbname="mydb")
 
 You can also pass `user`, `password`, `host`, `port`, and `url`.
 
+> Works with RMariaDB as well
+
 ### SQLite
 
 Install the R package

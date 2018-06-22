@@ -65,8 +65,16 @@ dbxConnect <- function(url=NULL, adapter=NULL, ...) {
       stop("Could not load adapter: RPostgres or RPostgreSQL")
     }
   } else if (grepl("mysql", adapter)) {
-    requireLib("RMySQL")
-    obj <- RMySQL::MySQL()
+    if (requireNamespace("RMySQL", quietly=TRUE)) {
+      obj <- RMySQL::MySQL()
+    } else if (requireNamespace("RMariaDB", quietly=TRUE)) {
+      obj <- RMariaDB::MariaDB()
+      if (is.null(params$bigint)) {
+        params$bigint <- "numeric"
+      }
+    } else {
+      stop("Could not load adapter: RMySQL or RMariaDB")
+    }
   } else if (grepl("sqlite", adapter)) {
     requireLib("RSQLite")
     obj <- RSQLite::SQLite()
@@ -342,7 +350,7 @@ isPostgres <- function(conn) {
 }
 
 isMySQL <- function(conn) {
-  class(conn) == "MySQLConnection"
+  class(conn) == "MySQLConnection" || class(conn) == "MariaDBConnection"
 }
 
 selectOrExecute <- function(conn, sql, records) {
