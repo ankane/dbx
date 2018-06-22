@@ -134,7 +134,7 @@ dbxUpdate(db, table, records, where_cols=c("id"))
 
 Use `where_cols` to specify the columns used for lookup. Other columns are written to the table.
 
-> Updates are batched when possible, but often need to be run as multiple queries. We recommend upsert when possible for better performance, as it can always be run as a single query.
+> Updates are batched when possible, but often need to be run as multiple queries. We recommend upsert when possible for better performance, as it can always be run as a single query. Turn on logging to see the difference.
 
 ### Upsert
 
