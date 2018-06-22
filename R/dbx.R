@@ -311,7 +311,8 @@ whereClause <- function(cols, row) {
 
 valuesClause <- function(conn, records) {
   quoted_records <- quoteRecords(conn, records)
-  paste(apply(quoted_records, 1, function(x) { paste0("(", paste(x, collapse=", "), ")") }), collapse=", ")
+  rows <- apply(quoted_records, 1, function(x) { paste0(x, collapse=", ") })
+  paste0("(", rows, ")", collapse=", ")
 }
 
 insertClause <- function(conn, table, records) {
