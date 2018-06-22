@@ -172,6 +172,7 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
     colnames(quoted_records) <- colnames(batch)
 
     dbWithTransaction(conn, {
+      # TODO batch updates with matching set clause
       for (i in 1:nrow(quoted_records)) {
         row <- quoted_records[i,, drop=FALSE]
         sql <- paste("UPDATE", quoted_table, "SET", setClause(quoted_update_cols, row[update_cols]), "WHERE", whereClause(quoted_where_cols, row[where_cols]))
