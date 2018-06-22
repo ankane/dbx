@@ -163,9 +163,9 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
   update_cols <- setdiff(cols, where_cols)
 
   # quote
-  quoted_table <- dbQuoteIdentifier(conn, table)
-  quoted_where_cols <- dbQuoteIdentifier(conn, where_cols)
-  quoted_update_cols <- dbQuoteIdentifier(conn, update_cols)
+  quoted_table <- quoteIdent(conn, table)
+  quoted_where_cols <- quoteIdent(conn, where_cols)
+  quoted_update_cols <- quoteIdent(conn, update_cols)
 
   inBatches(records, batch_size, function(batch) {
     quoted_records <- quoteRecords(conn, batch)
@@ -208,17 +208,18 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
   }
 
   update_cols <- setdiff(cols, where_cols)
+  quoted_update_cols <- quoteIdent(conn, update_cols)
 
   inBatches(records, batch_size, function(batch) {
     if (isMySQL(conn)) {
       sql <- insertClause(conn, table, batch)
-      set_sql <- upsertSetClause(conn, update_cols)
+      set_sql <- upsertSetClause(quoted_update_cols)
       sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
       selectOrExecute(conn, sql, batch)
     } else {
       conflict_target <- colsClause(conn, where_cols)
       sql <- insertClause(conn, table, batch)
-      set_sql <- upsertSetClausePostgres(conn, update_cols)
+      set_sql <- upsertSetClausePostgres(quoted_update_cols)
       sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
       selectOrExecute(conn, sql, batch)
     }
@@ -246,7 +247,7 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' dbxDelete(db, table)
 #' }
 dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
-  quoted_table <- dbQuoteIdentifier(conn, table)
+  quoted_table <- quoteIdent(conn, table)
 
   if (is.null(where)) {
     if (isPostgres(conn) || isMySQL(conn)) {
@@ -259,7 +260,7 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
     # do nothing
   } else {
     cols <- colnames(where)
-    quoted_cols <- dbQuoteIdentifier(conn, cols)
+    quoted_cols <- quoteIdent(conn, cols)
 
     inBatches(where, batch_size, function(batch_where) {
       if (length(batch_where) == 1) {
@@ -282,22 +283,20 @@ equalClause <- function(cols, row) {
   lapply(1:length(cols), function (i) { paste(cols[i] , "=", row[[i]]) })
 }
 
-upsertSetClause <- function(conn, cols) {
+upsertSetClause <- function(cols) {
   paste0(lapply(cols, function(x) {
-    col <- dbQuoteIdentifier(conn, as.character(x))
-    paste0(col, " = VALUES(", col, ")")
+    paste0(x, " = VALUES(", x, ")")
   }), collapse=", ")
 }
 
-upsertSetClausePostgres <- function(conn, cols) {
+upsertSetClausePostgres <- function(cols) {
   paste0(lapply(cols, function(x) {
-    col <- dbQuoteIdentifier(conn, as.character(x))
-    paste0(col, " = excluded.", col)
+    paste0(x, " = excluded.", x)
   }), collapse=", ")
 }
 
 colsClause <- function(conn, cols) {
-   paste0(dbQuoteIdentifier(conn, cols), collapse=", ")
+   paste0(quoteIdent(conn, cols), collapse=", ")
 }
 
 setClause <- function(cols, row) {
@@ -327,7 +326,7 @@ valuesClause <- function(conn, records) {
 
 insertClause <- function(conn, table, records) {
   cols <- colnames(records)
-  quoted_table <- dbQuoteIdentifier(conn, table)
+  quoted_table <- quoteIdent(conn, table)
   quoted_cols <- colsClause(conn, cols)
   records_sql <- valuesClause(conn, records)
   paste0("INSERT INTO ", quoted_table, " (", quoted_cols, ") VALUES ", records_sql)
@@ -422,4 +421,8 @@ combineResults <- function(ret) {
   } else {
     do.call(rbind, ret)
   }
+}
+
+quoteIdent <- function(conn, cols) {
+  as.character(dbQuoteIdentifier(conn, cols))
 }
