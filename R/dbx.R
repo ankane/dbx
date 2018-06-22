@@ -413,7 +413,7 @@ inBatches <- function(records, batch_size, f) {
 
 # https://stackoverflow.com/questions/2851327/convert-a-list-of-data-frames-into-one-data-frame
 combineResults <- function(ret) {
-  if (requireNamespace("dplyr", quietly=TRUE)) {
+  if (isNamespaceLoaded("dplyr")) {
     dplyr::bind_rows(ret)
   } else {
     do.call(rbind, ret)
