@@ -143,7 +143,7 @@ dbxInsert <- function(conn, table, records, batch_size=NULL) {
 #' @param records A data frame of records to insert
 #' @param where_cols The columns to use for WHERE clause
 #' @param batch_size The number of records to update in a single transaction (defaults to all)
-#' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
+#' @importFrom DBI dbWithTransaction
 #' @export
 #' @examples \dontrun{
 #'
@@ -190,7 +190,6 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @param records A data frame of records to upsert
 #' @param where_cols The columns to use for WHERE clause
 #' @param batch_size The number of records to upsert in a single statement (defaults to all)
-#' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
 #' @examples \dontrun{
 #'
@@ -235,7 +234,6 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @param table The table name to delete records from
 #' @param where A data frame of records to delete
 #' @param batch_size The number of records to delete in a single statement (defaults to all)
-#' @importFrom DBI dbQuoteLiteral dbQuoteIdentifier dbWithTransaction
 #' @export
 #' @examples \dontrun{
 #'
@@ -314,6 +312,7 @@ singleValuesRow <- function(conn, row) {
   paste0("(", paste(dbQuoteLiteral(conn, row), collapse=", "), ")")
 }
 
+#' @importFrom DBI dbQuoteLiteral
 quoteRecords <- function(conn, records) {
   quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
   for (i in 1:ncol(records)) {
@@ -430,6 +429,7 @@ combineResults <- function(ret) {
   }
 }
 
+#' @importFrom DBI dbQuoteIdentifier
 quoteIdent <- function(conn, cols) {
   as.character(dbQuoteIdentifier(conn, cols))
 }
