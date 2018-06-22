@@ -161,13 +161,20 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
   }
 
   update_cols <- setdiff(cols, where_cols)
+
+  # quote
   quoted_table <- dbQuoteIdentifier(conn, table)
+  quoted_where_cols <- dbQuoteIdentifier(conn, where_cols)
+  quoted_update_cols <- dbQuoteIdentifier(conn, update_cols)
 
   inBatches(records, batch_size, function(batch) {
+    quoted_records <- quoteRecords(conn, batch)
+    colnames(quoted_records) <- colnames(batch)
+
     dbWithTransaction(conn, {
-      for (i in 1:nrow(batch)) {
-        row <- batch[i,, drop=FALSE]
-        sql <- paste("UPDATE", quoted_table, "SET", setClause(conn, row[update_cols]), whereClause(conn, row[where_cols]))
+      for (i in 1:nrow(quoted_records)) {
+        row <- quoted_records[i,, drop=FALSE]
+        sql <- paste("UPDATE", quoted_table, "SET", setClause(quoted_update_cols, row[update_cols]), "WHERE", whereClause(quoted_where_cols, row[where_cols]))
         execute(conn, sql)
       }
     })
@@ -261,7 +268,7 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
         execute(conn, sql)
       } else {
         quoted_records <- quoteRecords(conn, batch_where)
-        clauses <- apply(quoted_records, 1, function(x) { paste0("(", paste0(multiValueRow(quoted_cols, x), collapse=" AND "), ")") })
+        clauses <- apply(quoted_records, 1, function(x) { paste0("(", whereClause(quoted_cols, x), ")") })
         sql <- paste("DELETE FROM", quoted_table, "WHERE", paste(clauses, collapse=" OR "))
         execute(conn, sql)
       }
@@ -271,17 +278,8 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   invisible()
 }
 
-multiValueRow <- function(quoted_cols, row) {
-  lapply(1:length(quoted_cols), function (i) { paste(quoted_cols[i] , "=", row[[i]]) })
-}
-
-equalClause <- function(conn, row) {
-  cols <- colnames(row)
-  set <- c()
-  for (i in cols) {
-    set <- c(set, paste(dbQuoteIdentifier(conn, i), "=", dbQuoteLiteral(conn, as.character(row[i][[1]]))))
-  }
-  set
+equalClause <- function(cols, row) {
+  lapply(1:length(cols), function (i) { paste(cols[i] , "=", row[[i]]) })
 }
 
 upsertSetClause <- function(conn, cols) {
@@ -302,12 +300,12 @@ colsClause <- function(conn, cols) {
    paste0(dbQuoteIdentifier(conn, cols), collapse=", ")
 }
 
-setClause <- function(conn, row) {
-  paste0(equalClause(conn, row), collapse=", ")
+setClause <- function(cols, row) {
+  paste(equalClause(cols, row), collapse=", ")
 }
 
-whereClause <- function(conn, row) {
-  paste("WHERE", paste(equalClause(conn, row), collapse=" AND "))
+whereClause <- function(cols, row) {
+  paste(equalClause(cols, row), collapse=" AND ")
 }
 
 singleValuesRow <- function(conn, row) {
