@@ -264,12 +264,13 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
     quoted_cols <- quoteIdent(conn, cols)
 
     inBatches(where, batch_size, function(batch_where) {
+      quoted_records <- quoteRecords(conn, batch_where)
+
       if (length(batch_where) == 1) {
         quoted_col <- quoted_cols[1]
-        sql <- paste("DELETE FROM", quoted_table, "WHERE", quoted_col, "IN", singleValuesRow(conn, where[, 1]))
+        sql <- paste0("DELETE FROM ", quoted_table, " WHERE ", quoted_col, " IN (", paste(quoted_records[, 1], collapse=", ") , ")")
         execute(conn, sql)
       } else {
-        quoted_records <- quoteRecords(conn, batch_where)
         clauses <- apply(quoted_records, 1, function(x) { paste0("(", whereClause(quoted_cols, x), ")") })
         sql <- paste("DELETE FROM", quoted_table, "WHERE", paste(clauses, collapse=" OR "))
         execute(conn, sql)
@@ -306,10 +307,6 @@ setClause <- function(cols, row) {
 
 whereClause <- function(cols, row) {
   paste(equalClause(cols, row), collapse=" AND ")
-}
-
-singleValuesRow <- function(conn, row) {
-  paste0("(", paste(dbQuoteLiteral(conn, row), collapse=", "), ")")
 }
 
 #' @importFrom DBI dbQuoteLiteral
