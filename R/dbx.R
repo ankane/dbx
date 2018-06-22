@@ -309,6 +309,8 @@ whereClause <- function(cols, row) {
   paste(equalClause(cols, row), collapse=" AND ")
 }
 
+# could be a faster method than apply
+# https://rpubs.com/wch/200398
 valuesClause <- function(conn, records) {
   quoted_records <- quoteRecords(conn, records)
   rows <- apply(quoted_records, 1, function(x) { paste0(x, collapse=", ") })
