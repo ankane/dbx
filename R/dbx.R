@@ -208,6 +208,9 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
   }
 
   update_cols <- setdiff(cols, where_cols)
+
+  # quote
+  quoted_where_cols <- quoteIdent(conn, where_cols)
   quoted_update_cols <- quoteIdent(conn, update_cols)
 
   inBatches(records, batch_size, function(batch) {
@@ -217,7 +220,7 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
       sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
       selectOrExecute(conn, sql, batch)
     } else {
-      conflict_target <- colsClause(conn, where_cols)
+      conflict_target <- colsClause(quoted_where_cols)
       sql <- insertClause(conn, table, batch)
       set_sql <- upsertSetClausePostgres(quoted_update_cols)
       sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
@@ -284,19 +287,19 @@ equalClause <- function(cols, row) {
 }
 
 upsertSetClause <- function(cols) {
-  paste0(lapply(cols, function(x) {
+  paste(lapply(cols, function(x) {
     paste0(x, " = VALUES(", x, ")")
   }), collapse=", ")
 }
 
 upsertSetClausePostgres <- function(cols) {
-  paste0(lapply(cols, function(x) {
+  paste(lapply(cols, function(x) {
     paste0(x, " = excluded.", x)
   }), collapse=", ")
 }
 
-colsClause <- function(conn, cols) {
-   paste0(quoteIdent(conn, cols), collapse=", ")
+colsClause <- function(cols) {
+  paste(cols, collapse=", ")
 }
 
 setClause <- function(cols, row) {
@@ -308,7 +311,7 @@ whereClause <- function(cols, row) {
 }
 
 singleValuesRow <- function(conn, row) {
-  paste0("(", paste0(dbQuoteLiteral(conn, row), collapse=", "), ")")
+  paste0("(", paste(dbQuoteLiteral(conn, row), collapse=", "), ")")
 }
 
 quoteRecords <- function(conn, records) {
@@ -321,15 +324,19 @@ quoteRecords <- function(conn, records) {
 
 valuesClause <- function(conn, records) {
   quoted_records <- quoteRecords(conn, records)
-  paste0(apply(quoted_records, 1, function(x) { paste0("(", paste0(x, collapse=", "), ")") }), collapse=", ")
+  paste(apply(quoted_records, 1, function(x) { paste0("(", paste(x, collapse=", "), ")") }), collapse=", ")
 }
 
 insertClause <- function(conn, table, records) {
   cols <- colnames(records)
+
+  # quote
   quoted_table <- quoteIdent(conn, table)
-  quoted_cols <- colsClause(conn, cols)
+  quoted_cols <- quoteIdent(conn, cols)
+
+  cols_sql <- colsClause(quoted_cols)
   records_sql <- valuesClause(conn, records)
-  paste0("INSERT INTO ", quoted_table, " (", quoted_cols, ") VALUES ", records_sql)
+  paste0("INSERT INTO ", quoted_table, " (", cols_sql, ") VALUES ", records_sql)
 }
 
 requireLib <- function(name) {
