@@ -174,6 +174,16 @@ Log all SQL queries with:
 options(dbx_verbose=TRUE)
 ```
 
+Customize logging by passing a function
+
+```r
+logQuery <- function(sql) {
+  # your logging code
+}
+
+options(dbx_verbose=logQuery)
+```
+
 ## Database Credentials
 
 Environment variables are a good way to store database credentials. This keeps them outside your source control. It’s also how platforms like [Heroku](https://www.heroku.com) store them.
