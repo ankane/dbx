@@ -35,8 +35,8 @@ And follow the instructions for your database library
 
 To install with [Jetpack](https://github.com/ankane/jetpack), use:
 
-```sh
-jetpack add dbx --remote=github::ankane/dbx
+```r
+jetpack::add("dbx", remote="ankane/dbx")
 ```
 
 ### Postgres
