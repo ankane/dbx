@@ -15,11 +15,8 @@ dbxSelect(conn, statement)
 Select records
 }
 \examples{
-\dontrun{
-
 db <- dbxConnect(adapter="sqlite", dbname=":memory:")
+DBI::dbCreateTable(db, "forecasts", data.frame(id=1:3, temperature=20:22))
 
 records <- dbxSelect(db, "SELECT * FROM forecasts")
-
-}
 }

@@ -23,10 +23,11 @@ Upsert records
 \examples{
 \dontrun{
 
-db <- dbxConnect(adapter="sqlite", dbname=":memory:")
+db <- dbxConnect(adapter="postgres", dbname="dbx")
 table <- "forecasts"
-records <- data.frame(id=c(2, 3), temperature=c(20, 25))
+DBI::dbCreateTable(db, table, data.frame(id=1:3, temperature=20:22))
 
+records <- data.frame(id=c(3, 4), temperature=c(20, 25))
 upserts <- dbxUpsert(db, table, records, where_cols=c("id"))
 }
 }
