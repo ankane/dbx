@@ -196,6 +196,12 @@ Create an `.Renviron` file in your home directory with:
 DATABASE_URL=postgres://user:pass@host/dbname
 ```
 
+Install [urltools](https://cran.r-project.org/package=urltools):
+
+```r
+install.packages("urltools")
+```
+
 And use:
 
 ```r

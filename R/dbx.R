@@ -3,7 +3,6 @@
 #' @param url A database URL
 #' @param adapter The database adapter to use
 #' @param ... Arguments to pass to dbConnect
-#' @importFrom urltools url_parse get_credentials
 #' @importFrom DBI dbConnect
 #' @export
 #' @examples
@@ -29,8 +28,12 @@ dbxConnect <- function(url=NULL, adapter=NULL, ...) {
   params <- list(...)
 
   if (!is.null(url)) {
-    uri <- url_parse(url)
-    creds <- get_credentials(url)
+    if (!requireNamespace("urltools", quietly=TRUE)) {
+      stop("Install 'urltools' to use url")
+    }
+
+    uri <- urltools::url_parse(url)
+    creds <- urltools::get_credentials(url)
     adapter <- uri$scheme
 
     params$dbname <- uri$path

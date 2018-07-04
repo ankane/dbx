@@ -10,5 +10,5 @@ BugReports: https://github.com/ankane/dbx/issues
 License: MIT + file LICENSE
 LazyData: TRUE
 RoxygenNote: 6.0.1
-Imports: DBI, urltools
-Suggests: testthat, RSQLite, RMariaDB, RMySQL, RPostgres, RPostgreSQL, dplyr
+Imports: DBI
+Suggests: testthat, urltools, RSQLite, RMariaDB, RMySQL, RPostgres, RPostgreSQL, dplyr
