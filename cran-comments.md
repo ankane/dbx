@@ -2,7 +2,7 @@
 
 This is a resubmission. In this version I have:
 
-* Improved examples
+* Added version numbers for dependencies
 
 ## Test environments
 
