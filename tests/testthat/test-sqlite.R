@@ -8,6 +8,9 @@ new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFac
 dbExecute(db, "CREATE TABLE orders (id INTEGER PRIMARY KEY AUTOINCREMENT, city VARCHAR(255))")
 dbxInsert(db, "orders", orders)
 
+dbExecute(db, "DROP TABLE IF EXISTS events")
+dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE)")
+
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
   expect_equal(res, orders)
@@ -82,6 +85,12 @@ test_that("empty insert works", {
   empty_orders <- data.frame()
   res <- dbxInsert(db, "orders", empty_orders)
   expect_equal(res, empty_orders)
+})
+
+test_that("dates works", {
+  events <- data.frame(created_on=as.Date(c("2018-01-01", "2018-01-02")))
+  res <- dbxInsert(db, "events", events)
+  expect_equal(res$created_on, events$created_on)
 })
 
 test_that("connect with url works", {

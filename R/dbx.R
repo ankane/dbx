@@ -439,7 +439,11 @@ quoteIdent <- function(conn, cols) {
 quoteRecords <- function(conn, records) {
   quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
   for (i in 1:ncol(records)) {
-    quoted_records[, i] <- dbQuoteLiteral(conn, records[, i])
+    col <- records[, i]
+    if (isMySQL(conn) && class(records[, i]) == "Date") {
+      col <- as.character(col)
+    }
+    quoted_records[, i] <- dbQuoteLiteral(conn, col)
   }
   quoted_records
 }
