@@ -13,7 +13,7 @@ Designed for both research and production environments
 
 Supports Postgres, MySQL, SQLite, and more
 
-![Screenshot](https://gist.github.com/ankane/b6988db2802aca68a589b31e41b44195/raw/b8197d9a0506e02b83910f2659a61e90fe69f41b/dbx.png)
+![Screenshot](https://gist.github.com/ankane/b6988db2802aca68a589b31e41b44195/raw/619e19addf388c14e905ed475121fe5806bf8991/dbx.png)
 
 [![Build Status](https://travis-ci.org/ankane/dbx.svg?branch=master)](https://travis-ci.org/ankane/dbx)
 
