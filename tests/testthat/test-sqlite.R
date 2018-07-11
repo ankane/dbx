@@ -9,7 +9,7 @@ dbExecute(db, "CREATE TABLE orders (id INTEGER PRIMARY KEY AUTOINCREMENT, city V
 dbxInsert(db, "orders", orders)
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE)")
+dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at TIMESTAMP)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
@@ -91,6 +91,14 @@ test_that("dates works", {
   events <- data.frame(created_on=as.Date(c("2018-01-01", "2018-01-02")))
   res <- dbxInsert(db, "events", events)
   expect_equal(res$created_on, events$created_on)
+})
+
+test_that("times works", {
+  t1 <- as.POSIXlt("2018-01-01 12:30:55")
+  t2 <- as.POSIXlt("2018-01-01 16:59:59")
+  events <- data.frame(updated_at=c(t1, t2))
+  res <- dbxInsert(db, "events", events)
+  expect_equal(res$updated_at, events$updated_at)
 })
 
 test_that("connect with url works", {
