@@ -96,7 +96,7 @@ test_that("dates works", {
   expect_equal(res$created_on, events$created_on)
 
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$created_on, paste(events$created_on, "UTC"))
+  expect_equal(res$created_on, format(events$created_on))
 })
 
 test_that("times works", {

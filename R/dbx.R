@@ -479,8 +479,12 @@ quoteRecords <- function(conn, records) {
       col <- format(col)
     } else if (isPostgres(conn) && isTime(col)) {
       col <- format(col, "%Y-%m-%d %H:%M:%OS6 %Z")
-    } else if (isSQLite(conn) && isTime(col)) {
-      col <- format(col, tz="UTC", "%Y-%m-%d %H:%M:%OS6")
+    } else if (isSQLite(conn)) {
+      if (isTime(col)) {
+        col <- format(col, tz="UTC", "%Y-%m-%d %H:%M:%OS6")
+      } else if (isDate(col)) {
+        col <- format(col)
+      }
     }
     quoted_records[, i] <- dbQuoteLiteral(conn, col)
   }
