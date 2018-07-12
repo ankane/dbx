@@ -114,6 +114,22 @@ test_that("times works", {
   expect_equal(res$updated_at, events$updated_at)
 })
 
+test_that("time zones works", {
+  dbxDelete(db, "events")
+  t1 <- as.POSIXlt("2018-01-01 12:30:55", tz="America/New_York")
+  t2 <- as.POSIXlt("2018-01-01 16:59:59", tz="America/New_York")
+  events <- data.frame(updated_at=c(t1, t2))
+  dbxInsert(db, "events", events)
+
+  # test returned time
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$updated_at, events$updated_at)
+
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 09:30:55'")
+  expect_equal(1, res$count)
+})
+
 test_that("connect with url works", {
   library(urltools)
   con2 <- dbxConnect(url="postgres://localhost/dbx_test")
