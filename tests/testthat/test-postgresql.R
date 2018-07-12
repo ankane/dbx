@@ -142,4 +142,8 @@ test_that("time zones works", {
   expect_equal(1, res$count)
 })
 
+test_that("time zone is UTC", {
+  expect_equal("UTC", dbxSelect(db, "SHOW timezone")$TimeZone)
+})
+
 dbxDisconnect(db)

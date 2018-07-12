@@ -147,6 +147,10 @@ test_that("time zones works", {
   expect_equal(1, res$count)
 })
 
+test_that("time zone is UTC", {
+  expect_equal("+00:00", dbxSelect(db, "SELECT @@session.time_zone")$`@@session.time_zone`)
+})
+
 test_that("connect with url works", {
   library(urltools)
   con2 <- dbxConnect("mysql://localhost/dbx_test")

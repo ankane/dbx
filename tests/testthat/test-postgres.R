@@ -142,6 +142,10 @@ test_that("time zones works", {
   expect_equal(1, res$count)
 })
 
+test_that("time zone is UTC", {
+  expect_equal("UTC", dbxSelect(db, "SHOW timezone")$TimeZone)
+})
+
 test_that("connect with url works", {
   library(urltools)
   con2 <- dbxConnect(url="postgres://localhost/dbx_test")

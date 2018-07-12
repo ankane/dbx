@@ -86,7 +86,16 @@ dbxConnect <- function(url=NULL, adapter=NULL, ...) {
     stop("Unknown adapter")
   }
 
-  do.call(dbConnect, c(obj, params))
+  conn <- do.call(dbConnect, c(obj, params))
+
+  # other adapters do this automatically
+  if (isRPostgreSQL(conn)) {
+    dbExecute(conn, "SET SESSION timezone TO 'UTC'")
+  } else if (isRMySQL(conn)) {
+    dbExecute(conn, "SET time_zone = '+00:00'")
+  }
+
+  conn
 }
 
 #' Close a database connection
@@ -345,12 +354,20 @@ requireLib <- function(name) {
   }
 }
 
+isRPostgreSQL <- function(conn) {
+  inherits(conn, "PostgreSQLConnection")
+}
+
 isPostgres <- function(conn) {
-  class(conn) == "PostgreSQLConnection" || class(conn) == "PqConnection"
+  isRPostgreSQL(conn) || inherits(conn, "PqConnection")
+}
+
+isRMySQL <- function(conn) {
+  inherits(conn, "MySQLConnection")
 }
 
 isMySQL <- function(conn) {
-  class(conn) == "MySQLConnection" || class(conn) == "MariaDBConnection"
+  isRMySQL(conn) || inherits(conn, "MariaDBConnection")
 }
 
 selectOrExecute <- function(conn, sql, records) {
