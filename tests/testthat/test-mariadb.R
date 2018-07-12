@@ -1,26 +1,26 @@
-context("postgresql")
+context("mariadb")
 
 skip_on_cran()
 
-db <- dbxConnect(adapter=RPostgreSQL::PostgreSQL(), dbname="dbx_test")
+db <- dbxConnect(adapter=RMariaDB::MariaDB(), dbname="dbx_test", bigint="numeric")
 
 orders <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
 new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFactors=FALSE)
 
 dbExecute(db, "DROP TABLE IF EXISTS orders")
-dbExecute(db, "CREATE TABLE orders (id SERIAL PRIMARY KEY, city text, other text)")
+dbExecute(db, "CREATE TABLE orders (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, city VARCHAR(255))")
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id SERIAL PRIMARY KEY, created_on DATE, updated_at TIMESTAMP)")
+dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at TIMESTAMP)")
 
 test_that("select works", {
-  res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC")
+  res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
   expect_equal(res, orders)
 })
 
 test_that("select order works", {
-  res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id DESC")
+  res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id DESC")
   expect_equal(res, reverse(orders))
 })
 
@@ -30,7 +30,8 @@ test_that("select columns works", {
 })
 
 test_that("insert works", {
-  res <- dbxInsert(db, "orders", new_orders[c("city")])
+  dbxInsert(db, "orders", new_orders[c("city")])
+  res <- dbxSelect(db, "SELECT * FROM orders WHERE id > 2 ORDER BY id ASC")
   expect_equal(res, new_orders)
 })
 
@@ -63,13 +64,14 @@ test_that("delete empty does not delete rows", {
   delete_orders <- data.frame(id=c())
   dbxDelete(db, "orders", where=delete_orders)
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM orders")
-  expect_equal(4, res$count)
+  exp <- data.frame(count=4)
+  expect_equal(res, exp)
 })
 
 test_that("delete one column works", {
   delete_orders <- data.frame(id=c(3))
   dbxDelete(db, "orders", where=delete_orders)
-  res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC")
+  res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
   exp <- rbind(orders, new_orders)[c(1, 2, 4), ]
   rownames(exp) <- NULL
   expect_equal(res, exp)
@@ -77,7 +79,7 @@ test_that("delete one column works", {
 
 test_that("delete multiple columns works", {
   dbxDelete(db, "orders", where=orders)
-  res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC")
+  res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
   exp <- new_orders[c(2), ]
   rownames(exp) <- NULL
   expect_equal(res, exp)
@@ -86,7 +88,8 @@ test_that("delete multiple columns works", {
 test_that("delete all works", {
   dbxDelete(db, "orders")
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM orders")
-  expect_equal(0, res$count)
+  exp <- data.frame(count=0)
+  expect_equal(res, exp)
 })
 
 test_that("insert batch size works", {
@@ -112,22 +115,6 @@ test_that("times works", {
   events <- data.frame(updated_at=c(t1, t2))
   res <- dbxInsert(db, "events", events)
   expect_equal(res$updated_at, events$updated_at)
-})
-
-test_that("time zones works", {
-  dbxDelete(db, "events")
-  t1 <- as.POSIXlt("2018-01-01 12:30:55", tz="America/New_York")
-  t2 <- as.POSIXlt("2018-01-01 16:59:59", tz="America/New_York")
-  events <- data.frame(updated_at=c(t1, t2))
-  dbxInsert(db, "events", events)
-
-  # test returned time
-  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$updated_at, events$updated_at)
-
-  # test stored time
-  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 09:30:55'")
-  expect_equal(1, res$count)
 })
 
 dbxDisconnect(db)

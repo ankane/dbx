@@ -1,8 +1,8 @@
-context("postgresql")
+context("postgres")
 
 skip_on_cran()
 
-db <- dbxConnect(adapter=RPostgreSQL::PostgreSQL(), dbname="dbx_test")
+db <- dbxConnect(adapter="postgres", dbname="dbx_test")
 
 orders <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
 new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFactors=FALSE)
@@ -128,6 +128,15 @@ test_that("time zones works", {
   # test stored time
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 09:30:55'")
   expect_equal(1, res$count)
+})
+
+test_that("connect with url works", {
+  library(urltools)
+  con2 <- dbxConnect(url="postgres://localhost/dbx_test")
+  res <- dbxSelect(con2, "SELECT 1 AS hi")
+  dbxDisconnect(con2)
+  exp <- data.frame(hi=c(1))
+  expect_equal(res, exp)
 })
 
 dbxDisconnect(db)
