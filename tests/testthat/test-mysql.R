@@ -111,9 +111,9 @@ test_that("dates works", {
 
   expect_equal(res$created_on, events$created_on)
 
-  # no support for dates
-  # res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  # expect_equal(res$created_on, events$created_on)
+  # dates returned as character vectors
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$created_on, format(events$created_on, tz="Etc/UTC"))
 })
 
 test_that("times works", {
@@ -126,9 +126,9 @@ test_that("times works", {
 
   expect_equal(res$updated_at, events$updated_at)
 
-  # no support for times
-  # res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  # expect_equal(res$updated_at, events$updated_at)
+  # times returned as character vectors in UTC
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$updated_at, format(events$updated_at, tz="Etc/UTC"))
 })
 
 test_that("time zones works", {

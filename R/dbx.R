@@ -441,7 +441,7 @@ quoteRecords <- function(conn, records) {
   for (i in 1:ncol(records)) {
     col <- records[, i]
     if (isMySQL(conn) && inherits(col, "Date")) {
-      col <- as.character(col)
+      col <- format(col)
     }
     if (class(conn) == "PostgreSQLConnection" && inherits(col, "POSIXt")) {
       col <- format(col)
