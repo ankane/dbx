@@ -12,7 +12,7 @@ dbExecute(db, "CREATE TABLE orders (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at TIMESTAMP)")
+dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
@@ -115,6 +115,22 @@ test_that("times works", {
   events <- data.frame(updated_at=c(t1, t2))
   res <- dbxInsert(db, "events", events)
   expect_equal(res$updated_at, events$updated_at)
+})
+
+test_that("time zones works", {
+  dbxDelete(db, "events")
+  t1 <- as.POSIXlt("2018-01-01 12:30:55", tz="America/New_York")
+  t2 <- as.POSIXlt("2018-01-01 16:59:59", tz="America/New_York")
+  events <- data.frame(updated_at=c(t1, t2))
+  dbxInsert(db, "events", events)
+
+  # test returned time
+  # res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  # expect_equal(res$updated_at, events$updated_at)
+
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 17:30:55'")
+  expect_equal(1, res$count)
 })
 
 test_that("connect with url works", {
