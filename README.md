@@ -185,6 +185,13 @@ logQuery <- function(sql) {
 options(dbx_verbose=logQuery)
 ```
 
+## Dates & Times
+
+There are a few limitations with date and time columns to be aware of:
+
+- With RMySQL, date and time columns are returned as character vectors. For this reason, we recommend RMariaDB instead.
+- With SQLite, there is [no native support](https://www.sqlite.org/datatype3.html) for date or time columns.
+
 ## Database Credentials
 
 Environment variables are a convenient way to store database credentials. This keeps them outside your source control. It’s also how platforms like [Heroku](https://www.heroku.com) store them.
