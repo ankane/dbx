@@ -95,7 +95,6 @@ test_that("dates works", {
 
   expect_equal(res$created_on, events$created_on)
 
-  # no date type
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
   expect_equal(res$created_on, paste(events$created_on, "UTC"))
 })
@@ -110,9 +109,8 @@ test_that("times works", {
 
   expect_equal(res$updated_at, events$updated_at)
 
-  # no time type
-  # res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  # expect_equal(res$updated_at, events$updated_at)
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$updated_at, format(events$updated_at, tz="UTC", "%Y-%m-%d %H:%M:%OS6"))
 })
 
 test_that("connect with url works", {

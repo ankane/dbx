@@ -376,6 +376,10 @@ isMySQL <- function(conn) {
   isRMySQL(conn) || inherits(conn, "MariaDBConnection")
 }
 
+isSQLite <- function(conn) {
+  inherits(conn, "SQLiteConnection")
+}
+
 isDate <- function(col) {
   inherits(col, "Date")
 }
@@ -472,9 +476,11 @@ quoteRecords <- function(conn, records) {
   for (i in 1:ncol(records)) {
     col <- records[, i]
     if (isMySQL(conn) && isDate(col)) {
-      col <- format(col)
+      col <- format(col, "%Y-%m-%d %H:%M:%OS6")
     } else if (isPostgres(conn) && isTime(col)) {
-      col <- format(col, usetz=TRUE)
+      col <- format(col, "%Y-%m-%d %H:%M:%OS6 %Z")
+    } else if (isSQLite(conn) && isTime(col)) {
+      col <- format(col, tz="UTC", "%Y-%m-%d %H:%M:%OS6")
     }
     quoted_records[, i] <- dbQuoteLiteral(conn, col)
   }

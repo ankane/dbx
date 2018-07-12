@@ -187,10 +187,16 @@ options(dbx_verbose=logQuery)
 
 ## Dates & Times
 
+**Note:** There are many improvements to date and time handling on master. We recommend using the latest version:
+
+```r
+devtools::install_github("ankane/dbx")
+```
+
 There are a few limitations with date and time columns to be aware of:
 
 - With RMySQL, date and time columns are returned as character vectors in UTC. For this reason, we recommend RMariaDB instead.
-- With SQLite, date columns are returned as character vectors, and time columns are returned as integers.
+- With SQLite, date and time columns are returned as character vectors in UTC.
 
 ## Database Credentials
 
