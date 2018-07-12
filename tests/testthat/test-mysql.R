@@ -113,7 +113,7 @@ test_that("dates works", {
 
   # dates returned as character vectors
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$created_on, format(events$created_on, tz="Etc/UTC"))
+  expect_equal(res$created_on, events$created_on)
 
   # test typecast
   expect_equal(as.Date(res$created_on), events$created_on)
@@ -131,7 +131,7 @@ test_that("times works", {
 
   # times returned as character vectors in UTC
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$updated_at, format(events$updated_at, tz="Etc/UTC"))
+  expect_equal(res$updated_at, events$updated_at)
 
   # test typecast
   col <- as.POSIXct(res$updated_at, tz="Etc/UTC")
@@ -149,7 +149,7 @@ test_that("time zones works", {
 
   # test returned time
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$updated_at, format(events$updated_at, tz="Etc/UTC"))
+  expect_equal(res$updated_at, events$updated_at)
 
   # test stored time
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 17:30:55'")
@@ -166,7 +166,7 @@ test_that("timestamp works", {
 
   # test returned time
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$deleted_at, format(events$deleted_at, tz="Etc/UTC"))
+  expect_equal(res$deleted_at, events$deleted_at)
 
   # test stored time
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE deleted_at = '2018-01-01 17:30:55'")

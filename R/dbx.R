@@ -121,7 +121,7 @@ dbxDisconnect <- function(conn) {
 #'
 #' @param conn A DBIConnection object
 #' @param statement The SQL statement to use
-#' @importFrom DBI dbSendQuery dbFetch dbClearResult dbHasCompleted
+#' @importFrom DBI dbSendQuery dbFetch dbClearResult dbHasCompleted dbColumnInfo
 #' @export
 #' @examples
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
@@ -131,19 +131,36 @@ dbxDisconnect <- function(conn) {
 dbxSelect <- function(conn, statement) {
   statement <- processStatement(statement)
   ret <- list()
+  cast_dates <- list()
+  cast_times <- list()
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type 7 in column"), {
     res <- dbSendQuery(conn, statement)
-    # we can hopefully use dbColumnInfo(res) here
-    # in the future once we SQL type is returned
-    # https://github.com/r-dbi/DBI/issues/78
+
+    if (isRMySQL(conn)) {
+      column_info <- dbColumnInfo(res)
+      cast_dates <- which(column_info$type == "DATE")
+      cast_times <- which(column_info$type %in% c("DATETIME", "TIMESTAMP"))
+    }
+
     while (!dbHasCompleted(res)) {
       ret[[length(ret) + 1]] <- dbFetch(res)
     }
     dbClearResult(res)
   })
 
-  combineResults(ret)
+  records <- combineResults(ret)
+
+  for (i in cast_dates) {
+    records[, i] <- as.Date(records[, i])
+  }
+
+  for (i in cast_times) {
+    records[, i] <- as.POSIXct(records[, i], tz="Etc/UTC")
+    attr(records[, i], "tzone") <- currentTimeZone()
+  }
+
+  records
 }
 
 #' Insert records
@@ -470,6 +487,10 @@ inBatches <- function(records, batch_size, f) {
   } else {
     records
   }
+}
+
+currentTimeZone <- function() {
+  Sys.getenv("TZ", Sys.timezone())
 }
 
 # https://stackoverflow.com/questions/2851327/convert-a-list-of-data-frames-into-one-data-frame
