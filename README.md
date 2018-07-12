@@ -193,12 +193,9 @@ options(dbx_verbose=logQuery)
 devtools::install_github("ankane/dbx")
 ```
 
-There are a few limitations with date and time columns to be aware of:
+When times are retrieved, they are converted to the time zone in `Sys.timezone()`. The exceptions are RSQLite and RMySQL, where date and time columns are returned as character vectors in UTC. *For this reason, we recommend installing RMariaDB instead for MySQL.*
 
-- With RMySQL, date and time columns are returned as character vectors in UTC. For this reason, we recommend RMariaDB instead.
-- With SQLite, date and time columns are returned as character vectors in UTC.
-
-For RMySQL and SQLite, you can typecast date columns with:
+You can manually typecast date columns with:
 
 ```r
 records$created_on <- as.Date(records$created_on)
