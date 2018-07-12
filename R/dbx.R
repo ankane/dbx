@@ -440,8 +440,11 @@ quoteRecords <- function(conn, records) {
   quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
   for (i in 1:ncol(records)) {
     col <- records[, i]
-    if (isMySQL(conn) && class(records[, i]) == "Date") {
+    if (isMySQL(conn) && inherits(col, "Date")) {
       col <- as.character(col)
+    }
+    if (class(conn) == "PostgreSQLConnection" && inherits(col, "POSIXt")) {
+      col <- format(col)
     }
     quoted_records[, i] <- dbQuoteLiteral(conn, col)
   }
