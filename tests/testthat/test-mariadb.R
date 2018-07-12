@@ -131,6 +131,7 @@ test_that("times works", {
 
 test_that("time zones works", {
   dbxDelete(db, "events")
+
   t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
   t2 <- as.POSIXct("2018-01-01 16:59:59", tz="America/New_York")
   events <- data.frame(updated_at=c(t1, t2))
@@ -147,6 +148,14 @@ test_that("time zones works", {
 
 test_that("time zone is UTC", {
   expect_equal("+00:00", dbxSelect(db, "SELECT @@session.time_zone")$`@@session.time_zone`)
+})
+
+test_that("connect with url works", {
+  con2 <- dbxConnect("mariadb://localhost/dbx_test")
+  res <- dbxSelect(con2, "SELECT 1 AS hi")
+  dbxDisconnect(con2)
+  exp <- data.frame(hi=c(1))
+  expect_equal(res, exp)
 })
 
 dbxDisconnect(db)

@@ -116,7 +116,6 @@ test_that("times works", {
 })
 
 test_that("connect with url works", {
-  library(urltools)
   con2 <- dbxConnect(url="sqlite:///:memory:")
   res <- dbxSelect(con2, "SELECT 1 AS hi")
   dbxDisconnect(con2)

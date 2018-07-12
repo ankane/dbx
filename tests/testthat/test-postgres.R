@@ -128,6 +128,7 @@ test_that("times works", {
 
 test_that("time zones works", {
   dbxDelete(db, "events")
+
   t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
   t2 <- as.POSIXct("2018-01-01 16:59:59", tz="America/New_York")
   events <- data.frame(updated_at=c(t1, t2))
@@ -144,6 +145,7 @@ test_that("time zones works", {
 
 test_that("timestamp with time zone works", {
   dbxDelete(db, "events")
+
   t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
   t2 <- as.POSIXct("2018-01-01 16:59:59", tz="America/New_York")
   events <- data.frame(deleted_at=c(t1, t2))
@@ -163,7 +165,6 @@ test_that("time zone is UTC", {
 })
 
 test_that("connect with url works", {
-  library(urltools)
   con2 <- dbxConnect(url="postgres://localhost/dbx_test")
   res <- dbxSelect(con2, "SELECT 1 AS hi")
   dbxDisconnect(con2)
