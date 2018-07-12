@@ -480,6 +480,7 @@ quoteRecords <- function(conn, records) {
     } else if (isPostgres(conn) && isTime(col)) {
       col <- format(col, "%Y-%m-%d %H:%M:%OS6 %Z")
     } else if (isSQLite(conn)) {
+      # since no standard, store in same format as Rails
       if (isTime(col)) {
         col <- format(col, tz="Etc/UTC", "%Y-%m-%d %H:%M:%OS6")
       } else if (isDate(col)) {
