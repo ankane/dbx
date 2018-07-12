@@ -476,7 +476,7 @@ quoteRecords <- function(conn, records) {
   for (i in 1:ncol(records)) {
     col <- records[, i]
     if (isMySQL(conn) && isDate(col)) {
-      col <- format(col, "%Y-%m-%d %H:%M:%OS6")
+      col <- format(col)
     } else if (isPostgres(conn) && isTime(col)) {
       col <- format(col, "%Y-%m-%d %H:%M:%OS6 %Z")
     } else if (isSQLite(conn) && isTime(col)) {
