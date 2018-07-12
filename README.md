@@ -300,3 +300,24 @@ Everyone is encouraged to help improve this project. Here are a few ways you can
 - Fix bugs and [submit pull requests](https://github.com/ankane/dbx/pulls)
 - Write, clarify, or fix documentation
 - Suggest or add new features
+
+To get started with development and testing:
+
+```sh
+git clone https://github.com/ankane/dbx.git
+cd dbx
+
+# create Postgres database
+createdb dbx_test
+
+# create MySQL database
+mysql -u root -e "CREATE DATABASE dbx_test"
+```
+
+In R, do:
+
+```r
+install.packages("devtools")
+devtools::install_deps(dependencies=TRUE)
+devtools::test()
+```
