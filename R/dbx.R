@@ -132,9 +132,12 @@ dbxSelect <- function(conn, statement) {
   statement <- processStatement(statement)
   res <- dbSendQuery(conn, statement)
   ret <- list()
-  while (!dbHasCompleted(res)) {
-    ret[[length(ret) + 1]] <- dbFetch(res)
-  }
+
+  silenceWarnings("length of NULL cannot be changed", {
+    while (!dbHasCompleted(res)) {
+      ret[[length(ret) + 1]] <- dbFetch(res)
+    }
+  })
   dbClearResult(res)
   combineResults(ret)
 }
@@ -295,6 +298,15 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   }
 
   invisible()
+}
+
+silenceWarnings <- function(msg, code) {
+  warn <- function(w) {
+    if (conditionMessage(w) == msg) {
+      invokeRestart("muffleWarning")
+    }
+  }
+  withCallingHandlers(code, warning=warn)
 }
 
 equalClause <- function(cols, row) {
