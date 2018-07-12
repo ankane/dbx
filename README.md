@@ -190,7 +190,7 @@ options(dbx_verbose=logQuery)
 There are a few limitations with date and time columns to be aware of:
 
 - With RMySQL, date and time columns are returned as character vectors in UTC. For this reason, we recommend RMariaDB instead.
-- With SQLite, there is [no native support](https://www.sqlite.org/datatype3.html) for date or time columns.
+- With SQLite, date columns are returned as character vectors, and time columns are returned as integers.
 
 ## Database Credentials
 
