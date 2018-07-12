@@ -113,6 +113,9 @@ test_that("dates works", {
 
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
   expect_equal(res$created_on, events$created_on)
+
+  # dates always in UTC
+  expect(all(format(res$created_on, "%Z") == "UTC"))
 })
 
 test_that("times works", {
