@@ -9,7 +9,7 @@ dbExecute(db, "CREATE TABLE orders (id INTEGER PRIMARY KEY AUTOINCREMENT, city V
 dbxInsert(db, "orders", orders)
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at TIMESTAMP)")
+dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at DATETIME)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
@@ -96,8 +96,8 @@ test_that("dates works", {
   expect_equal(res$created_on, events$created_on)
 
   # no date type
-  # res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  # expect_equal(res$created_on, events$created_on)
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$created_on, paste(events$created_on, "UTC"))
 })
 
 test_that("times works", {
