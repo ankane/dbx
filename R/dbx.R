@@ -134,6 +134,9 @@ dbxSelect <- function(conn, statement) {
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type 7 in column"), {
     res <- dbSendQuery(conn, statement)
+    # we can hopefully use dbColumnInfo(res) here
+    # in the future once we SQL type is returned
+    # https://github.com/r-dbi/DBI/issues/78
     while (!dbHasCompleted(res)) {
       ret[[length(ret) + 1]] <- dbFetch(res)
     }
