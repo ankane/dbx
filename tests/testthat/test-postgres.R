@@ -154,7 +154,7 @@ test_that("timestamp with time zone works", {
   expect_equal(res$deleted_at, events$deleted_at)
 
   # test stored time
-  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE deleted_at = '2018-01-01 09:30:55 PST'")
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE deleted_at = '2018-01-01 17:30:55'")
   expect_equal(1, res$count)
 })
 
