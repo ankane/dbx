@@ -481,7 +481,7 @@ quoteRecords <- function(conn, records) {
       col <- format(col, "%Y-%m-%d %H:%M:%OS6 %Z")
     } else if (isSQLite(conn)) {
       if (isTime(col)) {
-        col <- format(col, tz="UTC", "%Y-%m-%d %H:%M:%OS6")
+        col <- format(col, tz="Etc/UTC", "%Y-%m-%d %H:%M:%OS6")
       } else if (isDate(col)) {
         col <- format(col)
       }
