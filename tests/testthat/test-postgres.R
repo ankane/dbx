@@ -12,7 +12,7 @@ dbExecute(db, "CREATE TABLE orders (id SERIAL PRIMARY KEY, city text, other text
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id SERIAL PRIMARY KEY, created_on DATE, updated_at TIMESTAMP)")
+dbExecute(db, "CREATE TABLE events (id SERIAL PRIMARY KEY, created_on DATE, updated_at TIMESTAMP, deleted_at TIMESTAMPTZ)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC")
@@ -139,6 +139,22 @@ test_that("time zones works", {
 
   # test stored time
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 09:30:55'")
+  expect_equal(1, res$count)
+})
+
+test_that("timestamp with time zone works", {
+  dbxDelete(db, "events")
+  t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
+  t2 <- as.POSIXct("2018-01-01 16:59:59", tz="America/New_York")
+  events <- data.frame(deleted_at=c(t1, t2))
+  dbxInsert(db, "events", events)
+
+  # test returned time
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$deleted_at, events$deleted_at)
+
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE deleted_at = '2018-01-01 09:30:55 PST'")
   expect_equal(1, res$count)
 })
 

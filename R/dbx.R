@@ -473,8 +473,8 @@ quoteRecords <- function(conn, records) {
     col <- records[, i]
     if (isMySQL(conn) && isDate(col)) {
       col <- format(col)
-    } else if (isRPostgreSQL(conn) && isTime(col)) {
-      col <- format(col)
+    } else if (isPostgres(conn) && isTime(col)) {
+      col <- format(col, usetz=TRUE)
     }
     quoted_records[, i] <- dbQuoteLiteral(conn, col)
   }
