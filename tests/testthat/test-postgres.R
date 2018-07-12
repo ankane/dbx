@@ -115,8 +115,8 @@ test_that("dates works", {
 test_that("times works", {
   dbxDelete(db, "events")
 
-  t1 <- as.POSIXlt("2018-01-01 12:30:55")
-  t2 <- as.POSIXlt("2018-01-01 16:59:59")
+  t1 <- as.POSIXct("2018-01-01 12:30:55")
+  t2 <- as.POSIXct("2018-01-01 16:59:59")
   events <- data.frame(updated_at=c(t1, t2))
   res <- dbxInsert(db, "events", events)
 
@@ -128,8 +128,8 @@ test_that("times works", {
 
 test_that("time zones works", {
   dbxDelete(db, "events")
-  t1 <- as.POSIXlt("2018-01-01 12:30:55", tz="America/New_York")
-  t2 <- as.POSIXlt("2018-01-01 16:59:59", tz="America/New_York")
+  t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
+  t2 <- as.POSIXct("2018-01-01 16:59:59", tz="America/New_York")
   events <- data.frame(updated_at=c(t1, t2))
   dbxInsert(db, "events", events)
 
