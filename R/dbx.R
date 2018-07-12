@@ -79,6 +79,12 @@ dbxConnect <- function(url=NULL, adapter=NULL, ...) {
     } else {
       stop("Could not load adapter: RMySQL or RMariaDB")
     }
+  } else if (grepl("mariadb", adapter)) {
+    requireLib("RMariaDB")
+    obj <- RMariaDB::MariaDB()
+    if (is.null(params$bigint)) {
+      params$bigint <- "numeric"
+    }
   } else if (grepl("sqlite", adapter)) {
     requireLib("RSQLite")
     obj <- RSQLite::SQLite()

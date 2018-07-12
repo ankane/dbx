@@ -2,7 +2,7 @@ context("mariadb")
 
 skip_on_cran()
 
-db <- dbxConnect(adapter=RMariaDB::MariaDB(), dbname="dbx_test", bigint="numeric")
+db <- dbxConnect(adapter="mariadb", dbname="dbx_test")
 
 orders <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
 new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFactors=FALSE)
