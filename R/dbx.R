@@ -370,6 +370,14 @@ isMySQL <- function(conn) {
   isRMySQL(conn) || inherits(conn, "MariaDBConnection")
 }
 
+isDate <- function(col) {
+  inherits(col, "Date")
+}
+
+isTime <- function(col) {
+  inherits(col, "POSIXt")
+}
+
 selectOrExecute <- function(conn, sql, records) {
   if (isPostgres(conn)) {
     sql <- paste(sql, "RETURNING *")
@@ -457,10 +465,9 @@ quoteRecords <- function(conn, records) {
   quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
   for (i in 1:ncol(records)) {
     col <- records[, i]
-    if (isMySQL(conn) && inherits(col, "Date")) {
+    if (isMySQL(conn) && isDate(col)) {
       col <- format(col)
-    }
-    if (class(conn) == "PostgreSQLConnection" && inherits(col, "POSIXt")) {
+    } else if (isRPostgreSQL(conn) && isTime(col)) {
       col <- format(col)
     }
     quoted_records[, i] <- dbQuoteLiteral(conn, col)
