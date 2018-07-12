@@ -130,15 +130,16 @@ dbxDisconnect <- function(conn) {
 #' records <- dbxSelect(db, "SELECT * FROM forecasts")
 dbxSelect <- function(conn, statement) {
   statement <- processStatement(statement)
-  res <- dbSendQuery(conn, statement)
   ret <- list()
 
-  silenceWarnings("length of NULL cannot be changed", {
+  silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type 7 in column"), {
+    res <- dbSendQuery(conn, statement)
     while (!dbHasCompleted(res)) {
       ret[[length(ret) + 1]] <- dbFetch(res)
     }
+    dbClearResult(res)
   })
-  dbClearResult(res)
+
   combineResults(ret)
 }
 
@@ -300,9 +301,9 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   invisible()
 }
 
-silenceWarnings <- function(msg, code) {
+silenceWarnings <- function(msgs, code) {
   warn <- function(w) {
-    if (conditionMessage(w) == msg) {
+    if (any(sapply(msgs, function(x) { grepl(x, conditionMessage(w)) }))) {
       invokeRestart("muffleWarning")
     }
   }
