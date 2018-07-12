@@ -198,6 +198,19 @@ There are a few limitations with date and time columns to be aware of:
 - With RMySQL, date and time columns are returned as character vectors in UTC. For this reason, we recommend RMariaDB instead.
 - With SQLite, date and time columns are returned as character vectors in UTC.
 
+For RMySQL and SQLite, you can typecast date columns with:
+
+```r
+records$created_on <- as.Date(records$created_on)
+```
+
+And time columns with:
+
+```r
+records$created_at <- as.POSIXct(records$created_at, tz="Etc/UTC")
+attr(records$created_at, "tzone") <- Sys.timezone()
+```
+
 ## Database Credentials
 
 Environment variables are a convenient way to store database credentials. This keeps them outside your source control. It’s also how platforms like [Heroku](https://www.heroku.com) store them.
