@@ -8,7 +8,7 @@ new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFac
 dbExecute(db, "CREATE TABLE orders (id INTEGER PRIMARY KEY AUTOINCREMENT, city VARCHAR(255))")
 dbxInsert(db, "orders", orders)
 
-dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at DATETIME)")
+dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at DATETIME, active BOOLEAN)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
@@ -84,6 +84,19 @@ test_that("empty insert works", {
   empty_orders <- data.frame()
   res <- dbxInsert(db, "orders", empty_orders)
   expect_equal(res, empty_orders)
+})
+
+test_that("boolean works", {
+  dbxDelete(db, "events")
+
+  events <- data.frame(active=c(TRUE, FALSE))
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(res$active, events$active)
+
+  # typecasting not supported yet
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$active == 1, events$active)
 })
 
 test_that("dates works", {
