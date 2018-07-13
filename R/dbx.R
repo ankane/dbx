@@ -141,6 +141,7 @@ dbxSelect <- function(conn, statement) {
   cast_datetimes <- list()
   convert_tz <- list()
   cast_booleans <- list()
+  cast_json <- list()
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type"), {
     res <- dbSendQuery(conn, statement)
@@ -152,6 +153,7 @@ dbxSelect <- function(conn, statement) {
           convert_tz <- which(column_info$type == "TIMESTAMP")
         } else {
           convert_tz <- which(column_info$`.typname` == "timestamp")
+          cast_json <- which(column_info$`.typname` == "json" | column_info$`.typname` == "jsonb")
         }
       }
     } else if (isRMySQL(conn)) {
@@ -185,6 +187,10 @@ dbxSelect <- function(conn, statement) {
   for (i in convert_tz) {
     records[, i] <- as.POSIXct(format(records[, i], "%Y-%m-%d %H:%M:%OS6"), tz=storageTimeZone(conn))
     attr(records[, i], "tzone") <- currentTimeZone()
+  }
+
+  for (i in cast_json) {
+    records[, i] <- as.character(records[, i])
   }
 
   for (i in cast_booleans) {

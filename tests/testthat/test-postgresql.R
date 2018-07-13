@@ -118,10 +118,10 @@ test_that("json works", {
   events <- data.frame(properties=c('{"hello": "world"}'), stringsAsFactors=FALSE)
   res <- dbxInsert(db, "events", events)
 
-  expect_equal(as.character(res$properties), events$properties)
+  expect_equal(res$properties, events$properties)
 
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(as.character(res$properties), events$properties)
+  expect_equal(res$properties, events$properties)
 })
 
 test_that("jsonb works", {
@@ -130,10 +130,10 @@ test_that("jsonb works", {
   events <- data.frame(propertiesb=c('{"hello": "world"}'), stringsAsFactors=FALSE)
   res <- dbxInsert(db, "events", events)
 
-  expect_equal(as.character(res$propertiesb), events$propertiesb)
+  expect_equal(res$propertiesb, events$propertiesb)
 
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(as.character(res$propertiesb), events$propertiesb)
+  expect_equal(res$propertiesb, events$propertiesb)
 })
 
 test_that("jsonlite with jsonb works", {
