@@ -22,7 +22,8 @@ Supports Postgres, MySQL, SQLite, and more
 Install dbx
 
 ```r
-install.packages("dbx")
+install.packages("devtools")
+devtools::install_github("ankane/dbx")
 ```
 
 And follow the instructions for your database library
@@ -35,7 +36,7 @@ And follow the instructions for your database library
 To install with [Jetpack](https://github.com/ankane/jetpack), use:
 
 ```r
-jetpack::add("dbx")
+jetpack::add("dbx", remote="ankane/dbx")
 ```
 
 ### Postgres
@@ -188,12 +189,6 @@ options(dbx_verbose=logQuery)
 ## Data Types
 
 ### Dates & Times
-
-**Note:** There are many improvements to date and time handling on master. We recommend using the latest version:
-
-```r
-devtools::install_github("ankane/dbx")
-```
 
 When times are retrieved, they are converted to your local time zone. The exception is SQLite, where date and time columns are returned as character vectors in UTC, as RSQLite does [not provide enough info](https://github.com/r-dbi/RSQLite/issues/263) to typecast automatically right now.
 
