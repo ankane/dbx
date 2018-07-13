@@ -447,6 +447,10 @@ isDatetime <- function(col) {
   inherits(col, "POSIXt")
 }
 
+isLogical <- function(col) {
+  inherits(col, "logical")
+}
+
 selectOrExecute <- function(conn, sql, records) {
   if (isPostgres(conn)) {
     sql <- paste(sql, "RETURNING *")
@@ -552,6 +556,8 @@ quoteRecords <- function(conn, records) {
     } else if (isPostgres(conn)) {
       if (isDatetime(col)) {
         col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6 %Z")
+      } else if (isLogical(col) && isRPostgreSQL(conn)) {
+        col <- as.character(col)
       }
     } else if (isSQLite(conn)) {
       # since no standard, store dates and times in the same format as Rails

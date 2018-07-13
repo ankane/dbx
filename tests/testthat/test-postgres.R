@@ -12,7 +12,7 @@ dbExecute(db, "CREATE TABLE orders (id SERIAL PRIMARY KEY, city text, other text
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id SERIAL PRIMARY KEY, created_on DATE, updated_at TIMESTAMP, deleted_at TIMESTAMPTZ)")
+dbExecute(db, "CREATE TABLE events (id SERIAL PRIMARY KEY, created_on DATE, updated_at TIMESTAMP, deleted_at TIMESTAMPTZ, active BOOLEAN)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC")
@@ -98,6 +98,18 @@ test_that("empty insert works", {
   empty_orders <- data.frame()
   res <- dbxInsert(db, "orders", empty_orders)
   expect_equal(res, empty_orders)
+})
+
+test_that("boolean works", {
+  dbxDelete(db, "events")
+
+  events <- data.frame(active=c(TRUE, FALSE))
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(res$active, events$active)
+
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$active, events$active)
 })
 
 test_that("dates works", {
