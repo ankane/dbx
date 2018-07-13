@@ -304,6 +304,24 @@ All connections are simply [DBI](https://cran.r-project.org/package=DBI) connect
 dbGetInfo(db)
 ```
 
+## Upgrading
+
+### 0.2.0 [unreleased]
+
+Version 0.2.0 brings a number of improvements to dates and times.
+
+One breaking change is `timestamp without time zone` columns in Postgres are now stored in UTC instead of local time. To keep the previous behavior, use:
+
+```r
+dbxConnect(adapter="postgres", storage_tz=Sys.timezone(), ...)
+```
+
+This does not affect `timestamp with time zone` columns.
+
+## History
+
+View the [changelog](https://github.com/ankane/dbx/blob/master/NEWS.md)
+
 ## Contributing
 
 Everyone is encouraged to help improve this project. Here are a few ways you can help:
