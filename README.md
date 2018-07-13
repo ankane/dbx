@@ -208,6 +208,12 @@ records$created_at <- as.POSIXct(records$created_at, tz="Etc/UTC")
 attr(records$created_at, "tzone") <- Sys.timezone()
 ```
 
+To store fractional seconds in MySQL, be sure to specify the [fractional seconds precision](https://dev.mysql.com/doc/refman/8.0/en/fractional-seconds.html) when creating your columns.
+
+```sql
+CREATE TABLE test (c1 TIME(6), c2 DATETIME(6), c3 TIMESTAMP(6));
+```
+
 ## Database Credentials
 
 Environment variables are a convenient way to store database credentials. This keeps them outside your source control. It’s also how platforms like [Heroku](https://www.heroku.com) store them.

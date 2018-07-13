@@ -2,6 +2,7 @@
 #'
 #' @param url A database URL
 #' @param adapter The database adapter to use
+#' @param storage_tz The time zone timestamps are stored in
 #' @param ... Arguments to pass to dbConnect
 #' @importFrom DBI dbConnect
 #' @export
@@ -20,7 +21,7 @@
 #' # Others
 #' db <- dbxConnect(adapter=odbc(), database="mydb")
 #' }
-dbxConnect <- function(url=NULL, adapter=NULL, ...) {
+dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
   }
@@ -94,6 +95,14 @@ dbxConnect <- function(url=NULL, adapter=NULL, ...) {
 
   conn <- do.call(dbConnect, c(obj, params))
 
+  if (!is.null(storage_tz)) {
+    if (!isPostgres(conn)) {
+      dbDisconnect(conn)
+      stop("storage_tz is only supported with Postgres")
+    }
+    attr(conn, "dbx_storage_tz") <- storage_tz
+  }
+
   # other adapters do this automatically
   if (isRPostgreSQL(conn)) {
     dbExecute(conn, "SET SESSION timezone TO 'UTC'")
@@ -133,15 +142,25 @@ dbxSelect <- function(conn, statement) {
   ret <- list()
   cast_dates <- list()
   cast_times <- list()
+  convert_tz <- list()
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type 7 in column"), {
     res <- dbSendQuery(conn, statement)
 
-    if (isRMySQL(conn)) {
+    if (isPostgres(conn) && storageTimeZone(conn) != currentTimeZone()) {
+      column_info <- dbColumnInfo(res)
+      if (isRPostgreSQL(conn)) {
+        convert_tz <- which(column_info$type == "TIMESTAMP")
+      } else {
+        convert_tz <- which(column_info$`.typname` == "timestamp")
+      }
+    } else if (isRMySQL(conn)) {
       column_info <- dbColumnInfo(res)
       cast_dates <- which(column_info$type == "DATE")
       cast_times <- which(column_info$type %in% c("DATETIME", "TIMESTAMP"))
     }
+    # TODO cast for RSQLite
+    # waiting on https://github.com/r-dbi/RSQLite/issues/263
 
     while (!dbHasCompleted(res)) {
       ret[[length(ret) + 1]] <- dbFetch(res)
@@ -156,7 +175,12 @@ dbxSelect <- function(conn, statement) {
   }
 
   for (i in cast_times) {
-    records[, i] <- as.POSIXct(records[, i], tz="Etc/UTC")
+    records[, i] <- as.POSIXct(records[, i], tz=storageTimeZone(conn))
+    attr(records[, i], "tzone") <- currentTimeZone()
+  }
+
+  for (i in convert_tz) {
+    records[, i] <- as.POSIXct(format(records[, i], "%Y-%m-%d %H:%M:%OS6"), tz=storageTimeZone(conn))
     attr(records[, i], "tzone") <- currentTimeZone()
   }
 
@@ -489,10 +513,6 @@ inBatches <- function(records, batch_size, f) {
   }
 }
 
-currentTimeZone <- function() {
-  Sys.getenv("TZ", Sys.timezone())
-}
-
 # https://stackoverflow.com/questions/2851327/convert-a-list-of-data-frames-into-one-data-frame
 combineResults <- function(ret) {
   if (isNamespaceLoaded("dplyr") && exists("bind_rows", where="package:dplyr", mode="function")) {
@@ -500,6 +520,15 @@ combineResults <- function(ret) {
   } else {
     do.call(rbind, ret)
   }
+}
+
+storageTimeZone <- function(conn) {
+  tz <- attr(conn, "dbx_storage_tz")
+  if (is.null(tz)) "Etc/UTC" else tz
+}
+
+currentTimeZone <- function() {
+  Sys.getenv("TZ", Sys.timezone())
 }
 
 #' @importFrom DBI dbQuoteIdentifier
@@ -512,14 +541,20 @@ quoteRecords <- function(conn, records) {
   quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
   for (i in 1:ncol(records)) {
     col <- records[, i]
-    if (isMySQL(conn) && isDate(col)) {
-      col <- format(col)
-    } else if (isPostgres(conn) && isTime(col)) {
-      col <- format(col, "%Y-%m-%d %H:%M:%OS6 %Z")
+    if (isMySQL(conn)) {
+      if (isTime(col)) {
+        col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
+      } else if (isDate(col)) {
+        col <- format(col)
+      }
+    } else if (isPostgres(conn)) {
+      if (isTime(col)) {
+        col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6 %Z")
+      }
     } else if (isSQLite(conn)) {
       # since no standard, store dates and times in the same format as Rails
       if (isTime(col)) {
-        col <- format(col, tz="Etc/UTC", "%Y-%m-%d %H:%M:%OS6")
+        col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
       } else if (isDate(col)) {
         col <- format(col)
       }

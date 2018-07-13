@@ -120,6 +120,22 @@ test_that("times works", {
   expect_equal(col, events$updated_at)
 })
 
+test_that("timestamps have precision", {
+  dbxDelete(db, "events")
+
+  t1 <- as.POSIXct("2018-01-01 12:30:55.123456")
+  events <- data.frame(updated_at=c(t1))
+  dbxInsert(db, "events", events)
+
+  # test returned time
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$updated_at, format(events$updated_at, tz="UTC", "%Y-%m-%d %H:%M:%OS6"))
+
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 20:30:55.123456'")
+  expect_equal(1, res$count)
+})
+
 test_that("connect with url works", {
   con2 <- dbxConnect(url="sqlite:///:memory:")
   res <- dbxSelect(con2, "SELECT 1 AS hi")

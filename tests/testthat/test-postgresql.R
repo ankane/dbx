@@ -125,8 +125,13 @@ test_that("times works", {
 
   expect_equal(res$updated_at, events$updated_at)
 
+  # test returned time
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
   expect_equal(res$updated_at, events$updated_at)
+
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 20:30:55'")
+  expect_equal(1, res$count)
 })
 
 test_that("time zones works", {
@@ -142,8 +147,8 @@ test_that("time zones works", {
   expect_equal(res$updated_at, events$updated_at)
 
   # test stored time
-  # res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 09:30:55 PST'")
-  # expect_equal(1, res$count)
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 17:30:55'")
+  expect_equal(1, res$count)
 })
 
 test_that("timestamp with time zone works", {
@@ -163,8 +168,44 @@ test_that("timestamp with time zone works", {
   expect_equal(1, res$count)
 })
 
+test_that("timestamps have precision", {
+  dbxDelete(db, "events")
+
+  t1 <- as.POSIXct("2018-01-01 12:30:55.123456")
+  events <- data.frame(updated_at=c(t1))
+  dbxInsert(db, "events", events)
+
+  # test returned time
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$updated_at, events$updated_at)
+
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 20:30:55.123456'")
+  expect_equal(1, res$count)
+})
+
 test_that("time zone is UTC", {
   expect_equal("UTC", dbxSelect(db, "SHOW timezone")$TimeZone)
+})
+
+test_that("local times works", {
+  inTimeZone("America/Chicago", {
+    db2 <- dbxConnect(adapter=RPostgreSQL::PostgreSQL(), dbname="dbx_test", storage_tz="America/Chicago")
+    dbxDelete(db2, "events")
+
+    t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
+    t2 <- as.POSIXct("2018-01-01 16:59:59", tz="America/New_York")
+    events <- data.frame(updated_at=c(t1, t2))
+    dbxInsert(db2, "events", events)
+
+    # test returned time
+    res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
+    expect_equal(res$updated_at, events$updated_at)
+
+    # test stored time
+    res <- dbxSelect(db2, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 11:30:55'")
+    expect_equal(1, res$count)
+  })
 })
 
 dbxDisconnect(db)

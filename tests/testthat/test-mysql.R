@@ -12,7 +12,7 @@ dbExecute(db, "CREATE TABLE orders (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME, deleted_at TIMESTAMP)")
+dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME(6), deleted_at TIMESTAMP(6))")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
@@ -129,14 +129,13 @@ test_that("times works", {
 
   expect_equal(res$updated_at, events$updated_at)
 
-  # times returned as character vectors in UTC
+  # test returned time
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
   expect_equal(res$updated_at, events$updated_at)
 
-  # test typecast
-  col <- as.POSIXct(res$updated_at, tz="Etc/UTC")
-  attr(col, "tzone") <- Sys.timezone()
-  expect_equal(col, events$updated_at)
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 20:30:55'")
+  expect_equal(1, res$count)
 })
 
 test_that("time zones works", {
@@ -170,6 +169,22 @@ test_that("timestamp works", {
 
   # test stored time
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE deleted_at = '2018-01-01 17:30:55'")
+  expect_equal(1, res$count)
+})
+
+test_that("timestamps have precision", {
+  dbxDelete(db, "events")
+
+  t1 <- as.POSIXct("2018-01-01 12:30:55.123456")
+  events <- data.frame(updated_at=c(t1))
+  dbxInsert(db, "events", events)
+
+  # test returned time
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$updated_at, events$updated_at)
+
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 20:30:55.123456'")
   expect_equal(1, res$count)
 })
 
