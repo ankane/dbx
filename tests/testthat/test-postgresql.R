@@ -217,6 +217,8 @@ test_that("local times works", {
     # test stored time
     res <- dbxSelect(db2, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 11:30:55'")
     expect_equal(1, res$count)
+
+    dbxDisconnect(db2)
   })
 })
 
