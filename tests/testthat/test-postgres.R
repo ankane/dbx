@@ -12,7 +12,7 @@ dbExecute(db, "CREATE TABLE orders (id SERIAL PRIMARY KEY, city text, other text
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id SERIAL PRIMARY KEY, created_on DATE, updated_at TIMESTAMP, deleted_at TIMESTAMPTZ, active BOOLEAN, properties JSON, propertiesb JSONB)")
+dbExecute(db, "CREATE TABLE events (id SERIAL PRIMARY KEY, created_on DATE, updated_at TIMESTAMP, deleted_at TIMESTAMPTZ, open_time TIME, active BOOLEAN, properties JSON, propertiesb JSONB)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC")
@@ -258,6 +258,23 @@ test_that("datetimes with storage_tz works", {
 
     dbxDisconnect(db2)
   })
+})
+
+test_that("times work", {
+  dbxDelete(db, "events")
+
+  events <- data.frame(open_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(as.character(res$open_time), events$open_time)
+
+  # test returned time
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(as.character(res$open_time), events$open_time)
+
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
+  expect_equal(1, res$count)
 })
 
 test_that("connect with url works", {
