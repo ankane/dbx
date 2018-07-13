@@ -2,7 +2,7 @@ context("postgresql")
 
 skip_on_cran()
 
-db <- dbxConnect(adapter=RPostgreSQL::PostgreSQL(), dbname="dbx_test")
+db <- dbxConnect(adapter="rpostgresql", dbname="dbx_test")
 
 orders <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
 new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFactors=FALSE)
@@ -202,7 +202,7 @@ test_that("time zone is UTC", {
 
 test_that("local times works", {
   inTimeZone("America/Chicago", {
-    db2 <- dbxConnect(adapter=RPostgreSQL::PostgreSQL(), dbname="dbx_test", storage_tz="America/Chicago")
+    db2 <- dbxConnect(adapter="rpostgresql", dbname="dbx_test", storage_tz="America/Chicago")
     dbxDelete(db2, "events")
 
     t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")

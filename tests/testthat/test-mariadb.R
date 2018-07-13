@@ -2,7 +2,7 @@ context("mariadb")
 
 skip_on_cran()
 
-db <- dbxConnect(adapter="mariadb", dbname="dbx_test")
+db <- dbxConnect(adapter="rmariadb", dbname="dbx_test")
 
 orders <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
 new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFactors=FALSE)
@@ -205,7 +205,7 @@ test_that("time zone is UTC", {
 })
 
 test_that("connect with url works", {
-  con2 <- dbxConnect("mariadb://localhost/dbx_test")
+  con2 <- dbxConnect("rmariadb://localhost/dbx_test")
   res <- dbxSelect(con2, "SELECT 1 AS hi")
   dbxDisconnect(con2)
   exp <- data.frame(hi=c(1))

@@ -56,41 +56,38 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
     }
   }
 
-  if (!is.character(adapter)) {
-    obj <- adapter
-  } else if (grepl("postgres", adapter)) {
-    if (requireNamespace("RPostgres", quietly=TRUE)) {
-      obj <- RPostgres::Postgres()
-      if (is.null(params$bigint)) {
-        params$bigint <- "numeric"
+  obj <- findAdapter(adapter)
+
+  if (is.null(obj)) {
+    # if not found by exact name
+
+    if (grepl("postgres", adapter)) {
+      if (requireNamespace("RPostgres", quietly=TRUE)) {
+        adapter <- "rpostgres"
+      } else if (requireNamespace("RPostgreSQL", quietly=TRUE)) {
+        adapter <- "rpostgresql"
+      } else {
+        stop("Could not load adapter: RPostgres or RPostgreSQL")
       }
-    } else if (requireNamespace("RPostgreSQL", quietly=TRUE)) {
-      obj <- RPostgreSQL::PostgreSQL()
-    } else {
-      stop("Could not load adapter: RPostgres or RPostgreSQL")
-    }
-  } else if (grepl("mysql", adapter)) {
-    if (requireNamespace("RMySQL", quietly=TRUE)) {
-      obj <- RMySQL::MySQL()
-    } else if (requireNamespace("RMariaDB", quietly=TRUE)) {
-      obj <- RMariaDB::MariaDB()
-      if (is.null(params$bigint)) {
-        params$bigint <- "numeric"
+    } else if (grepl("mysql", adapter)) {
+      if (requireNamespace("RMySQL", quietly=TRUE)) {
+        adapter <- "rmysql"
+      } else if (requireNamespace("RMariaDB", quietly=TRUE)) {
+        adapter <- "rmariadb"
+      } else {
+        stop("Could not load adapter: RMySQL or RMariaDB")
       }
+    } else if (grepl("sqlite", adapter)) {
+      adapter <- "rsqlite"
     } else {
-      stop("Could not load adapter: RMySQL or RMariaDB")
+      stop("Unknown adapter")
     }
-  } else if (grepl("mariadb", adapter)) {
-    requireLib("RMariaDB")
-    obj <- RMariaDB::MariaDB()
-    if (is.null(params$bigint)) {
-      params$bigint <- "numeric"
-    }
-  } else if (grepl("sqlite", adapter)) {
-    requireLib("RSQLite")
-    obj <- RSQLite::SQLite()
-  } else {
-    stop("Unknown adapter")
+
+    obj <- findAdapter(adapter)
+  }
+
+  if (is.null(params$bigint) && (inherits(obj, "PqDriver") || inherits(obj, "MariaDBDriver"))) {
+    params$bigint <- "numeric"
   }
 
   conn <- do.call(dbConnect, c(obj, params))
@@ -353,6 +350,32 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   }
 
   invisible()
+}
+
+findAdapter <- function(adapter) {
+  obj <- NULL
+  if (!is.character(adapter)) {
+    obj <- adapter
+  } else {
+    adapter <- tolower(adapter)
+    if (adapter == "rsqlite") {
+      requireLib("RSQLite")
+      obj <- RSQLite::SQLite()
+    } else if (adapter == "rmariadb") {
+      requireLib("RMariaDB")
+      obj <- RMariaDB::MariaDB()
+    } else if (adapter == "rmysql") {
+      requireLib("RMySQL")
+      obj <- RMySQL::MySQL()
+    } else if (adapter == "rpostgres") {
+      requireLib("RPostgres")
+      obj <- RPostgres::Postgres()
+    } else if (adapter == "rpostgresql") {
+      requireLib("RPostgreSQL")
+      obj <- RPostgreSQL::PostgreSQL()
+    }
+  }
+  obj
 }
 
 silenceWarnings <- function(msgs, code) {
