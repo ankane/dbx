@@ -12,7 +12,7 @@ dbExecute(db, "CREATE TABLE orders (id SERIAL PRIMARY KEY, city text, other text
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id SERIAL PRIMARY KEY, created_on DATE, updated_at TIMESTAMP, deleted_at TIMESTAMPTZ, active BOOLEAN, properties JSONB)")
+dbExecute(db, "CREATE TABLE events (id SERIAL PRIMARY KEY, created_on DATE, updated_at TIMESTAMP, deleted_at TIMESTAMPTZ, active BOOLEAN, properties JSON, propertiesb JSONB)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC")
@@ -112,7 +112,7 @@ test_that("boolean works", {
   expect_equal(res$active, events$active)
 })
 
-test_that("jsonb works", {
+test_that("json works", {
   dbxDelete(db, "events")
 
   events <- data.frame(properties=c('{"hello": "world"}'), stringsAsFactors=FALSE)
@@ -122,6 +122,18 @@ test_that("jsonb works", {
 
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
   expect_equal(as.character(res$properties), events$properties)
+})
+
+test_that("jsonb works", {
+  dbxDelete(db, "events")
+
+  events <- data.frame(propertiesb=c('{"hello": "world"}'), stringsAsFactors=FALSE)
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(as.character(res$propertiesb), events$propertiesb)
+
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(as.character(res$propertiesb), events$propertiesb)
 })
 
 test_that("dates works", {

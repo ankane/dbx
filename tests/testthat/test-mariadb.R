@@ -116,6 +116,9 @@ test_that("boolean works", {
   expect_equal(res$active == 1, events$active)
 })
 
+# json not supported yet
+# Unimplemented MAX_NO_FIELD_TYPES
+
 test_that("dates works", {
   dbxDelete(db, "events")
 

@@ -220,6 +220,10 @@ Boolean columns are not automatically typecast with RMariaDB and RSQLite due to 
 records$active <- records$active != 0
 ```
 
+### JSON
+
+RMariaDB does not currently supported JSON. We recommend RMySQL instead.
+
 ## Database Credentials
 
 Environment variables are a convenient way to store database credentials. This keeps them outside your source control. It’s also how platforms like [Heroku](https://www.heroku.com) store them.

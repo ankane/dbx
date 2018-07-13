@@ -142,7 +142,7 @@ dbxSelect <- function(conn, statement) {
   convert_tz <- list()
   cast_booleans <- list()
 
-  silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type 7 in column"), {
+  silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type"), {
     res <- dbSendQuery(conn, statement)
 
     if (isPostgres(conn)) {

@@ -12,7 +12,7 @@ dbExecute(db, "CREATE TABLE orders (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME(6), deleted_at TIMESTAMP(6), active BOOLEAN)")
+dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME(6), deleted_at TIMESTAMP(6), active BOOLEAN, properties JSON)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
@@ -113,6 +113,18 @@ test_that("boolean works", {
 
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
   expect_equal(res$active, events$active)
+})
+
+test_that("json works", {
+  dbxDelete(db, "events")
+
+  events <- data.frame(properties=c('{"hello": "world"}'), stringsAsFactors=FALSE)
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(res$properties, events$properties)
+
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$properties, events$properties)
 })
 
 test_that("dates works", {
