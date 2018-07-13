@@ -6,7 +6,8 @@
 - High performance batch operations
 - Safe inserts, updates, and deletes without writing SQL
 - Upserts!!
-- Plays nicely with auto-incrementing primary keys
+- Great date and time support
+- Works well with auto-incrementing primary keys
 - Built on top of [DBI](https://cran.r-project.org/package=DBI)
 
 Designed for both research and production environments
@@ -190,7 +191,7 @@ options(dbx_verbose=logQuery)
 
 ### Dates & Times
 
-When times are retrieved, they are converted to your local time zone. The exception is SQLite, where date and time columns are returned as character vectors in UTC, as RSQLite does [not provide enough info](https://github.com/r-dbi/RSQLite/issues/263) to typecast automatically right now.
+Times are stored in the database in UTC. When retrieved, they are converted to your local time zone. The exception is SQLite, where date and time columns are returned as character vectors in UTC, as RSQLite does [not provide enough info](https://github.com/r-dbi/RSQLite/issues/263) to typecast automatically right now.
 
 For SQLite, you can manually typecast date columns with:
 
