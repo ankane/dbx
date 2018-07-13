@@ -196,14 +196,14 @@ Times are stored in the database in UTC. When retrieved, they are converted to y
 For SQLite, you can manually typecast date columns with:
 
 ```r
-records$created_on <- as.Date(records$created_on)
+records$column <- as.Date(records$column)
 ```
 
 And time columns with:
 
 ```r
-records$created_at <- as.POSIXct(records$created_at, tz="Etc/UTC")
-attr(records$created_at, "tzone") <- Sys.timezone()
+records$column <- as.POSIXct(records$column, tz="Etc/UTC")
+attr(records$column, "tzone") <- Sys.timezone()
 ```
 
 To store fractional seconds in MySQL, be sure to specify the [fractional seconds precision](https://dev.mysql.com/doc/refman/8.0/en/fractional-seconds.html) when creating your columns.
@@ -217,10 +217,18 @@ CREATE TABLE test (c1 TIME(6), c2 DATETIME(6), c3 TIMESTAMP(6));
 Boolean columns are not automatically typecast with RMariaDB and RSQLite due to limitations. You can manually typecast with:
 
 ```r
-records$active <- records$active != 0
+records$column <- records$column != 0
 ```
 
 ### JSON
+
+JSON and JSONB columns are not automatically typecast. You can manually typecast with:
+
+```r
+library(jsonlite)
+
+records$column <- fromJSON(records$column)
+```
 
 RMariaDB does not currently supported JSON. We recommend RMySQL instead.
 
