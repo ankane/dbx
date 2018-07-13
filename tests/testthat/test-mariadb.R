@@ -12,7 +12,7 @@ dbExecute(db, "CREATE TABLE orders (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME(6), deleted_at TIMESTAMP(6), active BOOLEAN)")
+dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME(6), deleted_at TIMESTAMP(6), open_time TIME, active BOOLEAN)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
@@ -205,6 +205,23 @@ test_that("datetimes have precision", {
 
 test_that("time zone is UTC", {
   expect_equal("+00:00", dbxSelect(db, "SELECT @@session.time_zone")$`@@session.time_zone`)
+})
+
+test_that("times work", {
+  dbxDelete(db, "events")
+
+  events <- data.frame(open_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(as.character(res$open_time), events$open_time)
+
+  # test returned time
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(as.character(res$open_time), events$open_time)
+
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
+  expect_equal(1, res$count)
 })
 
 test_that("connect with url works", {
