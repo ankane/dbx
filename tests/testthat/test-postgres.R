@@ -163,7 +163,7 @@ test_that("dates works", {
   expect(all(format(res$created_on, "%Z") == "UTC"))
 })
 
-test_that("times works", {
+test_that("datetimes works", {
   dbxDelete(db, "events")
 
   t1 <- as.POSIXct("2018-01-01 12:30:55")
@@ -182,7 +182,7 @@ test_that("times works", {
   expect_equal(1, res$count)
 })
 
-test_that("time zones works", {
+test_that("datetimes with time zones works", {
   dbxDelete(db, "events")
 
   t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
@@ -216,7 +216,7 @@ test_that("timestamp with time zone works", {
   expect_equal(1, res$count)
 })
 
-test_that("timestamps have precision", {
+test_that("datetimes have precision", {
   dbxDelete(db, "events")
 
   t1 <- as.POSIXct("2018-01-01 12:30:55.123456")
@@ -236,7 +236,7 @@ test_that("time zone is UTC", {
   expect_equal("UTC", dbxSelect(db, "SHOW timezone")$TimeZone)
 })
 
-test_that("local times works", {
+test_that("datetimes with storage_tz works", {
   # does not work on Windows when this is different than Sys.timezone()
   # see https://github.com/r-dbi/RPostgres/issues/190
   inTimeZone("America/Chicago", {

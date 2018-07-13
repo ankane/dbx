@@ -114,7 +114,7 @@ test_that("dates works", {
   expect_equal(as.Date(res$created_on), events$created_on)
 })
 
-test_that("times works", {
+test_that("datetimes works", {
   dbxDelete(db, "events")
 
   t1 <- as.POSIXct("2018-01-01 12:30:55")
@@ -133,7 +133,7 @@ test_that("times works", {
   expect_equal(col, events$updated_at)
 })
 
-test_that("timestamps have precision", {
+test_that("datetimes have precision", {
   dbxDelete(db, "events")
 
   t1 <- as.POSIXct("2018-01-01 12:30:55.123456")

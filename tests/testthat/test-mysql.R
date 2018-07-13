@@ -143,7 +143,7 @@ test_that("dates works", {
   expect_equal(as.Date(res$created_on), events$created_on)
 })
 
-test_that("times works", {
+test_that("datetimes works", {
   dbxDelete(db, "events")
 
   t1 <- as.POSIXct("2018-01-01 12:30:55")
@@ -162,7 +162,7 @@ test_that("times works", {
   expect_equal(1, res$count)
 })
 
-test_that("time zones works", {
+test_that("datetimes with time zones works", {
   dbxDelete(db, "events")
 
   t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
@@ -196,7 +196,7 @@ test_that("timestamp works", {
   expect_equal(1, res$count)
 })
 
-test_that("timestamps have precision", {
+test_that("datetimes have precision", {
   dbxDelete(db, "events")
 
   t1 <- as.POSIXct("2018-01-01 12:30:55.123456")
