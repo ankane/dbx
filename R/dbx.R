@@ -147,12 +147,14 @@ dbxSelect <- function(conn, statement) {
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type 7 in column"), {
     res <- dbSendQuery(conn, statement)
 
-    if (isPostgres(conn) && storageTimeZone(conn) != currentTimeZone()) {
-      column_info <- dbColumnInfo(res)
-      if (isRPostgreSQL(conn)) {
-        convert_tz <- which(column_info$type == "TIMESTAMP")
-      } else {
-        convert_tz <- which(column_info$`.typname` == "timestamp")
+    if (isPostgres(conn)) {
+      if (storageTimeZone(conn) != currentTimeZone()) {
+        column_info <- dbColumnInfo(res)
+        if (isRPostgreSQL(conn)) {
+          convert_tz <- which(column_info$type == "TIMESTAMP")
+        } else {
+          convert_tz <- which(column_info$`.typname` == "timestamp")
+        }
       }
     } else if (isRMySQL(conn)) {
       column_info <- dbColumnInfo(res)
