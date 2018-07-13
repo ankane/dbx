@@ -185,7 +185,9 @@ logQuery <- function(sql) {
 options(dbx_verbose=logQuery)
 ```
 
-## Dates & Times
+## Data Types
+
+### Dates & Times
 
 **Note:** There are many improvements to date and time handling on master. We recommend using the latest version:
 
@@ -212,6 +214,14 @@ To store fractional seconds in MySQL, be sure to specify the [fractional seconds
 
 ```sql
 CREATE TABLE test (c1 TIME(6), c2 DATETIME(6), c3 TIMESTAMP(6));
+```
+
+### Booleans
+
+Due to limitations, boolean columns are not automatically typecast with RMariaDB and RSQLite. You can manually typecast with:
+
+```r
+records$active <- records$active == 1
 ```
 
 ## Database Credentials
