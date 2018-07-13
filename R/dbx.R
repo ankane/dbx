@@ -478,6 +478,10 @@ isDatetime <- function(col) {
   inherits(col, "POSIXt")
 }
 
+isTime <- function(col) {
+  inherits(col, "hms")
+}
+
 isLogical <- function(col) {
   inherits(col, "logical")
 }
@@ -587,6 +591,8 @@ quoteRecords <- function(conn, records) {
     } else if (isPostgres(conn)) {
       if (isDatetime(col)) {
         col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6 %Z")
+      } else if (isTime(col)) {
+        col <- format(col)
       } else if (isLogical(col) && isRPostgreSQL(conn)) {
         col <- as.character(col)
       }

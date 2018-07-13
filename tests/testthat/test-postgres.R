@@ -277,6 +277,23 @@ test_that("times work", {
   expect_equal(1, res$count)
 })
 
+test_that("hms with times work", {
+  dbxDelete(db, "events")
+
+  events <- data.frame(open_time=c(hms::as.hms("12:30:55"), hms::as.hms("16:59:59")), stringsAsFactors=FALSE)
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(res$open_time, events$open_time)
+
+  # test returned time
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$open_time, events$open_time)
+
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
+  expect_equal(1, res$count)
+})
+
 test_that("connect with url works", {
   con2 <- dbxConnect(url="postgres://localhost/dbx_test")
   res <- dbxSelect(con2, "SELECT 1 AS hi")
