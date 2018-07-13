@@ -4,6 +4,7 @@
 - Fixed errors with dates and times
 - Fixed date and time typecasting with RMySQL
 - Fixed boolean writes with RPostgreSQL
+- Fixed boolean typecasting with RMySQL
 
 Breaking
 

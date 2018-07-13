@@ -63,7 +63,7 @@ You can also pass `user`, `password`, `host`, `port`, and `url`.
 Install the R package
 
 ```r
-install.packages("RMariaDB")
+install.packages("RMySQL")
 ```
 
 And use:
@@ -76,7 +76,7 @@ db <- dbxConnect(adapter="mysql", dbname="mydb")
 
 You can also pass `user`, `password`, `host`, `port`, and `url`.
 
-> Works with RMySQL as well
+> Works with RMariaDB as well
 
 ### SQLite
 

@@ -143,6 +143,7 @@ dbxSelect <- function(conn, statement) {
   cast_dates <- list()
   cast_datetimes <- list()
   convert_tz <- list()
+  cast_booleans <- list()
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type 7 in column"), {
     res <- dbSendQuery(conn, statement)
@@ -160,9 +161,12 @@ dbxSelect <- function(conn, statement) {
       column_info <- dbColumnInfo(res)
       cast_dates <- which(column_info$type == "DATE")
       cast_datetimes <- which(column_info$type %in% c("DATETIME", "TIMESTAMP"))
+      cast_booleans <- which(column_info$type == "TINYINT" & column_info$length == 1)
     }
-    # TODO cast for RSQLite
+    # TODO cast dates and times for RSQLite
     # waiting on https://github.com/r-dbi/RSQLite/issues/263
+
+    # TODO cast booleans for RMariaDB
 
     while (!dbHasCompleted(res)) {
       ret[[length(ret) + 1]] <- dbFetch(res)
@@ -184,6 +188,10 @@ dbxSelect <- function(conn, statement) {
   for (i in convert_tz) {
     records[, i] <- as.POSIXct(format(records[, i], "%Y-%m-%d %H:%M:%OS6"), tz=storageTimeZone(conn))
     attr(records[, i], "tzone") <- currentTimeZone()
+  }
+
+  for (i in cast_booleans) {
+    records[, i] <- records[, i] == 1
   }
 
   records
