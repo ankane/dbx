@@ -188,7 +188,7 @@ dbxSelect <- function(conn, statement) {
   }
 
   for (i in cast_booleans) {
-    records[, i] <- records[, i] == 1
+    records[, i] <- records[, i] != 0
   }
 
   records
