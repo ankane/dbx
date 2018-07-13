@@ -141,7 +141,7 @@ dbxSelect <- function(conn, statement) {
   statement <- processStatement(statement)
   ret <- list()
   cast_dates <- list()
-  cast_times <- list()
+  cast_datetimes <- list()
   convert_tz <- list()
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type 7 in column"), {
@@ -157,7 +157,7 @@ dbxSelect <- function(conn, statement) {
     } else if (isRMySQL(conn)) {
       column_info <- dbColumnInfo(res)
       cast_dates <- which(column_info$type == "DATE")
-      cast_times <- which(column_info$type %in% c("DATETIME", "TIMESTAMP"))
+      cast_datetimes <- which(column_info$type %in% c("DATETIME", "TIMESTAMP"))
     }
     # TODO cast for RSQLite
     # waiting on https://github.com/r-dbi/RSQLite/issues/263
@@ -174,7 +174,7 @@ dbxSelect <- function(conn, statement) {
     records[, i] <- as.Date(records[, i])
   }
 
-  for (i in cast_times) {
+  for (i in cast_datetimes) {
     records[, i] <- as.POSIXct(records[, i], tz=storageTimeZone(conn))
     attr(records[, i], "tzone") <- currentTimeZone()
   }
@@ -441,7 +441,7 @@ isDate <- function(col) {
   inherits(col, "Date")
 }
 
-isTime <- function(col) {
+isDatetime <- function(col) {
   inherits(col, "POSIXt")
 }
 
@@ -542,18 +542,18 @@ quoteRecords <- function(conn, records) {
   for (i in 1:ncol(records)) {
     col <- records[, i]
     if (isMySQL(conn)) {
-      if (isTime(col)) {
+      if (isDatetime(col)) {
         col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
       } else if (isDate(col)) {
         col <- format(col)
       }
     } else if (isPostgres(conn)) {
-      if (isTime(col)) {
+      if (isDatetime(col)) {
         col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6 %Z")
       }
     } else if (isSQLite(conn)) {
       # since no standard, store dates and times in the same format as Rails
-      if (isTime(col)) {
+      if (isDatetime(col)) {
         col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
       } else if (isDate(col)) {
         col <- format(col)
