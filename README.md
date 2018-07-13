@@ -193,7 +193,7 @@ options(dbx_verbose=logQuery)
 devtools::install_github("ankane/dbx")
 ```
 
-When times are retrieved, they are converted to your local time zone. The exception is SQLite, where date and time columns are returned as character vectors in UTC.
+When times are retrieved, they are converted to your local time zone. The exception is SQLite, where date and time columns are returned as character vectors in UTC, as RSQLite does [not provide enough info](https://github.com/r-dbi/RSQLite/issues/263) to typecast automatically right now.
 
 For SQLite, you can manually typecast date columns with:
 
