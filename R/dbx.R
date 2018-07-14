@@ -3,7 +3,8 @@
 #' @param url A database URL
 #' @param adapter The database adapter to use
 #' @param storage_tz The time zone timestamps are stored in
-#' @param cast_times Cast times to hms
+#' @param cast_times Cast time columns to 'hms' objects
+#' @param cast_blobs Cast blob columns to 'blob' objects
 #' @param ... Arguments to pass to dbConnect
 #' @importFrom DBI dbConnect
 #' @export
@@ -22,7 +23,7 @@
 #' # Others
 #' db <- dbxConnect(adapter=odbc(), database="mydb")
 #' }
-dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL, ...) {
+dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL, cast_blobs=NULL, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
   }
@@ -103,9 +104,16 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL,
 
   if (!is.null(cast_times)) {
     if (cast_times && !requireNamespace("hms", quietly=TRUE)) {
-      stop("hms is required for cast_times")
+      stop("'hms' package is required for cast_times")
     }
     attr(conn, "dbx_cast_times") <- cast_times
+  }
+
+  if (!is.null(cast_blobs)) {
+    if (cast_blobs && !requireNamespace("blob", quietly=TRUE)) {
+      stop("'blob' package is required for cast_blobs")
+    }
+    attr(conn, "dbx_cast_blobs") <- cast_blobs
   }
 
   # other adapters do this automatically
@@ -151,6 +159,7 @@ dbxSelect <- function(conn, statement) {
   cast_booleans <- list()
   cast_json <- list()
   cast_times <- list()
+  unescape_blobs <- list()
   cast_blobs <- list()
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown ("), {
@@ -170,7 +179,10 @@ dbxSelect <- function(conn, statement) {
           cast_times <- which(sql_types == "time")
         }
 
-        cast_blobs <- which(sql_types == "bytea")
+        unescape_blobs <- which(sql_types == "bytea")
+        if (identical(attr(conn, "dbx_cast_blobs"), TRUE)) {
+          cast_blobs <- unescape_blobs
+        }
       } else {
         sql_types <- column_info$`.typname`
 
@@ -231,8 +243,12 @@ dbxSelect <- function(conn, statement) {
       records[, i] <- records[, i] != 0
     }
 
-    for (i in cast_blobs) {
+    for (i in unescape_blobs) {
       records[[colnames(records)[i]]] <- lapply(records[, i], function(x) { if (is.na(x)) x else RPostgreSQL::postgresqlUnescapeBytea(x) })
+    }
+
+    for (i in cast_blobs) {
+      records[[colnames(records)[i]]] <- blob::as.blob(records[, i])
     }
 
     if (isRMariaDB(conn)) {

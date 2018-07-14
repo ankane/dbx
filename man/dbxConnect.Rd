@@ -5,7 +5,7 @@
 \title{Create a database connection}
 \usage{
 dbxConnect(url = NULL, adapter = NULL, storage_tz = NULL,
-  cast_times = NULL, ...)
+  cast_times = NULL, cast_blobs = NULL, ...)
 }
 \arguments{
 \item{url}{A database URL}
@@ -14,7 +14,9 @@ dbxConnect(url = NULL, adapter = NULL, storage_tz = NULL,
 
 \item{storage_tz}{The time zone timestamps are stored in}
 
-\item{cast_times}{Cast times to hms}
+\item{cast_times}{Cast time columns to 'hms' object}
+
+\item{cast_blobs}{Cast binary columns to 'blob' object}
 
 \item{...}{Arguments to pass to dbConnect}
 }
