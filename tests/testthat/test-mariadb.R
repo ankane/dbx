@@ -231,11 +231,11 @@ test_that("times work", {
   events <- data.frame(open_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
   res <- dbxInsert(db, "events", events)
 
-  expect_equal(as.character(res$open_time), events$open_time)
+  expect_equal(res$open_time, events$open_time)
 
   # test returned time
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(as.character(res$open_time), events$open_time)
+  expect_equal(res$open_time, events$open_time)
 
   # test stored time
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
@@ -252,7 +252,7 @@ test_that("hms with times work", {
 
   # test returned time
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$open_time, events$open_time)
+  expect_equal(res$open_time, format(events$open_time))
 
   # test stored time
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")

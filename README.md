@@ -263,6 +263,14 @@ DBI::dbWithTransaction(db, {
 
 Dates are returned as `Date` objects and times as `POSIXct` objects. Times are stored in the database in UTC and converted to your local time zone when retrieved.
 
+Times without dates are returned as `character` vectors since R has no built-in support for this type. If you use [hms](https://cran.r-project.org/package=hms), can you convert columns with:
+
+```r
+records$column <- hms::as.hms(records$column)
+```
+
+SQLite does not have support for `TIME` columns, so we recommend storing as `VARCHAR`.
+
 ### JSON
 
 JSON and JSONB columns are returned as `character` vectors. You can use [jsonlite](https://cran.r-project.org/package=jsonlite) to parse them with:

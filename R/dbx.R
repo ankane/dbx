@@ -290,12 +290,12 @@ dbxSelect <- function(conn, statement) {
       records[, i] <- hms::as.hms(records[, i])
     }
 
-    if (isFALSE(attr(conn, "dbx_cast_times"))) {
-      uncast_times <- which(sapply(records, isTime))
-      for (i in uncast_times) {
-        records[, i] <- format(records[, i])
-      }
+    # if (isFALSE(attr(conn, "dbx_cast_times"))) {
+    uncast_times <- which(sapply(records, isTime))
+    for (i in uncast_times) {
+      records[, i] <- format(records[, i])
     }
+    # }
 
     if (!identical(attr(conn, "dbx_cast_binary"), "blob")) {
       uncast_blobs <- which(sapply(records, isBlob))

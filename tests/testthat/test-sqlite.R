@@ -8,7 +8,7 @@ new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFac
 dbExecute(db, "CREATE TABLE orders (id INTEGER PRIMARY KEY AUTOINCREMENT, city VARCHAR(255))")
 dbxInsert(db, "orders", orders)
 
-dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at DATETIME, open_time DATETIME, active BOOLEAN, properties TEXT, image BLOB)")
+dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at DATETIME, open_time VARCHAR(255), active BOOLEAN, properties TEXT, image BLOB)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
