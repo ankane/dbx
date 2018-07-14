@@ -12,7 +12,8 @@ dbExecute(db, "CREATE TABLE orders (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME(6), deleted_at TIMESTAMP(6) NULL DEFAULT NULL, open_time TIME, active BOOLEAN, properties JSON, image BLOB)")
+json_type <- if (length(Sys.getenv("TRAVIS")) > 0) "TEXT" else "JSON"
+dbExecute(db, paste0("CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME(6), deleted_at TIMESTAMP(6) NULL DEFAULT NULL, open_time TIME, active BOOLEAN, properties ", json_type, ", image BLOB)"))
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
@@ -134,6 +135,8 @@ test_that("boolean works", {
 })
 
 test_that("json works", {
+  skip_on_travis()
+
   dbxDelete(db, "events")
 
   events <- data.frame(properties=c('{"hello": "world"}'), stringsAsFactors=FALSE)
