@@ -3,6 +3,7 @@
 #' @param url A database URL
 #' @param adapter The database adapter to use
 #' @param storage_tz The time zone timestamps are stored in
+#' @param cast_times Cast times to hms
 #' @param ... Arguments to pass to dbConnect
 #' @importFrom DBI dbConnect
 #' @export
@@ -21,7 +22,7 @@
 #' # Others
 #' db <- dbxConnect(adapter=odbc(), database="mydb")
 #' }
-dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
+dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
   }
@@ -100,6 +101,13 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
     attr(conn, "dbx_storage_tz") <- storage_tz
   }
 
+  if (!is.null(cast_times)) {
+    if (cast_times && !requireNamespace("hms", quietly=TRUE)) {
+      stop("hms is required for cast_times")
+    }
+    attr(conn, "dbx_cast_times") <- cast_times
+  }
+
   # other adapters do this automatically
   if (isRPostgreSQL(conn)) {
     dbExecute(conn, "SET SESSION timezone TO 'UTC'")
@@ -142,6 +150,7 @@ dbxSelect <- function(conn, statement) {
   convert_tz <- list()
   cast_booleans <- list()
   cast_json <- list()
+  cast_times <- list()
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown ("), {
     res <- dbSendQuery(conn, statement)
@@ -149,18 +158,33 @@ dbxSelect <- function(conn, statement) {
     if (isPostgres(conn)) {
       if (storageTimeZone(conn) != currentTimeZone()) {
         column_info <- dbColumnInfo(res)
+
         if (isRPostgreSQL(conn)) {
-          convert_tz <- which(column_info$type == "TIMESTAMP")
+          sql_types <- tolower(column_info$type)
+
+          convert_tz <- which(sql_types == "timestamp")
+
+          if (identical(attr(conn, "dbx_cast_times"), TRUE)) {
+            cast_times <- which(sql_types == "time")
+          }
         } else {
-          convert_tz <- which(column_info$`.typname` == "timestamp")
-          cast_json <- which(column_info$`.typname` == "json" | column_info$`.typname` == "jsonb")
+          sql_types <- column_info$`.typname`
+
+          convert_tz <- which(sql_types == "timestamp")
+          cast_json <- which(sql_types %in% c("json", "jsonb"))
         }
       }
     } else if (isRMySQL(conn)) {
       column_info <- dbColumnInfo(res)
-      cast_dates <- which(column_info$type == "DATE")
-      cast_datetimes <- which(column_info$type %in% c("DATETIME", "TIMESTAMP"))
-      cast_booleans <- which(column_info$type == "TINYINT" & column_info$length == 1)
+      sql_types <- tolower(column_info$type)
+
+      cast_dates <- which(sql_types == "date")
+      cast_datetimes <- which(sql_types %in% c("datetime", "timestamp"))
+      cast_booleans <- which(sql_types == "tinyint" & column_info$length == 1)
+
+      if (identical(attr(conn, "dbx_cast_times"), TRUE)) {
+        cast_times <- which(sql_types == "time")
+      }
     }
     # TODO cast dates and times for RSQLite
     # waiting on https://github.com/r-dbi/RSQLite/issues/263
@@ -199,6 +223,17 @@ dbxSelect <- function(conn, statement) {
 
     for (i in cast_booleans) {
       records[, i] <- records[, i] != 0
+    }
+
+    for (i in cast_times) {
+      records[, i] <- hms::as.hms(records[, i])
+    }
+
+    if (identical(attr(conn, "dbx_cast_times"), FALSE)) {
+      uncast_times <- which(sapply(records, isTime))
+      for (i in uncast_times) {
+        records[, i] <- format(records[, i])
+      }
     }
   }
 
