@@ -184,12 +184,12 @@ dbxSelect <- function(conn, statement) {
         convert_tz <- which(sql_types == "timestamp")
       }
 
-      if (identical(attr(conn, "dbx_cast_times"), TRUE)) {
+      if (isTRUE(attr(conn, "dbx_cast_times"))) {
         cast_times <- which(sql_types == "time")
       }
 
       unescape_blobs <- which(sql_types == "bytea")
-      if (identical(attr(conn, "dbx_cast_blobs"), TRUE)) {
+      if (isTRUE(attr(conn, "dbx_cast_blobs"))) {
         cast_blobs <- unescape_blobs
       }
 
@@ -214,7 +214,7 @@ dbxSelect <- function(conn, statement) {
       cast_datetimes <- which(sql_types %in% c("datetime", "timestamp"))
       cast_booleans <- which(sql_types == "tinyint" & column_info$length == 1)
 
-      if (identical(attr(conn, "dbx_cast_times"), TRUE)) {
+      if (isTRUE(attr(conn, "dbx_cast_times"))) {
         cast_times <- which(sql_types == "time")
       }
 
@@ -244,7 +244,7 @@ dbxSelect <- function(conn, statement) {
       # TODO cast dates and times for RSQLite
       # waiting on https://github.com/r-dbi/RSQLite/issues/263
 
-      if (identical(attr(conn, "dbx_cast_blobs"), TRUE)) {
+      if (isTRUE(attr(conn, "dbx_cast_blobs"))) {
         cast_blobs <- which(sapply(records, isBinary))
       }
     }
@@ -267,7 +267,7 @@ dbxSelect <- function(conn, statement) {
       records[, i] <- as.character(records[, i])
     }
 
-    if (identical(attr(conn, "dbx_cast_json"), TRUE)) {
+    if (isTRUE(attr(conn, "dbx_cast_json"))) {
       for (i in cast_json) {
         records[[colnames(records)[i]]] <- lapply(records[, i], function(x) { if (is.na(x)) x else jsonlite::fromJSON(x) })
       }
@@ -289,14 +289,14 @@ dbxSelect <- function(conn, statement) {
       records[, i] <- hms::as.hms(records[, i])
     }
 
-    if (identical(attr(conn, "dbx_cast_times"), FALSE)) {
+    if (isFALSE(attr(conn, "dbx_cast_times"))) {
       uncast_times <- which(sapply(records, isTime))
       for (i in uncast_times) {
         records[, i] <- format(records[, i])
       }
     }
 
-    if (identical(attr(conn, "dbx_cast_blobs"), FALSE)) {
+    if (isFALSE(attr(conn, "dbx_cast_blobs"))) {
       uncast_blobs <- which(sapply(records, isBlob))
       for (i in uncast_blobs) {
         records[[colnames(records)[i]]] <- lapply(records[, i], as.raw)
@@ -644,7 +644,7 @@ processStatement <- function(statement) {
   comment <- getOption("dbx_comment")
 
   if (!is.null(comment)) {
-    if (identical(comment, TRUE)) {
+    if (isTRUE(comment)) {
       comment <- paste0("script:", sub(".*=", "", commandArgs()[4]))
     }
     statement <- paste0(statement, " /*", comment, "*/")
