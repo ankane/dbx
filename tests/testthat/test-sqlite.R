@@ -169,34 +169,39 @@ test_that("datetimes have precision", {
 test_that("times work", {
   dbxDelete(db, "events")
 
-  events <- data.frame(open_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
+  t1 <- as.POSIXct("2000-01-01 12:30:55")
+  t2 <- as.POSIXct("2000-01-01 16:59:59")
+  events <- data.frame(open_time=c(t1, t2), stringsAsFactors=FALSE)
   res <- dbxInsert(db, "events", events)
 
   expect_equal(res$open_time, events$open_time)
 
   # test returned time
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$open_time, events$open_time)
+  expect_equal(res$open_time, format(events$open_time, tz="UTC", "%Y-%m-%d %H:%M:%OS6"))
 
   # test stored time
-  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '2000-01-01 20:30:55.000000'")
   expect_equal(1, res$count)
 })
 
 test_that("hms with times work", {
   dbxDelete(db, "events")
 
-  events <- data.frame(open_time=c(hms::as.hms("12:30:55"), hms::as.hms("16:59:59")), stringsAsFactors=FALSE)
+  events <- data.frame(open_time=hms::as.hms(c("12:30:55", "16:59:59")), stringsAsFactors=FALSE)
   res <- dbxInsert(db, "events", events)
 
   expect_equal(res$open_time, events$open_time)
 
   # test returned time
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$open_time, as.character(events$open_time))
+
+  # can be converted
+  res$open_time <- hms::as.hms(as.POSIXct(res$open_time, tz="Etc/UTC"))
+  expect_equal(hms::as.hms(res$open_time, tz="Etc/UTC"), events$open_time)
 
   # test stored time
-  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '2000-01-01 20:30:55.000000'")
   expect_equal(1, res$count)
 })
 

@@ -261,11 +261,17 @@ DBI::dbWithTransaction(db, {
 
 ### Dates & Times
 
-Times are stored in the database in UTC. When retrieved, they are converted to your local time zone.
+Dates are returned as `Date` objects and times as `POSIXct` objects. Times are stored in the database in UTC and converted to your local time zone when retrieved.
+
+Times without dates are returned as `POSIXct` objects with a date of `2000-01-01` since R has no built-in support for this type. If you use [hms](https://cran.r-project.org/package=hms), can you convert the column with:
+
+```r
+records$column <- hms::as.hms(records$column)
+```
 
 ### JSON
 
-JSON and JSONB columns are returned as character vectors. You can use [jsonlite](https://cran.r-project.org/package=jsonlite) to parse them with:
+JSON and JSONB columns are returned as `character` vectors. You can use [jsonlite](https://cran.r-project.org/package=jsonlite) to parse them with:
 
 ```r
 records$column <- lapply(records$column, jsonlite::fromJSON)
@@ -273,7 +279,7 @@ records$column <- lapply(records$column, jsonlite::fromJSON)
 
 ### Binary Data
 
-BLOB and BYTEA columns are returned as raw vectors.
+BLOB and BYTEA columns are returned as `raw` vectors.
 
 ## Data Type Limitations
 
@@ -290,6 +296,12 @@ And time columns with:
 ```r
 records$column <- as.POSIXct(records$column, tz="Etc/UTC")
 attr(records$column, "tzone") <- Sys.timezone()
+```
+
+To convert times without dates to hms, use:
+
+```r
+records$column <- hms::as.hms(as.POSIXct(records$column, tz="Etc/UTC"))
 ```
 
 ### Booleans
