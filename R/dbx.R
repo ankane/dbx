@@ -156,23 +156,26 @@ dbxSelect <- function(conn, statement) {
     res <- dbSendQuery(conn, statement)
 
     if (isPostgres(conn)) {
-      if (storageTimeZone(conn) != currentTimeZone()) {
-        column_info <- dbColumnInfo(res)
+      column_info <- dbColumnInfo(res)
 
-        if (isRPostgreSQL(conn)) {
-          sql_types <- tolower(column_info$type)
+      if (isRPostgreSQL(conn)) {
+        sql_types <- tolower(column_info$type)
 
+        if (storageTimeZone(conn) != currentTimeZone()) {
           convert_tz <- which(sql_types == "timestamp")
-
-          if (identical(attr(conn, "dbx_cast_times"), TRUE)) {
-            cast_times <- which(sql_types == "time")
-          }
-        } else {
-          sql_types <- column_info$`.typname`
-
-          convert_tz <- which(sql_types == "timestamp")
-          cast_json <- which(sql_types %in% c("json", "jsonb"))
         }
+
+        if (identical(attr(conn, "dbx_cast_times"), TRUE)) {
+          cast_times <- which(sql_types == "time")
+        }
+      } else {
+        sql_types <- column_info$`.typname`
+
+        if (storageTimeZone(conn) != currentTimeZone()) {
+          convert_tz <- which(sql_types == "timestamp")
+        }
+
+        cast_json <- which(sql_types %in% c("json", "jsonb"))
       }
     } else if (isRMySQL(conn)) {
       column_info <- dbColumnInfo(res)
