@@ -261,11 +261,11 @@ DBI::dbWithTransaction(db, {
 
 ### Dates & Times
 
-Times are stored in the database in UTC. When retrieved, they are converted to your local time zone.
+Dates are returned as `Date` objects and times as `POSIXct` objects. Times are stored in the database in UTC and converted to your local time zone when retrieved.
 
 ### JSON
 
-JSON and JSONB columns are returned as character vectors. You can use [jsonlite](https://cran.r-project.org/package=jsonlite) to parse them with:
+JSON and JSONB columns are returned as `character` vectors. You can use [jsonlite](https://cran.r-project.org/package=jsonlite) to parse them with:
 
 ```r
 records$column <- lapply(records$column, jsonlite::fromJSON)
@@ -273,7 +273,7 @@ records$column <- lapply(records$column, jsonlite::fromJSON)
 
 ### Binary Data
 
-BLOB and BYTEA columns are returned as raw vectors.
+BLOB and BYTEA columns are returned as `raw` vectors.
 
 ## Data Type Limitations
 
