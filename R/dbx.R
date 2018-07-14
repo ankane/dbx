@@ -100,33 +100,6 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
     attr(conn, "dbx_storage_tz") <- storage_tz
   }
 
-  # if (cast_json) {
-  #   if (!isRPostgres(conn)) {
-  #     stop("cast_json is only supported with RPostgres")
-  #   }
-  #   if (!requireNamespace("jsonlite", quietly=TRUE)) {
-  #     stop("'jsonlite' package is required for cast_json")
-  #   }
-  #   attr(conn, "dbx_cast_json") <- cast_json
-  # }
-
-  # if (!is.null(cast_times)) {
-  #   if (cast_times && !requireNamespace("hms", quietly=TRUE)) {
-  #     stop("'hms' package is required for cast_times")
-  #   }
-  #   attr(conn, "dbx_cast_times") <- cast_times
-  # }
-
-  # if (identical(cast_binary, "blob")) {
-  #   if (isRMySQL(conn)) {
-  #     stop("cast_binary is not supported for RMySQL")
-  #   }
-  #   if (!requireNamespace("blob", quietly=TRUE)) {
-  #     stop("'blob' package is required for cast_binary")
-  #   }
-  # }
-  # attr(conn, "dbx_cast_binary") <- cast_binary
-
   # other adapters do this automatically
   if (isRPostgreSQL(conn)) {
     dbExecute(conn, "SET SESSION timezone TO 'UTC'")
@@ -169,10 +142,7 @@ dbxSelect <- function(conn, statement) {
   convert_tz <- list()
   cast_booleans <- list()
   stringify_json <- list()
-  cast_json <- list()
-  cast_times <- list()
   unescape_blobs <- list()
-  cast_blobs <- list()
   fix_timetz <- list()
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown ("), {
@@ -186,20 +156,8 @@ dbxSelect <- function(conn, statement) {
         convert_tz <- which(sql_types == "timestamp")
       }
 
-      if (isTRUE(attr(conn, "dbx_cast_times"))) {
-        cast_times <- which(sql_types == "time")
-      }
-
       unescape_blobs <- which(sql_types == "bytea")
-      if (identical(attr(conn, "dbx_cast_binary"), "blob")) {
-        cast_blobs <- unescape_blobs
-      }
-
       fix_timetz <- which(sql_types == "timetzoid")
-
-      # json columns come back as unknown in RPostgreSQL
-      # could try to parse them from warning messages generated
-      # cast_json <- which(sql_types %in% c("json", "jsonb"))
     } else if (isRPostgres(conn)) {
       column_info <- dbColumnInfo(res)
       sql_types <- column_info$`.typname`
@@ -209,7 +167,6 @@ dbxSelect <- function(conn, statement) {
       }
 
       stringify_json <- which(sql_types %in% c("json", "jsonb"))
-      cast_json <- stringify_json
     } else if (isRMySQL(conn)) {
       column_info <- dbColumnInfo(res)
       sql_types <- tolower(column_info$type)
@@ -217,14 +174,12 @@ dbxSelect <- function(conn, statement) {
       cast_dates <- which(sql_types == "date")
       cast_datetimes <- which(sql_types %in% c("datetime", "timestamp"))
       cast_booleans <- which(sql_types == "tinyint" & column_info$length == 1)
-
-      if (isTRUE(attr(conn, "dbx_cast_times"))) {
-        cast_times <- which(sql_types == "time")
-      }
-
-      # json columns come back as unknown in RMySQL
-      # could try to parse them from warning messages generated
-      # cast_json <- which(sql_types == "json")
+    } else if (isRMariaDB(conn)) {
+      # TODO cast booleans for RMariaDB
+      # waiting on https://github.com/r-dbi/RMariaDB/issues/100
+    } else if (isSQLite(conn)) {
+      # TODO cast dates and times for RSQLite
+      # waiting on https://github.com/r-dbi/RSQLite/issues/263
     }
 
     # always fetch at least once
@@ -239,20 +194,6 @@ dbxSelect <- function(conn, statement) {
   records <- combineResults(ret)
 
   if (nrow(records) > 0) {
-    if (isRMariaDB(conn)) {
-      # TODO cast booleans for RMariaDB
-      # waiting on https://github.com/r-dbi/RMariaDB/issues/100
-
-      cast_blobs <- which(sapply(records, isBinary))
-    } else if (isSQLite(conn)) {
-      # TODO cast dates and times for RSQLite
-      # waiting on https://github.com/r-dbi/RSQLite/issues/263
-
-      if (identical(attr(conn, "dbx_cast_binary"), "blob")) {
-        cast_blobs <- which(sapply(records, isBinary))
-      }
-    }
-
     for (i in cast_dates) {
       records[, i] <- as.Date(records[, i])
     }
@@ -271,12 +212,6 @@ dbxSelect <- function(conn, statement) {
       records[, i] <- as.character(records[, i])
     }
 
-    if (isTRUE(attr(conn, "dbx_cast_json"))) {
-      for (i in cast_json) {
-        records[[colnames(records)[i]]] <- lapply(records[, i], function(x) { if (is.na(x)) x else jsonlite::fromJSON(x) })
-      }
-    }
-
     for (i in cast_booleans) {
       records[, i] <- records[, i] != 0
     }
@@ -285,30 +220,18 @@ dbxSelect <- function(conn, statement) {
       records[[colnames(records)[i]]] <- lapply(records[, i], function(x) { if (is.na(x)) x else RPostgreSQL::postgresqlUnescapeBytea(x) })
     }
 
-    for (i in cast_blobs) {
-      records[[colnames(records)[i]]] <- blob::as.blob(records[, i])
-    }
-
     for (i in fix_timetz) {
       records[, i] <- gsub("\\+00$", "", records[, i])
     }
 
-    for (i in cast_times) {
-      records[, i] <- hms::as.hms(records[, i])
-    }
-
-    # if (isFALSE(attr(conn, "dbx_cast_times"))) {
     uncast_times <- which(sapply(records, isTime))
     for (i in uncast_times) {
       records[, i] <- format(records[, i])
     }
-    # }
 
-    if (!identical(attr(conn, "dbx_cast_binary"), "blob")) {
-      uncast_blobs <- which(sapply(records, isBlob))
-      for (i in uncast_blobs) {
-        records[[colnames(records)[i]]] <- lapply(records[, i], as.raw)
-      }
+    uncast_blobs <- which(sapply(records, isBlob))
+    for (i in uncast_blobs) {
+      records[[colnames(records)[i]]] <- lapply(records[, i], as.raw)
     }
   }
 
