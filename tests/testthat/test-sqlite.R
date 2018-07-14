@@ -8,7 +8,7 @@ new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFac
 dbExecute(db, "CREATE TABLE orders (id INTEGER PRIMARY KEY AUTOINCREMENT, city VARCHAR(255))")
 dbxInsert(db, "orders", orders)
 
-dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at DATETIME, active BOOLEAN)")
+dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at DATETIME, active BOOLEAN, image BLOB)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
@@ -164,6 +164,21 @@ test_that("datetimes have precision", {
   # test stored time
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 20:30:55.123456'")
   expect_equal(1, res$count)
+})
+
+test_that("blob with binary works", {
+  dbxDelete(db, "events")
+
+  images <- list(1:3, 4:6)
+  serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
+
+  events <- data.frame(image=blob::as.blob(serialized_images))
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(res$image, events$image)
+
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(blob::as.blob(res$image), events$image)
 })
 
 test_that("connect with url works", {
