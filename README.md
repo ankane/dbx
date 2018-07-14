@@ -271,6 +271,8 @@ JSON and JSONB columns are returned as `character` vectors. You can use [jsonlit
 records$column <- lapply(records$column, jsonlite::fromJSON)
 ```
 
+SQLite does not have support for `JSON` columns, so we recommend storing as `TEXT`.
+
 ### Binary Data
 
 BLOB and BYTEA columns are returned as `raw` vectors.
