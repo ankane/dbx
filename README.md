@@ -230,6 +230,24 @@ records$column <- lapply(records$column, function(x) { if (is.na(x)) x else json
 
 RMariaDB does [not currently support JSON](https://github.com/r-dbi/DBI/issues/203). We recommend RMySQL instead.
 
+### BLOBs
+
+BLOB and BYTEA columns support both raw vectors and [blob](https://cran.r-project.org/package=blob) objects.
+
+For RMySQL, you can write to BLOB columns, but [can’t retrieve them directly](https://github.com/r-dbi/RMySQL/issues/123). As a workaround, you can do:
+
+```r
+records <- dbxSelect(db, "SELECT HEX(column) AS column FROM table")
+
+hexToRaw <- function(x) {
+  y <- strsplit(x, "")[[1]]
+  z <- paste0(y[c(TRUE, FALSE)], y[c(FALSE, TRUE)])
+  as.raw(as.hexmode(z))
+}
+
+records$column <- lapply(records$column, hexToRaw)
+```
+
 ## Database Credentials
 
 Environment variables are a convenient way to store database credentials. This keeps them outside your source control. It’s also how platforms like [Heroku](https://www.heroku.com) store them.

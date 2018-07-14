@@ -328,8 +328,8 @@ test_that("binary works", {
   # issue marked as dup, but unsure where dup issue is
   # https://github.com/r-dbi/RMySQL/issues/123
   res <- dbxSelect(db, "SELECT hex(image) AS image FROM events ORDER BY id")
-  hex <- toupper(as.character(lapply(serialized_images, function(x) { paste0(as.character(x), collapse="") })))
-  expect_equal(res$image, hex)
+  res$image <- lapply(res$image, hexToRaw)
+  expect_equal(res$image, serialized_images)
 })
 
 test_that("blob with binary works", {
@@ -347,8 +347,8 @@ test_that("blob with binary works", {
   # issue marked as dup, but unsure where dup issue is
   # https://github.com/r-dbi/RMySQL/issues/123
   res <- dbxSelect(db, "SELECT hex(image) AS image FROM events ORDER BY id")
-  hex <- toupper(as.character(lapply(serialized_images, function(x) { paste0(as.character(x), collapse="") })))
-  expect_equal(res$image, hex)
+  res$image <- lapply(res$image, hexToRaw)
+  expect_equal(res$image, serialized_images)
 })
 
 test_that("connect with url works", {
