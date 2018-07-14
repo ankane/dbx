@@ -177,6 +177,9 @@ dbxSelect <- function(conn, statement) {
 
     # TODO cast booleans for RMariaDB
 
+    # always fetch at least once
+    ret[[length(ret) + 1]] <- dbFetch(res)
+
     while (!dbHasCompleted(res)) {
       ret[[length(ret) + 1]] <- dbFetch(res)
     }
