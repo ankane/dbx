@@ -12,6 +12,28 @@ dbExecute(db, "CREATE TABLE events (id SERIAL PRIMARY KEY, created_on DATE, upda
 
 runTests(db)
 
+test_that("datetimes with storage_tz works", {
+  inTimeZone("America/Chicago", {
+    db2 <- dbxConnect(adapter="rpostgres", dbname="dbx_test", storage_tz="America/Chicago")
+    dbxDelete(db2, "events")
+
+    t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
+    t2 <- as.POSIXct("2018-01-01 16:59:59", tz="America/New_York")
+    events <- data.frame(updated_at=c(t1, t2))
+    dbxInsert(db2, "events", events)
+
+    # test returned time
+    res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
+    expect_equal(res$updated_at, events$updated_at)
+
+    # test stored time
+    res <- dbxSelect(db2, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 11:30:55'")
+    expect_equal(1, res$count)
+
+    dbxDisconnect(db2)
+  })
+})
+
 test_that("connect with url works", {
   con2 <- dbxConnect(url="postgres://localhost/dbx_test")
   res <- dbxSelect(con2, "SELECT 1 AS hi")

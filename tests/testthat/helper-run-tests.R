@@ -319,28 +319,6 @@ runTests <- function(db) {
     }
   })
 
-  test_that("datetimes with storage_tz works", {
-    inTimeZone("America/Chicago", {
-      db2 <- dbxConnect(adapter="rpostgresql", dbname="dbx_test", storage_tz="America/Chicago")
-      dbxDelete(db2, "events")
-
-      t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
-      t2 <- as.POSIXct("2018-01-01 16:59:59", tz="America/New_York")
-      events <- data.frame(updated_at=c(t1, t2))
-      dbxInsert(db2, "events", events)
-
-      # test returned time
-      res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
-      expect_equal(res$updated_at, events$updated_at)
-
-      # test stored time
-      res <- dbxSelect(db2, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 11:30:55'")
-      expect_equal(1, res$count)
-
-      dbxDisconnect(db2)
-    })
-  })
-
   test_that("times work", {
     dbxDelete(db, "events")
 
