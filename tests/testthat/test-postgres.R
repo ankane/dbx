@@ -166,6 +166,25 @@ test_that("jsonlite with jsonb works", {
   expect_equal(jsonlite::fromJSON(res$propertiesb), jsonlite::fromJSON(events$propertiesb))
 })
 
+test_that("cast_json true works", {
+  db2 <- dbxConnect(adapter="postgres", dbname="dbx_test", cast_json=TRUE)
+
+  dbxDelete(db2, "events")
+
+  data <- list(list(hello="world"), list(hello="r"))
+  json_data <- as.character(lapply(data, jsonlite::toJSON))
+
+  events <- data.frame(propertiesb=json_data, stringsAsFactors=FALSE)
+  res <- dbxInsert(db2, "events", events)
+
+  expect_equal(res$propertiesb, data)
+
+  res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$propertiesb, data)
+
+  dbxDisconnect(db2)
+})
+
 test_that("dates works", {
   dbxDelete(db, "events")
 

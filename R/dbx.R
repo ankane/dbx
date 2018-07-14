@@ -3,6 +3,7 @@
 #' @param url A database URL
 #' @param adapter The database adapter to use
 #' @param storage_tz The time zone timestamps are stored in
+#' @param cast_json Cast json columns
 #' @param cast_times Cast time columns to 'hms' objects
 #' @param cast_blobs Cast blob columns to 'blob' objects
 #' @param ... Arguments to pass to dbConnect
@@ -23,7 +24,7 @@
 #' # Others
 #' db <- dbxConnect(adapter=odbc(), database="mydb")
 #' }
-dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL, cast_blobs=NULL, ...) {
+dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_json=FALSE, cast_times=NULL, cast_blobs=NULL, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
   }
@@ -102,6 +103,13 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL,
     attr(conn, "dbx_storage_tz") <- storage_tz
   }
 
+  if (cast_json) {
+    if (!requireNamespace("jsonlite", quietly=TRUE)) {
+      stop("'jsonlite' package is required for cast_json")
+    }
+    attr(conn, "dbx_cast_json") <- cast_json
+  }
+
   if (!is.null(cast_times)) {
     if (cast_times && !requireNamespace("hms", quietly=TRUE)) {
       stop("'hms' package is required for cast_times")
@@ -157,6 +165,7 @@ dbxSelect <- function(conn, statement) {
   cast_datetimes <- list()
   convert_tz <- list()
   cast_booleans <- list()
+  stringify_json <- list()
   cast_json <- list()
   cast_times <- list()
   unescape_blobs <- list()
@@ -165,33 +174,35 @@ dbxSelect <- function(conn, statement) {
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown ("), {
     res <- dbSendQuery(conn, statement)
 
-    if (isPostgres(conn)) {
+    if (isRPostgreSQL(conn)) {
       column_info <- dbColumnInfo(res)
+      sql_types <- tolower(column_info$type)
 
-      if (isRPostgreSQL(conn)) {
-        sql_types <- tolower(column_info$type)
-
-        if (storageTimeZone(conn) != currentTimeZone()) {
-          convert_tz <- which(sql_types == "timestamp")
-        }
-
-        if (identical(attr(conn, "dbx_cast_times"), TRUE)) {
-          cast_times <- which(sql_types == "time")
-        }
-
-        unescape_blobs <- which(sql_types == "bytea")
-        if (identical(attr(conn, "dbx_cast_blobs"), TRUE)) {
-          cast_blobs <- unescape_blobs
-        }
-      } else {
-        sql_types <- column_info$`.typname`
-
-        if (storageTimeZone(conn) != currentTimeZone()) {
-          convert_tz <- which(sql_types == "timestamp")
-        }
-
-        cast_json <- which(sql_types %in% c("json", "jsonb"))
+      if (storageTimeZone(conn) != currentTimeZone()) {
+        convert_tz <- which(sql_types == "timestamp")
       }
+
+      if (identical(attr(conn, "dbx_cast_times"), TRUE)) {
+        cast_times <- which(sql_types == "time")
+      }
+
+      unescape_blobs <- which(sql_types == "bytea")
+      if (identical(attr(conn, "dbx_cast_blobs"), TRUE)) {
+        cast_blobs <- unescape_blobs
+      }
+
+      # json columns come back as unknown in RPostgreSQL
+      # cast_json <- which(sql_types %in% c("json", "jsonb"))
+    } else if (isRPostgres(conn)) {
+      column_info <- dbColumnInfo(res)
+      sql_types <- column_info$`.typname`
+
+      if (storageTimeZone(conn) != currentTimeZone()) {
+        convert_tz <- which(sql_types == "timestamp")
+      }
+
+      stringify_json <- which(sql_types %in% c("json", "jsonb"))
+      cast_json <- stringify_json
     } else if (isRMySQL(conn)) {
       column_info <- dbColumnInfo(res)
       sql_types <- tolower(column_info$type)
@@ -203,6 +214,8 @@ dbxSelect <- function(conn, statement) {
       if (identical(attr(conn, "dbx_cast_times"), TRUE)) {
         cast_times <- which(sql_types == "time")
       }
+
+      # cast_json <- which(sql_types == "json")
     }
 
     # always fetch at least once
@@ -245,8 +258,14 @@ dbxSelect <- function(conn, statement) {
       attr(records[, i], "tzone") <- currentTimeZone()
     }
 
-    for (i in cast_json) {
+    for (i in stringify_json) {
       records[, i] <- as.character(records[, i])
+    }
+
+    if (identical(attr(conn, "dbx_cast_json"), TRUE)) {
+      for (i in cast_json) {
+        records[[colnames(records)[i]]] <- lapply(records[, i], function(x) { if (is.na(x)) x else jsonlite::fromJSON(x) })
+      }
     }
 
     for (i in cast_booleans) {
