@@ -741,6 +741,8 @@ quoteRecords <- function(conn, records) {
         col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
       } else if (isDate(col)) {
         col <- format(col)
+      } else if (isTime(col)) {
+        col <- format(col)
       }
     }
     quoted_records[, i] <- dbQuoteLiteral(conn, col)

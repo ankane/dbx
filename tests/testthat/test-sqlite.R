@@ -8,7 +8,7 @@ new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFac
 dbExecute(db, "CREATE TABLE orders (id INTEGER PRIMARY KEY AUTOINCREMENT, city VARCHAR(255))")
 dbxInsert(db, "orders", orders)
 
-dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at DATETIME, active BOOLEAN, image BLOB)")
+dbExecute(db, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at DATETIME, open_time DATETIME, active BOOLEAN, image BLOB)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
@@ -163,6 +163,40 @@ test_that("datetimes have precision", {
 
   # test stored time
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 20:30:55.123456'")
+  expect_equal(1, res$count)
+})
+
+test_that("times work", {
+  dbxDelete(db, "events")
+
+  events <- data.frame(open_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(res$open_time, events$open_time)
+
+  # test returned time
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$open_time, events$open_time)
+
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
+  expect_equal(1, res$count)
+})
+
+test_that("hms with times work", {
+  dbxDelete(db, "events")
+
+  events <- data.frame(open_time=c(hms::as.hms("12:30:55"), hms::as.hms("16:59:59")), stringsAsFactors=FALSE)
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(res$open_time, events$open_time)
+
+  # test returned time
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$open_time, as.character(events$open_time))
+
+  # test stored time
+  res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
   expect_equal(1, res$count)
 })
 
