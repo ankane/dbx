@@ -3,6 +3,7 @@
 #' @param url A database URL
 #' @param adapter The database adapter to use
 #' @param storage_tz The time zone timestamps are stored in
+#' @param cast_json Cast json columns
 #' @param ... Arguments to pass to dbConnect
 #' @importFrom DBI dbConnect
 #' @export
@@ -21,7 +22,7 @@
 #' # Others
 #' db <- dbxConnect(adapter=odbc(), database="mydb")
 #' }
-dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
+dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_json=FALSE, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
   }
@@ -100,6 +101,13 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
     attr(conn, "dbx_storage_tz") <- storage_tz
   }
 
+  if (cast_json) {
+    if (!requireNamespace("jsonlite", quietly=TRUE)) {
+      stop("jsonlite is required for cast_json")
+    }
+    attr(conn, "dbx_cast_json") <- cast_json
+  }
+
   # other adapters do this automatically
   if (isRPostgreSQL(conn)) {
     dbExecute(conn, "SET SESSION timezone TO 'UTC'")
@@ -151,6 +159,7 @@ dbxSelect <- function(conn, statement) {
         column_info <- dbColumnInfo(res)
         if (isRPostgreSQL(conn)) {
           convert_tz <- which(column_info$type == "TIMESTAMP")
+          cast_json <- which(column_info$type == "JSON" | column_info$type == "JSONB")
         } else {
           convert_tz <- which(column_info$`.typname` == "timestamp")
           cast_json <- which(column_info$`.typname` == "json" | column_info$`.typname` == "jsonb")
@@ -161,6 +170,7 @@ dbxSelect <- function(conn, statement) {
       cast_dates <- which(column_info$type == "DATE")
       cast_datetimes <- which(column_info$type %in% c("DATETIME", "TIMESTAMP"))
       cast_booleans <- which(column_info$type == "TINYINT" & column_info$length == 1)
+      cast_json <- which(column_info$type == "JSON")
     }
     # TODO cast dates and times for RSQLite
     # waiting on https://github.com/r-dbi/RSQLite/issues/263
@@ -175,26 +185,32 @@ dbxSelect <- function(conn, statement) {
 
   records <- combineResults(ret)
 
-  for (i in cast_dates) {
-    records[, i] <- as.Date(records[, i])
-  }
+  if (nrow(records) > 0) {
+    for (i in cast_dates) {
+      records[, i] <- as.Date(records[, i])
+    }
 
-  for (i in cast_datetimes) {
-    records[, i] <- as.POSIXct(records[, i], tz=storageTimeZone(conn))
-    attr(records[, i], "tzone") <- currentTimeZone()
-  }
+    for (i in cast_datetimes) {
+      records[, i] <- as.POSIXct(records[, i], tz=storageTimeZone(conn))
+      attr(records[, i], "tzone") <- currentTimeZone()
+    }
 
-  for (i in convert_tz) {
-    records[, i] <- as.POSIXct(format(records[, i], "%Y-%m-%d %H:%M:%OS6"), tz=storageTimeZone(conn))
-    attr(records[, i], "tzone") <- currentTimeZone()
-  }
+    for (i in convert_tz) {
+      records[, i] <- as.POSIXct(format(records[, i], "%Y-%m-%d %H:%M:%OS6"), tz=storageTimeZone(conn))
+      attr(records[, i], "tzone") <- currentTimeZone()
+    }
 
-  for (i in cast_json) {
-    records[, i] <- as.character(records[, i])
-  }
+    for (i in cast_json) {
+      if (identical(attr(conn, "dbx_cast_json"), TRUE)) {
+        records[, i] <- jsonlite::fromJSON(records[, i])
+      } else if (isRPostgres(conn)) {
+        records[, i] <- as.character(records[, i])
+      }
+    }
 
-  for (i in cast_booleans) {
-    records[, i] <- records[, i] != 0
+    for (i in cast_booleans) {
+      records[, i] <- records[, i] != 0
+    }
   }
 
   records
@@ -460,8 +476,12 @@ isRPostgreSQL <- function(conn) {
   inherits(conn, "PostgreSQLConnection")
 }
 
+isRPostgres <- function(conn) {
+  inherits(conn, "PqConnection")
+}
+
 isPostgres <- function(conn) {
-  isRPostgreSQL(conn) || inherits(conn, "PqConnection")
+  isRPostgreSQL(conn) || isRPostgres(conn)
 }
 
 isRMySQL <- function(conn) {

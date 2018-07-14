@@ -222,7 +222,13 @@ records$column <- records$column != 0
 
 ### JSON
 
-JSON and JSONB columns are not automatically typecast. You can manually typecast with:
+JSON and JSONB columns are not automatically typecast by default. You can turn on typecasting by installing [jsonlite](https://cran.r-project.org/package=jsonlite) and doing:
+
+```r
+db <- dbxConnect(cast_json=TRUE, ...)
+```
+
+Or you can manually typecast with:
 
 ```r
 library(jsonlite)
