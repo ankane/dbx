@@ -12,7 +12,7 @@ dbExecute(db, "CREATE TABLE orders (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME(6), deleted_at TIMESTAMP(6), open_time TIME, active BOOLEAN, properties JSON)")
+dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME(6), deleted_at TIMESTAMP(6) NULL DEFAULT NULL, open_time TIME, active BOOLEAN, properties JSON)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
@@ -33,6 +33,18 @@ test_that("empty select works", {
   dbxDelete(db, "events")
   res <- dbxSelect(db, "SELECT * FROM events")
   expect_equal(0, nrow(res))
+})
+
+test_that("missing select returns NA", {
+  dbxDelete(db, "events")
+
+  dbxInsert(db, "events", data.frame(id=1))
+  res <- dbxSelect(db, "SELECT * FROM events")
+
+  expect_equal(as.Date(NA), res$created_on)
+  expect_equal(as.POSIXct(NA), res$updated_at)
+  expect_equal(as.POSIXct(NA), res$deleted_at)
+  expect_equal(NA, res$active)
 })
 
 test_that("insert works", {

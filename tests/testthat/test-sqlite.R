@@ -31,6 +31,17 @@ test_that("empty select works", {
   expect_equal(0, nrow(res))
 })
 
+test_that("missing select returns NA", {
+  dbxDelete(db, "events")
+
+  dbxInsert(db, "events", data.frame(id=1))
+  res <- dbxSelect(db, "SELECT * FROM events")
+
+  expect_equal(as.numeric(NA), res$created_on)
+  expect_equal(as.numeric(NA), res$updated_at)
+  expect_equal(as.numeric(NA), res$active)
+})
+
 test_that("insert works", {
   dbxInsert(db, "orders", new_orders[c("city")])
   res <- dbxSelect(db, "SELECT * FROM orders WHERE id > 2 ORDER BY id ASC")
