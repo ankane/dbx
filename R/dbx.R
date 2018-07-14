@@ -173,6 +173,7 @@ dbxSelect <- function(conn, statement) {
   cast_times <- list()
   unescape_blobs <- list()
   cast_blobs <- list()
+  fix_timetz <- list()
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown ("), {
     res <- dbSendQuery(conn, statement)
@@ -193,6 +194,8 @@ dbxSelect <- function(conn, statement) {
       if (identical(attr(conn, "dbx_cast_binary"), "blob")) {
         cast_blobs <- unescape_blobs
       }
+
+      fix_timetz <- which(sql_types == "timetzoid")
 
       # json columns come back as unknown in RPostgreSQL
       # could try to parse them from warning messages generated
@@ -284,6 +287,10 @@ dbxSelect <- function(conn, statement) {
 
     for (i in cast_blobs) {
       records[[colnames(records)[i]]] <- blob::as.blob(records[, i])
+    }
+
+    for (i in fix_timetz) {
+      records[, i] <- gsub("\\+00$", "", records[, i])
     }
 
     for (i in cast_times) {

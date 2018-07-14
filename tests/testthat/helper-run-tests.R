@@ -289,11 +289,11 @@ runTests <- function(db) {
     events <- data.frame(close_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
     res <- dbxInsert(db, "events", events)
 
-    expect_equal(res$close_time, paste0(events$close_time, "+00"))
+    expect_equal(res$close_time, events$close_time)
 
     # test returned time
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-    expect_equal(res$close_time, paste0(events$close_time, "+00"))
+    expect_equal(res$close_time, events$close_time)
 
     # test stored time
     res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE close_time = '12:30:55'")

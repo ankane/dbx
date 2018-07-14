@@ -2,7 +2,7 @@ context("postgres")
 
 skip_on_cran()
 
-db <- dbxConnect(adapter="postgres", dbname="dbx_test")
+db <- dbxConnect(adapter="rpostgres", dbname="dbx_test")
 
 dbExecute(db, "DROP TABLE IF EXISTS orders")
 dbExecute(db, "CREATE TABLE orders (id SERIAL PRIMARY KEY, city text, other text)")
