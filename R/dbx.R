@@ -151,6 +151,7 @@ dbxSelect <- function(conn, statement) {
   cast_booleans <- list()
   cast_json <- list()
   cast_times <- list()
+  cast_blobs <- list()
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown ("), {
     res <- dbSendQuery(conn, statement)
@@ -168,6 +169,8 @@ dbxSelect <- function(conn, statement) {
         if (identical(attr(conn, "dbx_cast_times"), TRUE)) {
           cast_times <- which(sql_types == "time")
         }
+
+        cast_blobs <- which(sql_types == "bytea")
       } else {
         sql_types <- column_info$`.typname`
 
@@ -226,6 +229,10 @@ dbxSelect <- function(conn, statement) {
 
     for (i in cast_booleans) {
       records[, i] <- records[, i] != 0
+    }
+
+    for (i in cast_blobs) {
+      records[[colnames(records)[i]]] <- lapply(records[, i], function(x) { if (is.na(x)) x else RPostgreSQL::postgresqlUnescapeBytea(x) })
     }
 
     for (i in cast_times) {

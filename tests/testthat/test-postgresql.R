@@ -378,10 +378,10 @@ test_that("binary works", {
   events <- data.frame(image=I(serialized_images))
   res <- dbxInsert(db, "events", events)
 
-  expect_equal(lapply(res$image, function(x) { unserialize(RPostgreSQL::postgresqlUnescapeBytea(x)) }), images)
+  expect_equal(lapply(res$image, unserialize), images)
 
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(lapply(res$image, function(x) { unserialize(RPostgreSQL::postgresqlUnescapeBytea(x)) }), images)
+  expect_equal(lapply(res$image, unserialize), images)
 })
 
 test_that("blob with binary works", {
@@ -393,10 +393,10 @@ test_that("blob with binary works", {
   events <- data.frame(image=blob::as.blob(serialized_images))
   res <- dbxInsert(db, "events", events)
 
-  expect_equal(lapply(res$image, function(x) { unserialize(RPostgreSQL::postgresqlUnescapeBytea(x)) }), images)
+  expect_equal(blob::as.blob(res$image), events$image)
 
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(lapply(res$image, function(x) { unserialize(RPostgreSQL::postgresqlUnescapeBytea(x)) }), images)
+  expect_equal(blob::as.blob(res$image), events$image)
 })
 
 dbxDisconnect(db)
