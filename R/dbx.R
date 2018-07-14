@@ -104,6 +104,9 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_json=FALSE,
   }
 
   if (cast_json) {
+    if (!isRPostgres(conn)) {
+      stop("cast_json is only supported with RPostgres")
+    }
     if (!requireNamespace("jsonlite", quietly=TRUE)) {
       stop("'jsonlite' package is required for cast_json")
     }
@@ -216,10 +219,9 @@ dbxSelect <- function(conn, statement) {
         cast_times <- which(sql_types == "time")
       }
 
-      # identify json types
-      # could also try to parse them from warning messages generated
-      # which may be more reliable
-      cast_json <- which(sql_types == "blob/text" & column_info$length == 196605)
+      # json columns come back as unknown in RMySQL
+      # could try to parse them from warning messages generated
+      # cast_json <- which(sql_types == "json")
     }
 
     # always fetch at least once

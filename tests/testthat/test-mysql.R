@@ -12,7 +12,7 @@ dbExecute(db, "CREATE TABLE orders (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-json_type <- if (length(Sys.getenv("TRAVIS")) > 0) "TEXT" else "JSON"
+json_type <- if (Sys.getenv("TRAVIS") == "") "JSON" else "TEXT"
 dbExecute(db, paste0("CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME(6), deleted_at TIMESTAMP(6) NULL DEFAULT NULL, open_time TIME, active BOOLEAN, properties ", json_type, ", image BLOB)"))
 
 test_that("select works", {
@@ -146,25 +146,6 @@ test_that("json works", {
 
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
   expect_equal(res$properties, events$properties)
-})
-
-test_that("cast_json true works", {
-  db2 <- dbxConnect(adapter="mysql", dbname="dbx_test", cast_json=TRUE)
-
-  dbxDelete(db2, "events")
-
-  data <- list(list(hello="world"), list(hello="r"))
-  json_data <- as.character(lapply(data, jsonlite::toJSON))
-
-  events <- data.frame(properties=json_data, stringsAsFactors=FALSE)
-  res <- dbxInsert(db2, "events", events)
-
-  expect_equal(res$properties, json_data)
-
-  res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$properties, data)
-
-  dbxDisconnect(db2)
 })
 
 test_that("dates works", {
