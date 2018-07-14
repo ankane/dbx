@@ -67,7 +67,11 @@ runTests <- function(db) {
       expect_equal(as.Date(NA), res$created_on)
       expect_equal(as.POSIXct(NA), res$updated_at)
       expect_equal(as.POSIXct(NA), res$deleted_at)
-      expect_equal(NA, res$active)
+      if (isRMariaDB(db)) {
+        expect_equal(as.numeric(NA), res$active)
+      } else {
+        expect_equal(NA, res$active)
+      }
     }
   })
 
@@ -156,7 +160,7 @@ runTests <- function(db) {
 
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
 
-    if (isSQLite(db)) {
+    if (isSQLite(db) || isRMariaDB(db)) {
       res$active <- res$active != 0
     }
 
@@ -164,6 +168,8 @@ runTests <- function(db) {
   })
 
   test_that("json works", {
+    skip_if(isRMariaDB(db))
+
     dbxDelete(db, "events")
 
     events <- data.frame(properties=c('{"hello": "world"}'), stringsAsFactors=FALSE)
