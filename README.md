@@ -222,13 +222,7 @@ records$column <- records$column != 0
 
 ### JSON
 
-JSON and JSONB columns are not automatically typecast. You can manually typecast with:
-
-```r
-library(jsonlite)
-
-records$column <- fromJSON(records$column)
-```
+JSON and JSONB columns are not automatically typecast.
 
 RMariaDB does [not currently support JSON](https://github.com/r-dbi/DBI/issues/203). We recommend RMySQL instead.
 
