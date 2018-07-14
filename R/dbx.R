@@ -216,7 +216,10 @@ dbxSelect <- function(conn, statement) {
         cast_times <- which(sql_types == "time")
       }
 
-      # cast_json <- which(sql_types == "json")
+      # identify json types
+      # could also try to parse them from warning messages generated
+      # which may be more reliable
+      cast_json <- which(sql_types == "blob/text" & column_info$length == 196605)
     }
 
     # always fetch at least once

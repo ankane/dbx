@@ -148,6 +148,25 @@ test_that("json works", {
   expect_equal(res$properties, events$properties)
 })
 
+test_that("cast_json true works", {
+  db2 <- dbxConnect(adapter="mysql", dbname="dbx_test", cast_json=TRUE)
+
+  dbxDelete(db2, "events")
+
+  data <- list(list(hello="world"), list(hello="r"))
+  json_data <- as.character(lapply(data, jsonlite::toJSON))
+
+  events <- data.frame(properties=json_data, stringsAsFactors=FALSE)
+  res <- dbxInsert(db2, "events", events)
+
+  expect_equal(res$properties, json_data)
+
+  res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$properties, data)
+
+  dbxDisconnect(db2)
+})
+
 test_that("dates works", {
   dbxDelete(db, "events")
 
