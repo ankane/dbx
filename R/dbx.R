@@ -3,7 +3,6 @@
 #' @param url A database URL
 #' @param adapter The database adapter to use
 #' @param storage_tz The time zone timestamps are stored in
-#' @param cast_times Cast time columns to 'hms' objects
 #' @param ... Arguments to pass to dbConnect
 #' @importFrom DBI dbConnect
 #' @export
@@ -22,7 +21,7 @@
 #' # Others
 #' db <- dbxConnect(adapter=odbc(), database="mydb")
 #' }
-dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL, ...) {
+dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
   }
@@ -111,12 +110,12 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL,
   #   attr(conn, "dbx_cast_json") <- cast_json
   # }
 
-  if (!is.null(cast_times)) {
-    if (cast_times && !requireNamespace("hms", quietly=TRUE)) {
-      stop("'hms' package is required for cast_times")
-    }
-    attr(conn, "dbx_cast_times") <- cast_times
-  }
+  # if (!is.null(cast_times)) {
+  #   if (cast_times && !requireNamespace("hms", quietly=TRUE)) {
+  #     stop("'hms' package is required for cast_times")
+  #   }
+  #   attr(conn, "dbx_cast_times") <- cast_times
+  # }
 
   # if (identical(cast_binary, "blob")) {
   #   if (isRMySQL(conn)) {
