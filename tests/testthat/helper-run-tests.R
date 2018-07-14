@@ -103,8 +103,6 @@ runTests <- function(db) {
   })
 
   test_that("upsert missing column raises error", {
-    skip_if(isSQLite(db))
-
     update_orders <- data.frame(id=c(3), city=c("LA"))
     expect_error(dbxUpsert(db, "orders", update_orders, where_cols=c("missing")), "where_cols not in records")
   })
