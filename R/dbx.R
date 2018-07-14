@@ -730,6 +730,9 @@ quoteRecords <- function(conn, records) {
       } else if (isBinary(col)) {
         if (isRPostgreSQL(conn)) {
           col <- as.character(lapply(col, function(x) { RPostgreSQL::postgresqlEscapeBytea(conn, x) }))
+        } else {
+          # removes AsIs
+          col <- blob::as.blob(lapply(col, function(x) { x }))
         }
       }
     } else if (isSQLite(conn)) {
