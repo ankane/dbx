@@ -214,7 +214,7 @@ CREATE TABLE test (c1 TIME(6), c2 DATETIME(6), c3 TIMESTAMP(6));
 
 ### Booleans
 
-Boolean columns are not automatically typecast with RMariaDB and RSQLite as column types cannot reliably be determined right now. You can manually typecast with:
+Boolean columns are not automatically typecast with RMariaDB and RSQLite as column types [cannot reliably be determined](https://github.com/r-dbi/RMariaDB/issues/100) right now. You can manually typecast with:
 
 ```r
 records$column <- records$column != 0
