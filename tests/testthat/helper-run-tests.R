@@ -1,3 +1,7 @@
+isSQLite <- function(conn) {
+  inherits(conn, "SQLiteConnection")
+}
+
 runTests <- function(db) {
   orders <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
   new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFactors=FALSE)
@@ -31,15 +35,21 @@ runTests <- function(db) {
     dbxInsert(db, "events", data.frame(id=1))
     res <- dbxSelect(db, "SELECT * FROM events")
 
-    expect_equal(as.Date(NA), res$created_on)
-    expect_equal(as.POSIXct(NA), res$updated_at)
-    expect_equal(as.POSIXct(NA), res$deleted_at)
-    expect_equal(NA, res$active)
+    if (isSQLite(db)) {
+      expect_equal(as.numeric(NA), res$created_on)
+      expect_equal(as.numeric(NA), res$updated_at)
+      expect_equal(as.numeric(NA), res$active)
+    } else {
+      expect_equal(as.Date(NA), res$created_on)
+      expect_equal(as.POSIXct(NA), res$updated_at)
+      expect_equal(as.POSIXct(NA), res$deleted_at)
+      expect_equal(NA, res$active)
+    }
   })
 
   test_that("insert works", {
     res <- dbxInsert(db, "orders", new_orders[c("city")])
-    expect_equal(res, new_orders)
+    expect_equal(res$city, new_orders$city)
   })
 
   test_that("update works", {
@@ -55,6 +65,8 @@ runTests <- function(db) {
   })
 
   test_that("upsert works", {
+    skip_if(isSQLite(db))
+
     upsert_orders <- data.frame(id=c(3, 5), city=c("Boston", "Chicago"))
     dbxUpsert(db, "orders", upsert_orders, where_cols=c("id"))
     res <- dbxSelect(db, "SELECT city FROM orders WHERE id IN (3, 5)")
@@ -63,6 +75,8 @@ runTests <- function(db) {
   })
 
   test_that("upsert missing column raises error", {
+    skip_if(isSQLite(db))
+
     update_orders <- data.frame(id=c(3), city=c("LA"))
     expect_error(dbxUpsert(db, "orders", update_orders, where_cols=c("missing")), "where_cols not in records")
   })
@@ -117,6 +131,11 @@ runTests <- function(db) {
     expect_equal(res$active, events$active)
 
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+
+    if (isSQLite(db)) {
+      res$active <- res$active != 0
+    }
+
     expect_equal(res$active, events$active)
   })
 
@@ -133,6 +152,8 @@ runTests <- function(db) {
   })
 
   test_that("jsonb works", {
+    skip_if(isSQLite(db))
+
     dbxDelete(db, "events")
 
     events <- data.frame(propertiesb=c('{"hello": "world"}'), stringsAsFactors=FALSE)
@@ -145,6 +166,8 @@ runTests <- function(db) {
   })
 
   test_that("jsonlite with jsonb works", {
+    skip_if(isSQLite(db))
+
     dbxDelete(db, "events")
 
     events <- data.frame(propertiesb=c(jsonlite::toJSON(list(hello="world"))), stringsAsFactors=FALSE)
@@ -160,11 +183,14 @@ runTests <- function(db) {
     dbxDelete(db, "events")
 
     events <- data.frame(created_on=as.Date(c("2018-01-01", "2018-01-02")))
-    res <- dbxInsert(db, "events", events)
-
-    expect_equal(res$created_on, events$created_on)
+    dbxInsert(db, "events", events)
 
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+
+    if (isSQLite(db)) {
+      res$created_on <- as.Date(res$created_on)
+    }
+
     expect_equal(res$created_on, events$created_on)
 
     # dates always in UTC
@@ -177,16 +203,20 @@ runTests <- function(db) {
     t1 <- as.POSIXct("2018-01-01 12:30:55")
     t2 <- as.POSIXct("2018-01-01 16:59:59")
     events <- data.frame(updated_at=c(t1, t2))
-    res <- dbxInsert(db, "events", events)
-
-    expect_equal(res$updated_at, events$updated_at)
+    dbxInsert(db, "events", events)
 
     # test returned time
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+
+    if (isSQLite(db)) {
+      res$updated_at <- as.POSIXct(res$updated_at, tz="Etc/UTC")
+      attr(res$updated_at, "tzone") <- Sys.timezone()
+    }
+
     expect_equal(res$updated_at, events$updated_at)
 
     # test stored time
-    res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 20:30:55'")
+    res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 20:30:55.000000'")
     expect_equal(1, res$count)
   })
 
@@ -200,14 +230,22 @@ runTests <- function(db) {
 
     # test returned time
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+
+    if (isSQLite(db)) {
+      res$updated_at <- as.POSIXct(res$updated_at, tz="Etc/UTC")
+      attr(res$updated_at, "tzone") <- Sys.timezone()
+    }
+
     expect_equal(res$updated_at, events$updated_at)
 
     # test stored time
-    res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 17:30:55'")
+    res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 17:30:55.000000'")
     expect_equal(1, res$count)
   })
 
   test_that("timestamp with time zone works", {
+    skip_if(isSQLite(db))
+
     dbxDelete(db, "events")
 
     t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
@@ -233,6 +271,12 @@ runTests <- function(db) {
 
     # test returned time
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+
+    if (isSQLite(db)) {
+      res$updated_at <- as.POSIXct(res$updated_at, tz="Etc/UTC")
+      attr(res$updated_at, "tzone") <- Sys.timezone()
+    }
+
     expect_equal(res$updated_at, events$updated_at)
 
     # test stored time
@@ -241,6 +285,9 @@ runTests <- function(db) {
   })
 
   test_that("time zone is UTC", {
+    # always utc
+    skip_if(isSQLite(db))
+
     expect_equal("UTC", dbxSelect(db, "SHOW timezone")$TimeZone)
   })
 
@@ -284,6 +331,8 @@ runTests <- function(db) {
   })
 
   test_that("times with time zone work", {
+    skip_if(isSQLite(db))
+
     dbxDelete(db, "events")
 
     events <- data.frame(close_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
@@ -304,9 +353,7 @@ runTests <- function(db) {
     dbxDelete(db, "events")
 
     events <- data.frame(open_time=c(hms::as.hms("12:30:55"), hms::as.hms("16:59:59")), stringsAsFactors=FALSE)
-    res <- dbxInsert(db, "events", events)
-
-    expect_equal(res$open_time, as.character(events$open_time))
+    dbxInsert(db, "events", events)
 
     # test returned time
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
