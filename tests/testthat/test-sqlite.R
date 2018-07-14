@@ -166,6 +166,21 @@ test_that("datetimes have precision", {
   expect_equal(1, res$count)
 })
 
+test_that("binary works", {
+  dbxDelete(db, "events")
+
+  images <- list(1:3, 4:6)
+  serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
+
+  events <- data.frame(image=I(serialized_images))
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(lapply(res$image, unserialize), images)
+
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(lapply(res$image, unserialize), images)
+})
+
 test_that("blob with binary works", {
   dbxDelete(db, "events")
 

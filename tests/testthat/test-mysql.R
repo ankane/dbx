@@ -313,6 +313,25 @@ test_that("cast_times false works", {
   dbxDisconnect(db2)
 })
 
+test_that("binary works", {
+  dbxDelete(db, "events")
+
+  images <- list(1:3, 4:6)
+  serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
+
+  events <- data.frame(image=I(serialized_images))
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(lapply(res$image, unserialize), images)
+
+  # RMySQL cannot read blobs
+  # issue marked as dup, but unsure where dup issue is
+  # https://github.com/r-dbi/RMySQL/issues/123
+  res <- dbxSelect(db, "SELECT hex(image) AS image FROM events ORDER BY id")
+  hex <- toupper(as.character(lapply(serialized_images, function(x) { paste0(as.character(x), collapse="") })))
+  expect_equal(res$image, hex)
+})
+
 test_that("blob with binary works", {
   dbxDelete(db, "events")
 
