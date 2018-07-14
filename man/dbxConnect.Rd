@@ -4,7 +4,8 @@
 \alias{dbxConnect}
 \title{Create a database connection}
 \usage{
-dbxConnect(url = NULL, adapter = NULL, storage_tz = NULL, ...)
+dbxConnect(url = NULL, adapter = NULL, storage_tz = NULL,
+  cast_times = NULL, ...)
 }
 \arguments{
 \item{url}{A database URL}
@@ -12,6 +13,8 @@ dbxConnect(url = NULL, adapter = NULL, storage_tz = NULL, ...)
 \item{adapter}{The database adapter to use}
 
 \item{storage_tz}{The time zone timestamps are stored in}
+
+\item{cast_times}{Cast times to hms}
 
 \item{...}{Arguments to pass to dbConnect}
 }
