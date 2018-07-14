@@ -263,9 +263,8 @@ DBI::dbWithTransaction(db, {
 
 Dates are returned as `Date` objects and times as `POSIXct` objects. Times are stored in the database in UTC and converted to your local time zone when retrieved.
 
-Times without dates are returned as `POSIXct` objects with a date of `2000-01-01` since R has no built-in support for this type. If you use [hms](https://cran.r-project.org/package=hms), can you convert the column with:
+Times without dates are returned as `character` vectors since R has no built-in support for this type. If you use [hms](https://cran.r-project.org/package=hms), can you convert the column with:
 
-```r
 records$column <- hms::as.hms(records$column)
 ```
 
@@ -296,12 +295,6 @@ And time columns with:
 ```r
 records$column <- as.POSIXct(records$column, tz="Etc/UTC")
 attr(records$column, "tzone") <- Sys.timezone()
-```
-
-To convert times without dates to hms, use:
-
-```r
-records$column <- hms::as.hms(as.POSIXct(records$column, tz="Etc/UTC"))
 ```
 
 ### Booleans
