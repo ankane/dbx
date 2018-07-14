@@ -143,7 +143,7 @@ dbxSelect <- function(conn, statement) {
   cast_booleans <- list()
   cast_json <- list()
 
-  silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type"), {
+  silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown ("), {
     res <- dbSendQuery(conn, statement)
 
     if (isPostgres(conn)) {
@@ -386,7 +386,7 @@ findAdapter <- function(adapter) {
 
 silenceWarnings <- function(msgs, code) {
   warn <- function(w) {
-    if (any(sapply(msgs, function(x) { grepl(x, conditionMessage(w)) }))) {
+    if (any(sapply(msgs, function(x) { grepl(x, conditionMessage(w), fixed=TRUE) }))) {
       invokeRestart("muffleWarning")
     }
   }
