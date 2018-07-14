@@ -12,7 +12,7 @@ dbExecute(db, "CREATE TABLE orders (id SERIAL PRIMARY KEY, city text, other text
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id SERIAL PRIMARY KEY, created_on DATE, updated_at TIMESTAMP, deleted_at TIMESTAMPTZ, open_time TIME, close_time TIMETZ, active BOOLEAN, properties JSON, propertiesb JSONB)")
+dbExecute(db, "CREATE TABLE events (id SERIAL PRIMARY KEY, created_on DATE, updated_at TIMESTAMP, deleted_at TIMESTAMPTZ, open_time TIME, close_time TIMETZ, active BOOLEAN, properties JSON, propertiesb JSONB, image BYTEA)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC")
@@ -367,6 +367,19 @@ test_that("cast_times false works", {
   expect_equal(1, res$count)
 
   dbxDisconnect(db2)
+})
+
+test_that("binary works", {
+  dbxDelete(db, "events")
+
+  images <- list(1:3, 4:6)
+  events <- data.frame(image=I(lapply(images, function(x) { serialize(x, NULL) })))
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(lapply(res$image, function(x) { unserialize(RPostgreSQL::postgresqlUnescapeBytea(x)) }), images)
+
+  res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+  expect_equal(lapply(res$image, function(x) { unserialize(RPostgreSQL::postgresqlUnescapeBytea(x)) }), images)
 })
 
 dbxDisconnect(db)

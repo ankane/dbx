@@ -539,6 +539,10 @@ isLogical <- function(col) {
   inherits(col, "logical")
 }
 
+isBinary <- function(col) {
+  is.raw(col[[1]])
+}
+
 selectOrExecute <- function(conn, sql, records) {
   if (isPostgres(conn)) {
     sql <- paste(sql, "RETURNING *")
@@ -650,6 +654,10 @@ quoteRecords <- function(conn, records) {
         col <- format(col)
       } else if (isLogical(col) && isRPostgreSQL(conn)) {
         col <- as.character(col)
+      } else if (isBinary(col)) {
+        if (isRPostgreSQL(conn)) {
+          col <- as.character(lapply(col, function(x) { RPostgreSQL::postgresqlEscapeBytea(conn, x) }))
+        }
       }
     } else if (isSQLite(conn)) {
       # since no standard, store dates and times in the same format as Rails
