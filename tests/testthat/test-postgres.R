@@ -420,24 +420,24 @@ test_that("blob with binary works", {
   expect_equal(res$image, lapply(events$image, as.raw))
 })
 
-test_that("cast_binary works", {
-  db2 <- dbxConnect(adapter="postgres", dbname="dbx_test", cast_binary="blob")
+# test_that("cast_binary works", {
+#   db2 <- dbxConnect(adapter="postgres", dbname="dbx_test", cast_binary="blob")
 
-  dbxDelete(db2, "events")
+#   dbxDelete(db2, "events")
 
-  images <- list(1:3, 4:6)
-  serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
+#   images <- list(1:3, 4:6)
+#   serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
 
-  events <- data.frame(image=blob::as.blob(serialized_images))
-  res <- dbxInsert(db2, "events", events)
+#   events <- data.frame(image=blob::as.blob(serialized_images))
+#   res <- dbxInsert(db2, "events", events)
 
-  expect_equal(res$image, events$image)
+#   expect_equal(res$image, events$image)
 
-  res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$image, events$image)
+#   res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
+#   expect_equal(res$image, events$image)
 
-  dbxDisconnect(db2)
-})
+#   dbxDisconnect(db2)
+# })
 
 test_that("connect with url works", {
   con2 <- dbxConnect(url="postgres://localhost/dbx_test")

@@ -234,12 +234,6 @@ RMariaDB does [not currently support JSON](https://github.com/r-dbi/DBI/issues/2
 
 BLOB and BYTEA columns are returned as raw vectors.
 
-You can have them returned as `blob` objects by installing the [blob](https://cran.r-project.org/package=blob) package and setting:
-
-```r
-db <- dbxConnect(cast_binary="blob", ...)
-```
-
 RMySQL can write BLOB columns, but [can’t retrieve them directly](https://github.com/r-dbi/RMySQL/issues/123). As a workaround, you can do:
 
 ```r

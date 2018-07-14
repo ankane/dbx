@@ -4,7 +4,6 @@
 #' @param adapter The database adapter to use
 #' @param storage_tz The time zone timestamps are stored in
 #' @param cast_times Cast time columns to 'hms' objects
-#' @param cast_binary Cast blob columns to 'blob' objects
 #' @param ... Arguments to pass to dbConnect
 #' @importFrom DBI dbConnect
 #' @export
@@ -23,7 +22,7 @@
 #' # Others
 #' db <- dbxConnect(adapter=odbc(), database="mydb")
 #' }
-dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL, cast_binary=NULL, ...) {
+dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
   }
@@ -119,15 +118,15 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL,
     attr(conn, "dbx_cast_times") <- cast_times
   }
 
-  if (identical(cast_binary, "blob")) {
-    if (isRMySQL(conn)) {
-      stop("cast_binary is not supported for RMySQL")
-    }
-    if (!requireNamespace("blob", quietly=TRUE)) {
-      stop("'blob' package is required for cast_binary")
-    }
-  }
-  attr(conn, "dbx_cast_binary") <- cast_binary
+  # if (identical(cast_binary, "blob")) {
+  #   if (isRMySQL(conn)) {
+  #     stop("cast_binary is not supported for RMySQL")
+  #   }
+  #   if (!requireNamespace("blob", quietly=TRUE)) {
+  #     stop("'blob' package is required for cast_binary")
+  #   }
+  # }
+  # attr(conn, "dbx_cast_binary") <- cast_binary
 
   # other adapters do this automatically
   if (isRPostgreSQL(conn)) {
