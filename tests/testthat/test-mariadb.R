@@ -316,6 +316,44 @@ test_that("blob with binary works", {
   expect_equal(res$image, events$image)
 })
 
+test_that("cast_blobs true works", {
+  db2 <- dbxConnect(adapter="rmariadb", dbname="dbx_test", cast_blobs=TRUE)
+
+  dbxDelete(db2, "events")
+
+  images <- list(1:3, 4:6)
+  serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
+
+  events <- data.frame(image=blob::as.blob(serialized_images))
+  res <- dbxInsert(db2, "events", events)
+
+  expect_equal(res$image, events$image)
+
+  res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$image, events$image)
+
+  dbxDisconnect(db2)
+})
+
+test_that("cast_blobs false works", {
+  db2 <- dbxConnect(adapter="rmariadb", dbname="dbx_test", cast_blobs=FALSE)
+
+  dbxDelete(db2, "events")
+
+  images <- list(1:3, 4:6)
+  serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
+
+  events <- data.frame(image=blob::as.blob(serialized_images))
+  res <- dbxInsert(db2, "events", events)
+
+  expect_equal(res$image, events$image)
+
+  res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
+  expect_equal(res$image, lapply(events$image, as.raw))
+
+  dbxDisconnect(db2)
+})
+
 test_that("connect with url works", {
   con2 <- dbxConnect("rmariadb://localhost/dbx_test")
   res <- dbxSelect(con2, "SELECT 1 AS hi")

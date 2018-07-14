@@ -271,6 +271,13 @@ dbxSelect <- function(conn, statement) {
         records[, i] <- format(records[, i])
       }
     }
+
+    if (identical(attr(conn, "dbx_cast_blobs"), FALSE)) {
+      uncast_blobs <- which(sapply(records, isBlob))
+      for (i in uncast_blobs) {
+        records[[colnames(records)[i]]] <- lapply(records[, i], as.raw)
+      }
+    }
   }
 
   records
@@ -578,6 +585,10 @@ isLogical <- function(col) {
 
 isBinary <- function(col) {
   is.raw(col[[1]])
+}
+
+isBlob <- function(col) {
+  inherits(col, "blob")
 }
 
 selectOrExecute <- function(conn, sql, records) {
