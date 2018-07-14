@@ -420,8 +420,8 @@ test_that("blob with binary works", {
   expect_equal(res$image, lapply(events$image, as.raw))
 })
 
-test_that("cast_blobs false works", {
-  db2 <- dbxConnect(adapter="postgres", dbname="dbx_test", cast_blobs=FALSE)
+test_that("cast_binary works", {
+  db2 <- dbxConnect(adapter="postgres", dbname="dbx_test", cast_binary="blob")
 
   dbxDelete(db2, "events")
 
@@ -431,10 +431,10 @@ test_that("cast_blobs false works", {
   events <- data.frame(image=blob::as.blob(serialized_images))
   res <- dbxInsert(db2, "events", events)
 
-  expect_equal(res$image, lapply(events$image, as.raw))
+  expect_equal(res$image, events$image)
 
   res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$image, lapply(events$image, as.raw))
+  expect_equal(res$image, events$image)
 
   dbxDisconnect(db2)
 })

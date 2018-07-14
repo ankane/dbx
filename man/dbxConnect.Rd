@@ -5,7 +5,7 @@
 \title{Create a database connection}
 \usage{
 dbxConnect(url = NULL, adapter = NULL, storage_tz = NULL,
-  cast_times = NULL, cast_blobs = NULL, ...)
+  cast_times = NULL, cast_binary = NULL, ...)
 }
 \arguments{
 \item{url}{A database URL}
@@ -16,7 +16,7 @@ dbxConnect(url = NULL, adapter = NULL, storage_tz = NULL,
 
 \item{cast_times}{Cast time columns to 'hms' objects}
 
-\item{cast_blobs}{Cast blob columns to 'blob' objects}
+\item{cast_binary}{Cast blob columns to 'blob' objects}
 
 \item{...}{Arguments to pass to dbConnect}
 }

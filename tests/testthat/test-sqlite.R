@@ -196,8 +196,8 @@ test_that("blob with binary works", {
   expect_equal(blob::as.blob(res$image), events$image)
 })
 
-test_that("cast_blobs true works", {
-  db2 <- dbxConnect(adapter="sqlite", dbname=":memory:", cast_blobs=TRUE)
+test_that("cast_binary works", {
+  db2 <- dbxConnect(adapter="sqlite", dbname=":memory:", cast_binary="blob")
   dbExecute(db2, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at DATETIME, active BOOLEAN, image BLOB)")
 
   images <- list(1:3, 4:6)
@@ -210,24 +210,6 @@ test_that("cast_blobs true works", {
 
   res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
   expect_equal(res$image, events$image)
-
-  dbxDisconnect(db2)
-})
-
-test_that("cast_blobs false works", {
-  db2 <- dbxConnect(adapter="sqlite", dbname=":memory:", cast_blobs=FALSE)
-  dbExecute(db2, "CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, created_on DATE, updated_at DATETIME, active BOOLEAN, image BLOB)")
-
-  images <- list(1:3, 4:6)
-  serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
-
-  events <- data.frame(image=blob::as.blob(serialized_images))
-  res <- dbxInsert(db2, "events", events)
-
-  expect_equal(res$image, events$image)
-
-  res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$image, lapply(events$image, as.raw))
 
   dbxDisconnect(db2)
 })
