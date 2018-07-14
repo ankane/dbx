@@ -1,3 +1,27 @@
+isRPostgreSQL <- function(conn) {
+  inherits(conn, "PostgreSQLConnection")
+}
+
+isRPostgres <- function(conn) {
+  inherits(conn, "PqConnection")
+}
+
+isPostgres <- function(conn) {
+  isRPostgreSQL(conn) || isRPostgres(conn)
+}
+
+isRMySQL <- function(conn) {
+  inherits(conn, "MySQLConnection")
+}
+
+isMySQL <- function(conn) {
+  isRMySQL(conn) || isRMariaDB(conn)
+}
+
+isRMariaDB <- function(conn) {
+  inherits(conn, "MariaDBConnection")
+}
+
 isSQLite <- function(conn) {
   inherits(conn, "SQLiteConnection")
 }
@@ -152,7 +176,7 @@ runTests <- function(db) {
   })
 
   test_that("jsonb works", {
-    skip_if(isSQLite(db))
+    skip_if(!isPostgres(db))
 
     dbxDelete(db, "events")
 
@@ -166,7 +190,7 @@ runTests <- function(db) {
   })
 
   test_that("jsonlite with jsonb works", {
-    skip_if(isSQLite(db))
+    skip_if(!isPostgres(db))
 
     dbxDelete(db, "events")
 
@@ -288,7 +312,11 @@ runTests <- function(db) {
     # always utc
     skip_if(isSQLite(db))
 
-    expect_equal("UTC", dbxSelect(db, "SHOW timezone")$TimeZone)
+    if (isPostgres(db)) {
+      expect_equal("UTC", dbxSelect(db, "SHOW timezone")$TimeZone)
+    } else {
+      expect_equal("+00:00", dbxSelect(db, "SELECT @@session.time_zone")$`@@session.time_zone`)
+    }
   })
 
   test_that("datetimes with storage_tz works", {
@@ -331,7 +359,7 @@ runTests <- function(db) {
   })
 
   test_that("times with time zone work", {
-    skip_if(isSQLite(db))
+    skip_if(!isPostgres(db))
 
     dbxDelete(db, "events")
 
@@ -413,11 +441,15 @@ runTests <- function(db) {
     serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
 
     events <- data.frame(image=I(serialized_images))
-    res <- dbxInsert(db, "events", events)
+    dbxInsert(db, "events", events)
 
-    expect_equal(lapply(res$image, unserialize), images)
+    if (isRMySQL(db)) {
+      res <- dbxSelect(db, "SELECT hex(image) AS image FROM events ORDER BY id")
+      res$image <- lapply(res$image, hexToRaw)
+    } else {
+      res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+    }
 
-    res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
     expect_equal(lapply(res$image, unserialize), images)
   })
 
@@ -428,11 +460,15 @@ runTests <- function(db) {
     serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
 
     events <- data.frame(image=blob::as.blob(serialized_images))
-    res <- dbxInsert(db, "events", events)
+    dbxInsert(db, "events", events)
 
-    expect_equal(blob::as.blob(res$image), events$image)
+    if (isRMySQL(db)) {
+      res <- dbxSelect(db, "SELECT hex(image) AS image FROM events ORDER BY id")
+      res$image <- lapply(res$image, hexToRaw)
+    } else {
+      res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+    }
 
-    res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
     expect_equal(blob::as.blob(res$image), events$image)
   })
 
