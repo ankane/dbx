@@ -187,67 +187,6 @@ logQuery <- function(sql) {
 options(dbx_verbose=logQuery)
 ```
 
-## Data Types
-
-### Dates & Times
-
-Times are stored in the database in UTC. When retrieved, they are converted to your local time zone. The exception is SQLite, where date and time columns are returned as character vectors in UTC, as RSQLite does [not provide enough info](https://github.com/r-dbi/RSQLite/issues/263) to typecast automatically right now.
-
-For SQLite, you can manually typecast date columns with:
-
-```r
-records$column <- as.Date(records$column)
-```
-
-And time columns with:
-
-```r
-records$column <- as.POSIXct(records$column, tz="Etc/UTC")
-attr(records$column, "tzone") <- Sys.timezone()
-```
-
-To store fractional seconds in MySQL, be sure to specify the [fractional seconds precision](https://dev.mysql.com/doc/refman/8.0/en/fractional-seconds.html) when creating your columns.
-
-```sql
-CREATE TABLE test (c1 TIME(6), c2 DATETIME(6), c3 TIMESTAMP(6));
-```
-
-### Booleans
-
-Boolean columns are not automatically typecast with RMariaDB and RSQLite as column types [cannot reliably be determined](https://github.com/r-dbi/RMariaDB/issues/100) right now. You can manually typecast with:
-
-```r
-records$column <- records$column != 0
-```
-
-### JSON
-
-JSON and JSONB columns are returned as character vectors. You can use [jsonlite](https://cran.r-project.org/package=jsonlite) to manually typecast with:
-
-```r
-records$column <- lapply(records$column, jsonlite::fromJSON)
-```
-
-RMariaDB does [not currently support JSON](https://github.com/r-dbi/DBI/issues/203). We recommend RMySQL instead.
-
-### Binary Data
-
-BLOB and BYTEA columns are returned as raw vectors.
-
-RMySQL can write BLOB columns, but [can’t retrieve them directly](https://github.com/r-dbi/RMySQL/issues/123). As a workaround, you can do:
-
-```r
-records <- dbxSelect(db, "SELECT HEX(column) AS column FROM table")
-
-hexToRaw <- function(x) {
-  y <- strsplit(x, "")[[1]]
-  z <- paste0(y[c(TRUE, FALSE)], y[c(FALSE, TRUE)])
-  as.raw(as.hexmode(z))
-}
-
-records$column <- lapply(records$column, hexToRaw)
-```
-
 ## Database Credentials
 
 Environment variables are a convenient way to store database credentials. This keeps them outside your source control. It’s also how platforms like [Heroku](https://www.heroku.com) store them.
@@ -316,6 +255,69 @@ DBI::dbWithTransaction(db, {
   dbxInsert(db, ...)
   dbxDelete(db, ...)
 })
+```
+
+## Data Type Notes
+
+### Dates & Times
+
+Times are stored in the database in UTC. When retrieved, they are converted to your local time zone.
+
+### JSON
+
+JSON and JSONB columns are returned as character vectors. You can use [jsonlite](https://cran.r-project.org/package=jsonlite) to parse them with:
+
+```r
+records$column <- lapply(records$column, jsonlite::fromJSON)
+```
+
+### Binary Data
+
+BLOB and BYTEA columns are returned as raw vectors.
+
+## Data Type Limitations
+
+### Dates & Times
+
+RSQLite does [not provide enough info](https://github.com/r-dbi/RSQLite/issues/263) to typecast automatically right now. You can manually typecast date columns with:
+
+```r
+records$column <- as.Date(records$column)
+```
+
+And time columns with:
+
+```r
+records$column <- as.POSIXct(records$column, tz="Etc/UTC")
+attr(records$column, "tzone") <- Sys.timezone()
+```
+
+### Booleans
+
+RMariaDB and RSQLite do [not provide enough info](https://github.com/r-dbi/RMariaDB/issues/100) to typecast automatically right now. You can manually typecast with:
+
+```r
+records$column <- records$column != 0
+```
+
+### JSON
+
+RMariaDB does [not currently support JSON](https://github.com/r-dbi/DBI/issues/203).
+
+### Binary Data
+
+RMySQL can write BLOB columns, but [can’t retrieve them directly](https://github.com/r-dbi/RMySQL/issues/123). As a workaround, you can do:
+
+```r
+records <- dbxSelect(db, "SELECT HEX(column) AS column FROM table")
+
+hexToRaw <- function(x) {
+  y <- strsplit(x, "")[[1]]
+  z <- paste0(y[c(TRUE, FALSE)], y[c(FALSE, TRUE)])
+  as.raw(as.hexmode(z))
+}
+
+records$column <- lapply(records$column, hexToRaw)
 ```
 
 ## Reference
