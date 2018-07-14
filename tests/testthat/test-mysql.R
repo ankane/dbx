@@ -12,7 +12,7 @@ dbExecute(db, "CREATE TABLE orders (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
 dbxInsert(db, "orders", orders[c("city")])
 
 dbExecute(db, "DROP TABLE IF EXISTS events")
-dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME(6), deleted_at TIMESTAMP(6) NULL DEFAULT NULL, open_time TIME, active BOOLEAN, properties JSON)")
+dbExecute(db, "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, created_on DATE, updated_at DATETIME(6), deleted_at TIMESTAMP(6) NULL DEFAULT NULL, open_time TIME, active BOOLEAN, properties JSON, image BLOB)")
 
 test_that("select works", {
   res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id ASC")
@@ -308,6 +308,25 @@ test_that("cast_times false works", {
   expect_equal(1, res$count)
 
   dbxDisconnect(db2)
+})
+
+test_that("blob with binary works", {
+  dbxDelete(db, "events")
+
+  images <- list(1:3, 4:6)
+  serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
+
+  events <- data.frame(image=blob::as.blob(serialized_images))
+  res <- dbxInsert(db, "events", events)
+
+  expect_equal(res$image, events$image)
+
+  # RMySQL cannot read blobs
+  # issue marked as dup, but unsure where dup issue is
+  # https://github.com/r-dbi/RMySQL/issues/123
+  res <- dbxSelect(db, "SELECT hex(image) AS image FROM events ORDER BY id")
+  hex <- toupper(as.character(lapply(serialized_images, function(x) { paste0(as.character(x), collapse="") })))
+  expect_equal(res$image, hex)
 })
 
 test_that("connect with url works", {
