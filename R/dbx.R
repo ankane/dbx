@@ -23,7 +23,7 @@
 #' # Others
 #' db <- dbxConnect(adapter=odbc(), database="mydb")
 #' }
-dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL, cast_blobs=NULL, ...) {
+dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL, cast_blobs=FALSE, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
   }
@@ -119,12 +119,10 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL,
     attr(conn, "dbx_cast_times") <- cast_times
   }
 
-  if (!is.null(cast_blobs)) {
-    if (cast_blobs && !requireNamespace("blob", quietly=TRUE)) {
-      stop("'blob' package is required for cast_blobs")
-    }
-    attr(conn, "dbx_cast_blobs") <- cast_blobs
+  if (cast_blobs && !requireNamespace("blob", quietly=TRUE)) {
+    stop("'blob' package is required for cast_blobs")
   }
+  attr(conn, "dbx_cast_blobs") <- cast_blobs
 
   # other adapters do this automatically
   if (isRPostgreSQL(conn)) {
@@ -296,7 +294,7 @@ dbxSelect <- function(conn, statement) {
       }
     }
 
-    if (isFALSE(attr(conn, "dbx_cast_blobs"))) {
+    if (!isTRUE(attr(conn, "dbx_cast_blobs"))) {
       uncast_blobs <- which(sapply(records, isBlob))
       for (i in uncast_blobs) {
         records[[colnames(records)[i]]] <- lapply(records[, i], as.raw)

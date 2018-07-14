@@ -328,7 +328,7 @@ test_that("blob with binary works", {
   expect_equal(res$image, events$image)
 
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$image, events$image)
+  expect_equal(res$image, lapply(events$image, as.raw))
 })
 
 test_that("cast_blobs true works", {
