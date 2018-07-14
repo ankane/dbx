@@ -257,11 +257,11 @@ test_that("hms with times work", {
   events <- data.frame(open_time=c(hms::as.hms("12:30:55"), hms::as.hms("16:59:59")), stringsAsFactors=FALSE)
   res <- dbxInsert(db, "events", events)
 
-  expect_equal(as.character(res$open_time), as.character(events$open_time))
+  expect_equal(res$open_time, events$open_time)
 
   # test returned time
   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  expect_equal(as.character(res$open_time), as.character(events$open_time))
+  expect_equal(res$open_time, as.character(events$open_time))
 
   # test stored time
   res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
