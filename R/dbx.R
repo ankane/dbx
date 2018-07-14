@@ -3,7 +3,6 @@
 #' @param url A database URL
 #' @param adapter The database adapter to use
 #' @param storage_tz The time zone timestamps are stored in
-#' @param cast_json Cast json columns
 #' @param cast_times Cast time columns to 'hms' objects
 #' @param cast_blobs Cast blob columns to 'blob' objects
 #' @param ... Arguments to pass to dbConnect
@@ -24,7 +23,7 @@
 #' # Others
 #' db <- dbxConnect(adapter=odbc(), database="mydb")
 #' }
-dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_json=FALSE, cast_times=NULL, cast_blobs=NULL, ...) {
+dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_times=NULL, cast_blobs=NULL, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
   }
@@ -103,15 +102,15 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, cast_json=FALSE,
     attr(conn, "dbx_storage_tz") <- storage_tz
   }
 
-  if (cast_json) {
-    if (!isRPostgres(conn)) {
-      stop("cast_json is only supported with RPostgres")
-    }
-    if (!requireNamespace("jsonlite", quietly=TRUE)) {
-      stop("'jsonlite' package is required for cast_json")
-    }
-    attr(conn, "dbx_cast_json") <- cast_json
-  }
+  # if (cast_json) {
+  #   if (!isRPostgres(conn)) {
+  #     stop("cast_json is only supported with RPostgres")
+  #   }
+  #   if (!requireNamespace("jsonlite", quietly=TRUE)) {
+  #     stop("'jsonlite' package is required for cast_json")
+  #   }
+  #   attr(conn, "dbx_cast_json") <- cast_json
+  # }
 
   if (!is.null(cast_times)) {
     if (cast_times && !requireNamespace("hms", quietly=TRUE)) {
