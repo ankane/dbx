@@ -225,7 +225,7 @@ records$column <- records$column != 0
 JSON and JSONB columns are returned as character vectors. You can use [jsonlite](https://cran.r-project.org/package=jsonlite) to manually typecast with:
 
 ```r
-lapply(records$column, jsonlite::fromJSON)
+records$column <- lapply(records$column, function(x) { if (is.na(x)) x else jsonlite::fromJSON(x) })
 ```
 
 RMariaDB does [not currently support JSON](https://github.com/r-dbi/DBI/issues/203). We recommend RMySQL instead.
