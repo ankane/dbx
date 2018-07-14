@@ -204,10 +204,6 @@ dbxSelect <- function(conn, statement) {
         cast_times <- which(sql_types == "time")
       }
     }
-    # TODO cast dates and times for RSQLite
-    # waiting on https://github.com/r-dbi/RSQLite/issues/263
-
-    # TODO cast booleans for RMariaDB
 
     # always fetch at least once
     ret[[length(ret) + 1]] <- dbFetch(res)
@@ -221,6 +217,20 @@ dbxSelect <- function(conn, statement) {
   records <- combineResults(ret)
 
   if (nrow(records) > 0) {
+    if (isRMariaDB(conn)) {
+      # TODO cast booleans for RMariaDB
+      # waiting on https://github.com/r-dbi/RMariaDB/issues/100
+
+      cast_blobs <- which(sapply(records, isBinary))
+    } else if (isSQLite(conn)) {
+      # TODO cast dates and times for RSQLite
+      # waiting on https://github.com/r-dbi/RSQLite/issues/263
+
+      if (identical(attr(conn, "dbx_cast_blobs"), TRUE)) {
+        cast_blobs <- which(sapply(records, isBinary))
+      }
+    }
+
     for (i in cast_dates) {
       records[, i] <- as.Date(records[, i])
     }
@@ -249,15 +259,6 @@ dbxSelect <- function(conn, statement) {
 
     for (i in cast_blobs) {
       records[[colnames(records)[i]]] <- blob::as.blob(records[, i])
-    }
-
-    if (isRMariaDB(conn)) {
-      # try to find blob columns since we don't get data types
-      for (i in 1:ncol(records)) {
-        if (isBinary(records[, i])) {
-          records[[colnames(records)[i]]] <- blob::as.blob(records[, i])
-        }
-      }
     }
 
     for (i in cast_times) {
