@@ -29,6 +29,12 @@ test_that("select columns works", {
   expect_equal(res, orders[c("id")])
 })
 
+test_that("empty select works", {
+  dbxDelete(db, "events")
+  res <- dbxSelect(db, "SELECT * FROM events")
+  expect_equal(0, nrow(res))
+})
+
 test_that("insert works", {
   dbxInsert(db, "orders", new_orders[c("city")])
   res <- dbxSelect(db, "SELECT * FROM orders WHERE id > 2 ORDER BY id ASC")

@@ -29,6 +29,12 @@ test_that("select columns works", {
   expect_equal(res, orders[c("id")])
 })
 
+test_that("empty select works", {
+  dbxDelete(db, "events")
+  res <- dbxSelect(db, "SELECT * FROM events")
+  expect_equal(0, nrow(res))
+})
+
 test_that("insert works", {
   res <- dbxInsert(db, "orders", new_orders[c("city")])
   expect_equal(res, new_orders)
@@ -148,20 +154,20 @@ test_that("jsonlite with jsonb works", {
   expect_equal(jsonlite::fromJSON(res$propertiesb), jsonlite::fromJSON(events$propertiesb))
 })
 
-test_that("cast_json works", {
-  db2 <- dbxConnect(adapter="postgres", dbname="dbx_test", cast_json=TRUE)
-  dbxDelete(db2, "events")
+# test_that("cast_json works", {
+#   db2 <- dbxConnect(adapter="postgres", dbname="dbx_test", cast_json=TRUE)
+#   dbxDelete(db2, "events")
 
-  events <- data.frame(properties=c('{"hello": "world"}'), stringsAsFactors=FALSE)
-  res <- dbxInsert(db2, "events", events)
+#   events <- data.frame(properties=c('{"hello": "world"}'), stringsAsFactors=FALSE)
+#   res <- dbxInsert(db2, "events", events)
 
-  expect_equal(res$properties, jsonlite::fromJSON(events$properties))
+#   expect_equal(res$properties, jsonlite::fromJSON(events$properties))
 
-  res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
-  expect_equal(res$properties, jsonlite::fromJSON(events$properties))
+#   res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
+#   expect_equal(res$properties, jsonlite::fromJSON(events$properties))
 
-  dbxDisconnect(db2)
-})
+#   dbxDisconnect(db2)
+# })
 
 test_that("dates works", {
   dbxDelete(db, "events")
