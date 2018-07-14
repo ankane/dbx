@@ -235,6 +235,15 @@ dbxSelect <- function(conn, statement) {
       records[[colnames(records)[i]]] <- lapply(records[, i], function(x) { if (is.na(x)) x else RPostgreSQL::postgresqlUnescapeBytea(x) })
     }
 
+    if (isRMariaDB(conn)) {
+      # try to find blob columns since we don't get data types
+      for (i in 1:ncol(records)) {
+        if (isBinary(records[, i])) {
+          records[[colnames(records)[i]]] <- blob::as.blob(records[, i])
+        }
+      }
+    }
+
     for (i in cast_times) {
       records[, i] <- hms::as.hms(records[, i])
     }
@@ -523,7 +532,11 @@ isRMySQL <- function(conn) {
 }
 
 isMySQL <- function(conn) {
-  isRMySQL(conn) || inherits(conn, "MariaDBConnection")
+  isRMySQL(conn) || isRMariaDB(conn)
+}
+
+isRMariaDB <- function(conn) {
+  inherits(conn, "MariaDBConnection")
 }
 
 isSQLite <- function(conn) {
