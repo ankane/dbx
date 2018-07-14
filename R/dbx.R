@@ -192,6 +192,7 @@ dbxSelect <- function(conn, statement) {
       }
 
       # json columns come back as unknown in RPostgreSQL
+      # could try to parse them from warning messages generated
       # cast_json <- which(sql_types %in% c("json", "jsonb"))
     } else if (isRPostgres(conn)) {
       column_info <- dbColumnInfo(res)
