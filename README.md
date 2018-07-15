@@ -369,7 +369,7 @@ Version 0.2.0 brings a number of fixes and improvements to data types.
 
 However, there a few breaking changes to be aware of:
 
-- The `dbxInsert` and `dbxUpsert` functions no longer return a data frame by default. For MySQL and SQLite, the data frame was just the `records` argument. For Postgres, if you use auto-incrementing primary keys, the data frame contained ids of the newly inserted/upserted records. To keep the previous behavior, pass name of the column as the `returning` argument:
+- The `dbxInsert` and `dbxUpsert` functions no longer return a data frame by default. For MySQL and SQLite, the data frame was just the `records` argument. For Postgres, if you use auto-incrementing primary keys, the data frame contained ids of the newly inserted/upserted records. To get the ids, pass name of the column as the `returning` argument:
 
   ```r
   dbxInsert(db, table, records, returning=c("id"))
