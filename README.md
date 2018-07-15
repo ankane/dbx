@@ -159,7 +159,7 @@ Use `where_cols` to specify the columns used for lookup. There must be a unique 
 If you use auto-incrementing ids in Postgres, you can get the ids of newly upserted rows by passing the column name:
 
 ```r
-ids <- dbxUpsert(db, table, records, where_cols=c("id"), returning=c("id"))
+dbxUpsert(db, table, records, where_cols=c("id"), returning=c("id"))
 ```
 
 ### Delete
