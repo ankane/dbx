@@ -449,8 +449,20 @@ runTests <- function(db, redshift=FALSE) {
     dbxUpdate(db, "events", all, where_cols=c("id"))
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
     expect_equal(res, all)
-    expect_equal(class(res$image), "list")
-    expect_equal(class(res$image[[1]]), "raw")
+
+    # empty binary handled in many different ways
+    if (isRMySQL(db)) {
+      # no way to tell text and blobs apart
+      expect_equal(class(res$image), "character")
+    } else {
+      expect_equal(class(res$image), "list")
+
+      if (isRMariaDB(db)) {
+        expect_equal(class(res$image[[1]]), "NULL")
+      } else {
+        expect_equal(res$image[[1]], as.raw(NULL))
+      }
+    }
   })
 
   dbxDisconnect(db)
