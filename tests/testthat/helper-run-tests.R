@@ -26,7 +26,7 @@ isSQLite <- function(conn) {
   inherits(conn, "SQLiteConnection")
 }
 
-runTests <- function(db) {
+runTests <- function(db, redshift=TRUE) {
   orders <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
   new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFactors=FALSE)
 
@@ -95,7 +95,7 @@ runTests <- function(db) {
   })
 
   test_that("upsert works", {
-    skip_if(isSQLite(db))
+    skip_if(isSQLite(db) || redshift)
 
     upsert_orders <- data.frame(id=c(3, 5), city=c("Boston", "Chicago"))
     dbxUpsert(db, "orders", upsert_orders, where_cols=c("id"))
@@ -140,7 +140,7 @@ runTests <- function(db) {
   })
 
   test_that("insert returning works", {
-    skip_if(!isPostgres(db))
+    skip_if(!isPostgres(db) || redshift)
 
     res <- dbxInsert(db, "orders", orders[c("city")], returning=c("id", "city"))
     expect_equal(res$id, c(5, 6))
@@ -380,6 +380,8 @@ runTests <- function(db) {
   })
 
   test_that("binary works", {
+    skip_if(redshift)
+
     dbxDelete(db, "events")
 
     images <- list(1:3, 4:6)
@@ -399,6 +401,8 @@ runTests <- function(db) {
   })
 
   test_that("blob with binary works", {
+    skip_if(redshift)
+
     dbxDelete(db, "events")
 
     images <- list(1:3, 4:6)
