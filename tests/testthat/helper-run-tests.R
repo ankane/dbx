@@ -82,14 +82,6 @@ runTests <- function(db, redshift=FALSE) {
     expect_equal(res$city, new_orders$city)
   })
 
-  # very important
-  test_that("can update what what just selected and get same result", {
-    all_orders <- dbxSelect(db, "SELECT * FROM orders ORDER BY id")
-    dbxUpdate(db, "orders", all_orders, where_cols=c("id"))
-    res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id")
-    expect_equal(res, all_orders)
-  })
-
   test_that("update works", {
     update_orders <- data.frame(id=c(3), city=c("LA"))
     dbxUpdate(db, "orders", update_orders, where_cols=c("id"))
@@ -147,6 +139,23 @@ runTests <- function(db, redshift=FALSE) {
     expect_equal(0, res$count)
   })
 
+  test_that("empty insert works", {
+    dbxInsert(db, "events", data.frame())
+    expect(TRUE)
+  })
+
+  test_that("empty update works", {
+    dbxUpdate(db, "events", data.frame(id = as.numeric(), active = as.logical()), where_cols=c("id"))
+    expect(TRUE)
+  })
+
+  test_that("empty upsert works", {
+    skip_if(!isPostgres(db) || redshift)
+
+    dbxUpsert(db, "events", data.frame(id = as.numeric(), active = as.logical()), where_cols=c("id"))
+    expect(TRUE)
+  })
+
   test_that("insert returning works", {
     skip_if(!isPostgres(db) || redshift)
 
@@ -165,12 +174,6 @@ runTests <- function(db, redshift=FALSE) {
 
     res <- dbxSelect(db, "SELECT id, city FROM orders")
     expect_equal(res, orders)
-  })
-
-  test_that("empty insert works", {
-    empty_orders <- data.frame()
-    res <- dbxInsert(db, "orders", empty_orders)
-    expect_equal(res, empty_orders)
   })
 
   test_that("boolean works", {
