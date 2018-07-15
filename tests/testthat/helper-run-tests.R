@@ -235,6 +235,26 @@ runTests <- function(db, redshift=FALSE) {
     expect_equal(res, orders)
   })
 
+  test_that("float works", {
+    dbxDelete(db, "events")
+
+    events <- data.frame(speed=c(1.2, 3.4))
+    dbxInsert(db, "events", events)
+
+    res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+    expect_equal(res$speed, events$speed, tolerance=0.000001)
+  })
+
+  test_that("decimal works", {
+    dbxDelete(db, "events")
+
+    events <- data.frame(distance=c(1.2, 3.4))
+    dbxInsert(db, "events", events)
+
+    res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+    expect_equal(res$distance, events$distance)
+  })
+
   test_that("boolean works", {
     dbxDelete(db, "events")
 
