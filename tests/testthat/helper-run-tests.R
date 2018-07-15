@@ -75,6 +75,27 @@ runTests <- function(db, redshift=FALSE) {
     }
   })
 
+  test_that("missing select returns NA no data", {
+    dbxDelete(db, "events")
+
+    res <- dbxSelect(db, "SELECT * FROM events")
+
+    if (isSQLite(db)) {
+      expect_equal(as.numeric(), res$created_on)
+      expect_equal(as.numeric(), res$updated_at)
+      expect_equal(as.numeric(), res$active)
+    } else {
+      expect_equal(as.Date(as.character()), res$created_on)
+      expect_equal(as.POSIXct(as.character()), res$updated_at)
+      expect_equal(as.POSIXct(as.character()), res$deleted_at)
+      if (isRMariaDB(db)) {
+        expect_equal(as.numeric(), res$active)
+      } else {
+        expect_equal(as.logical(), res$active)
+      }
+    }
+  })
+
   test_that("insert works", {
     dbxInsert(db, "orders", new_orders)
 

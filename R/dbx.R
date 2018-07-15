@@ -193,6 +193,24 @@ dbxSelect <- function(conn, statement) {
 
   records <- combineResults(ret)
 
+  for (i in cast_booleans) {
+    records[, i] <- records[, i] != 0
+  }
+
+  for (i in stringify_json) {
+    records[, i] <- as.character(records[, i])
+  }
+
+  uncast_times <- which(sapply(records, isTime))
+  for (i in uncast_times) {
+    records[, i] <- as.character(records[, i])
+  }
+
+  uncast_blobs <- which(sapply(records, isBlob))
+  for (i in uncast_blobs) {
+    records[[colnames(records)[i]]] <- lapply(records[, i], as.raw)
+  }
+
   if (nrow(records) > 0) {
     for (i in cast_dates) {
       records[, i] <- as.Date(records[, i])
@@ -208,14 +226,6 @@ dbxSelect <- function(conn, statement) {
       attr(records[, i], "tzone") <- currentTimeZone()
     }
 
-    for (i in stringify_json) {
-      records[, i] <- as.character(records[, i])
-    }
-
-    for (i in cast_booleans) {
-      records[, i] <- records[, i] != 0
-    }
-
     for (i in unescape_blobs) {
       records[[colnames(records)[i]]] <- lapply(records[, i], function(x) { if (is.na(x)) as.raw(NULL) else RPostgreSQL::postgresqlUnescapeBytea(x) })
     }
@@ -223,15 +233,13 @@ dbxSelect <- function(conn, statement) {
     for (i in fix_timetz) {
       records[, i] <- gsub("\\+00$", "", records[, i])
     }
-
-    uncast_times <- which(sapply(records, isTime))
-    for (i in uncast_times) {
-      records[, i] <- as.character(records[, i])
+  } else {
+    for (i in cast_dates) {
+      records[, i] <- as.Date(as.character())
     }
 
-    uncast_blobs <- which(sapply(records, isBlob))
-    for (i in uncast_blobs) {
-      records[[colnames(records)[i]]] <- lapply(records[, i], as.raw)
+    for (i in cast_datetimes) {
+      records[, i] <- as.POSIXct(as.character())
     }
   }
 
