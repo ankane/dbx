@@ -297,7 +297,7 @@ BLOB and BYTEA columns are returned as `raw` vectors.
 
 ### Dates & Times
 
-RSQLite does [not provide enough info](https://github.com/r-dbi/RSQLite/issues/263) to typecast automatically right now. You can manually typecast date columns with:
+RSQLite does not currently provide [enough info](https://github.com/r-dbi/RSQLite/issues/263) to automatically typecast dates and times. You can manually typecast date columns with:
 
 ```r
 records$column <- as.Date(records$column)
@@ -312,7 +312,7 @@ attr(records$column, "tzone") <- Sys.timezone()
 
 ### Booleans
 
-RMariaDB and RSQLite do [not provide enough info](https://github.com/r-dbi/RMariaDB/issues/100) to typecast automatically right now. You can manually typecast with:
+RMariaDB and RSQLite do not currently provide [enough info](https://github.com/r-dbi/RMariaDB/issues/100) to automatically typecast booleans. You can manually typecast with:
 
 ```r
 records$column <- records$column != 0
@@ -324,7 +324,7 @@ RMariaDB does [not currently support JSON](https://github.com/r-dbi/DBI/issues/2
 
 ### Binary Data
 
-RMySQL can write BLOB columns, but [can’t retrieve them directly](https://github.com/r-dbi/RMySQL/issues/123). As a workaround, you can do:
+RMySQL can write BLOB columns, but [can’t retrieve them directly](https://github.com/r-dbi/RMySQL/issues/123). To workaround this, use:
 
 ```r
 records <- dbxSelect(db, "SELECT HEX(column) AS column FROM table")
