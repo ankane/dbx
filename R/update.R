@@ -5,7 +5,6 @@
 #' @param records A data frame of records to insert
 #' @param where_cols The columns to use for WHERE clause
 #' @param batch_size The number of records to update in a single transaction (defaults to all)
-#' @importFrom DBI dbWithTransaction
 #' @export
 #' @examples
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")

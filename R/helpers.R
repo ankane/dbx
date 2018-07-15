@@ -1,3 +1,5 @@
+#' @importFrom DBI dbConnect dbDisconnect dbExecute dbQuoteIdentifier dbQuoteLiteral dbSendQuery dbFetch dbClearResult dbHasCompleted dbColumnInfo dbWithTransaction
+
 isRPostgreSQL <- function(conn) {
   inherits(conn, "PostgreSQLConnection")
 }
@@ -123,7 +125,6 @@ selectOrExecute <- function(conn, sql, records, returning) {
   }
 }
 
-#' @importFrom DBI dbExecute
 execute <- function(conn, statement) {
   statement <- processStatement(statement)
   dbExecute(conn, statement)
@@ -190,12 +191,10 @@ currentTimeZone <- function() {
   Sys.getenv("TZ", Sys.timezone())
 }
 
-#' @importFrom DBI dbQuoteIdentifier
 quoteIdent <- function(conn, cols) {
   as.character(dbQuoteIdentifier(conn, cols))
 }
 
-#' @importFrom DBI dbQuoteLiteral
 quoteRecords <- function(conn, records) {
   quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
   for (i in 1:ncol(records)) {

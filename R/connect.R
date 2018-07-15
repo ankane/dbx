@@ -4,7 +4,6 @@
 #' @param adapter The database adapter to use
 #' @param storage_tz The time zone timestamps are stored in
 #' @param ... Arguments to pass to dbConnect
-#' @importFrom DBI dbConnect
 #' @export
 #' @examples
 #' # SQLite

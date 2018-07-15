@@ -2,7 +2,6 @@
 #'
 #' @param conn A DBIConnection object
 #' @param statement The SQL statement to use
-#' @importFrom DBI dbSendQuery dbFetch dbClearResult dbHasCompleted dbColumnInfo
 #' @export
 #' @examples
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
