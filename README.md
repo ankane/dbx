@@ -124,7 +124,7 @@ records <- data.frame(temperature=c(32, 25))
 dbxInsert(db, table, records)
 ```
 
-If you use auto-incrementing ids in Postgres, the ids of the newly inserted rows can be returned by passing the column name:
+If you use auto-incrementing ids in Postgres, you can get the ids of newly inserted rows by passing the column name:
 
 ```r
 ids <- dbxInsert(db, table, records, returning=c("id"))
@@ -156,7 +156,7 @@ Use `where_cols` to specify the columns used for lookup. There must be a unique 
 
 *Only available for PostgreSQL 9.5+, MySQL 5.5+, and SQLite 3.24+*
 
-If you use auto-incrementing ids in Postgres, the ids of the newly inserted rows can be returned by passing the column name:
+If you use auto-incrementing ids in Postgres, you can get the ids of newly upserted rows by passing the column name:
 
 ```r
 ids <- dbxUpsert(db, table, records, where_cols=c("id"), returning=c("id"))
@@ -356,15 +356,21 @@ dbGetInfo(db)
 
 ### 0.2.0 [unreleased]
 
-Version 0.2.0 brings a number of improvements to dates and times.
+Version 0.2.0 brings a number of fixes and improvements to data types.
 
-One breaking change is `timestamp without time zone` columns in Postgres are now stored in UTC instead of local time. To keep the previous behavior, use:
+However, there a few breaking changes to be aware of:
 
-```r
-dbxConnect(adapter="postgres", storage_tz=Sys.timezone(), ...)
-```
+- `timestamp without time zone` columns in Postgres are now stored in UTC instead of local time. This does not affect `timestamp with time zone` columns. To keep the previous behavior, use:
 
-This does not affect `timestamp with time zone` columns.
+  ```r
+  dbxConnect(adapter="postgres", storage_tz=Sys.timezone(), ...)
+  ```
+
+- The `dbxInsert` and `dbxUpsert` functions no longer return a data frame by default. For MySQL and SQLite, the data frame was just the `records` argument. For Postgres, if you use auto-incrementing primary keys, the data frame contained ids of the newly inserted/upserted records. To keep the previous behavior, pass name of the column as the `returning` argument:
+
+  ```r
+  dbxInsert(db, table, records, returning=c("id"))
+  ```
 
 ## History
 

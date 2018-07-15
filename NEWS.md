@@ -1,10 +1,9 @@
 # dbx 0.2.0 [unreleased]
 
 - Added support for fractional seconds
-- Fixed errors with dates and times
-- Fixed date and time typecasting with RMySQL
-- Fixed boolean writes with RPostgreSQL
-- Fixed boolean typecasting with RMySQL
+- Fixed typecasting for dates, times, and booleans with RMySQL
+- Fixed error when writing dates with RMySQL
+- Fixed error when writing booleans with RPostgreSQL
 
 Breaking
 
@@ -12,6 +11,12 @@ Breaking
 
   ```r
   dbxConnect(adapter="postgres", storage_tz=Sys.timezone(), ...)
+  ```
+
+- The `dbxInsert` and `dbxUpsert` functions no longer return a data frame by default. For MySQL and SQLite, the data frame was just the `records` argument. For Postgres, if you use auto-incrementing primary keys, the data frame contained ids of the newly inserted/upserted records. To keep the previous behavior, pass name of the column as the `returning` argument:
+
+  ```r
+  dbxInsert(db, table, records, returning=c("id"))
   ```
 
 # dbx 0.1.0
