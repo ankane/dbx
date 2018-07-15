@@ -201,16 +201,6 @@ dbxSelect <- function(conn, statement) {
     records[, i] <- as.character(records[, i])
   }
 
-  uncast_times <- which(sapply(records, isTime))
-  for (i in uncast_times) {
-    records[, i] <- as.character(records[, i])
-  }
-
-  uncast_blobs <- which(sapply(records, isBlob))
-  for (i in uncast_blobs) {
-    records[[colnames(records)[i]]] <- lapply(records[, i], as.raw)
-  }
-
   if (nrow(records) > 0) {
     for (i in cast_dates) {
       records[, i] <- as.Date(records[, i])
@@ -232,6 +222,16 @@ dbxSelect <- function(conn, statement) {
 
     for (i in fix_timetz) {
       records[, i] <- gsub("\\+00$", "", records[, i])
+    }
+
+    uncast_times <- which(sapply(records, isTime))
+    for (i in uncast_times) {
+      records[, i] <- as.character(records[, i])
+    }
+
+    uncast_blobs <- which(sapply(records, isBlob))
+    for (i in uncast_blobs) {
+      records[[colnames(records)[i]]] <- lapply(records[, i], as.raw)
     }
   } else {
     for (i in cast_dates) {
