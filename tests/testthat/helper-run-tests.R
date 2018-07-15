@@ -379,48 +379,6 @@ runTests <- function(db) {
     expect_equal(1, res$count)
   })
 
-  # test_that("cast_times true works", {
-  #   db2 <- dbxConnect(adapter="rpostgresql", dbname="dbx_test", cast_times=TRUE)
-
-  #   dbxDelete(db2, "events")
-
-  #   events <- data.frame(open_time=c(hms::as.hms("12:30:55"), hms::as.hms("16:59:59")), stringsAsFactors=FALSE)
-  #   res <- dbxInsert(db2, "events", events)
-
-  #   expect_equal(res$open_time, events$open_time)
-
-  #   # test returned time
-  #   res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
-  #   expect_equal(res$open_time, events$open_time)
-
-  #   # test stored time
-  #   res <- dbxSelect(db2, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
-  #   expect_equal(1, res$count)
-
-  #   dbxDisconnect(db2)
-  # })
-
-  # test_that("cast_times false works", {
-  #   db2 <- dbxConnect(adapter="rpostgresql", dbname="dbx_test", cast_times=FALSE)
-
-  #   dbxDelete(db2, "events")
-
-  #   events <- data.frame(open_time=c(hms::as.hms("12:30:55"), hms::as.hms("16:59:59")), stringsAsFactors=FALSE)
-  #   res <- dbxInsert(db2, "events", events)
-
-  #   expect_equal(res$open_time, as.character(events$open_time))
-
-  #   # test returned time
-  #   res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
-  #   expect_equal(res$open_time, as.character(events$open_time))
-
-  #   # test stored time
-  #   res <- dbxSelect(db2, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
-  #   expect_equal(1, res$count)
-
-  #   dbxDisconnect(db2)
-  # })
-
   test_that("binary works", {
     dbxDelete(db, "events")
 
@@ -458,25 +416,6 @@ runTests <- function(db) {
 
     expect_equal(blob::as.blob(res$image), events$image)
   })
-
-  # test_that("cast_binary works", {
-  #   db2 <- dbxConnect(adapter="rpostgresql", dbname="dbx_test", cast_binary="blob")
-
-  #   dbxDelete(db2, "events")
-
-  #   images <- list(1:3, 4:6)
-  #   serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
-
-  #   events <- data.frame(image=blob::as.blob(serialized_images))
-  #   res <- dbxInsert(db2, "events", events)
-
-  #   expect_equal(res$image, events$image)
-
-  #   res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
-  #   expect_equal(res$image, events$image)
-
-  #   dbxDisconnect(db2)
-  # })
 
   dbxDisconnect(db)
 }
