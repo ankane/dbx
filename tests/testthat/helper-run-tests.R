@@ -22,7 +22,7 @@ runTests <- function(db, redshift=FALSE) {
   test_that("empty select works", {
     dbxDelete(db, "events")
     res <- dbxSelect(db, "SELECT * FROM events")
-    expect_equal(0, nrow(res))
+    expect_equal(nrow(res), 0)
   })
 
   test_that("empty result", {
@@ -139,7 +139,7 @@ runTests <- function(db, redshift=FALSE) {
     update_orders <- data.frame(id=c(3), city=c("LA"))
     dbxUpdate(db, "orders", update_orders, where_cols=c("id"))
     res <- dbxSelect(db, "SELECT city FROM orders WHERE id = 3")
-    expect_equal(c("LA"), res$city)
+    expect_equal(res$city, c("LA"))
   })
 
   test_that("update missing column raises error", {
@@ -152,8 +152,10 @@ runTests <- function(db, redshift=FALSE) {
 
     upsert_orders <- data.frame(id=c(3, 5), city=c("Boston", "Chicago"))
     dbxUpsert(db, "orders", upsert_orders, where_cols=c("id"))
+
     res <- dbxSelect(db, "SELECT city FROM orders WHERE id IN (3, 5)")
-    expect_equal(c("Boston", "Chicago"), res$city)
+    expect_equal(res$city, c("Boston", "Chicago"))
+
     dbxDelete(db, "orders", data.frame(id=c(5)))
   })
 
@@ -166,7 +168,7 @@ runTests <- function(db, redshift=FALSE) {
     delete_orders <- data.frame(id=c())
     dbxDelete(db, "orders", where=delete_orders)
     res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM orders")
-    expect_equal(4, res$count)
+    expect_equal(res$count, 4)
   })
 
   test_that("delete one column works", {
@@ -189,7 +191,7 @@ runTests <- function(db, redshift=FALSE) {
   test_that("delete all works", {
     dbxDelete(db, "orders")
     res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM orders")
-    expect_equal(0, res$count)
+    expect_equal(res$count, 0)
   })
 
   test_that("empty insert works", {
@@ -371,7 +373,7 @@ runTests <- function(db, redshift=FALSE) {
 
     # test stored time
     res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 17:30:55.000000'")
-    expect_equal(1, res$count)
+    expect_equal(res$count, 1)
   })
 
   test_that("timestamp with time zone works", {
@@ -390,7 +392,7 @@ runTests <- function(db, redshift=FALSE) {
 
     # test stored time
     res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE deleted_at = '2018-01-01 17:30:55'")
-    expect_equal(1, res$count)
+    expect_equal(res$count, 1)
   })
 
   test_that("datetimes have precision", {
@@ -412,7 +414,7 @@ runTests <- function(db, redshift=FALSE) {
 
     # test stored time
     res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = '2018-01-01 20:30:55.123456'")
-    expect_equal(1, res$count)
+    expect_equal(res$count, 1)
   })
 
   test_that("time zone is UTC", {
@@ -438,7 +440,7 @@ runTests <- function(db, redshift=FALSE) {
 
     # test stored time
     res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
-    expect_equal(1, res$count)
+    expect_equal(res$count, 1)
   })
 
   test_that("times with time zone work", {
@@ -455,7 +457,7 @@ runTests <- function(db, redshift=FALSE) {
 
     # test stored time
     res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE close_time = '12:30:55'")
-    expect_equal(1, res$count)
+    expect_equal(res$count, 1)
   })
 
   test_that("hms with times work", {
@@ -470,7 +472,7 @@ runTests <- function(db, redshift=FALSE) {
 
     # test stored time
     res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
-    expect_equal(1, res$count)
+    expect_equal(res$count, 1)
   })
 
   test_that("binary works", {
