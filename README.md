@@ -27,11 +27,12 @@ install.packages("devtools")
 devtools::install_github("ankane/dbx")
 ```
 
-And follow the instructions for your database library
+And follow the instructions for your database
 
 - [Postgres](#postgres)
 - [MySQL](#mysql)
 - [SQLite](#sqlite)
+- [Redshift](#redshift)
 - [Others](#others)
 
 To install with [Jetpack](https://github.com/ankane/jetpack), use:
@@ -95,6 +96,10 @@ library(dbx)
 
 db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 ```
+
+### Redshift
+
+For Redshift, follow the [Postgres instructions](#postgres).
 
 ### Others
 
