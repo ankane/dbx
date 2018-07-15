@@ -149,9 +149,9 @@ dbxSelect <- function(conn, statement) {
 
 emptyType <- function(type) {
   if (type == "Date") {
-    as.Date(character())
+    as.Date(as.character())
   } else if (type == "POSIXct") {
-    as.POSIXct(character())
+    as.POSIXct(as.character())
   } else if (type == "integer") {
     as.integer()
   } else if (type == "numeric") {
