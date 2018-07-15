@@ -217,7 +217,7 @@ dbxSelect <- function(conn, statement) {
     }
 
     for (i in unescape_blobs) {
-      records[[colnames(records)[i]]] <- lapply(records[, i], function(x) { if (is.na(x)) x else RPostgreSQL::postgresqlUnescapeBytea(x) })
+      records[[colnames(records)[i]]] <- lapply(records[, i], function(x) { if (is.na(x)) as.raw(NULL) else RPostgreSQL::postgresqlUnescapeBytea(x) })
     }
 
     for (i in fix_timetz) {

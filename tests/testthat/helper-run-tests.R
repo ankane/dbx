@@ -449,6 +449,8 @@ runTests <- function(db, redshift=FALSE) {
     dbxUpdate(db, "events", all, where_cols=c("id"))
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
     expect_equal(res, all)
+    expect_equal(class(res$image), "list")
+    expect_equal(class(res$image[[1]]), "raw")
   })
 
   dbxDisconnect(db)
