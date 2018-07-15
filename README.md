@@ -343,6 +343,10 @@ hexToRaw <- function(x) {
 records$column <- lapply(records$column, hexToRaw)
 ```
 
+### Empty Results
+
+RPostgreSQL returns a data frame with no columns when a query has no rows. This has been [fixed](https://github.com/tomoakin/RPostgreSQL/commit/f93cb17cf584d57ced5045a46d16d2bfe05a2769), but is not yet on CRAN.
+
 ## Reference
 
 To close a connection, use:
