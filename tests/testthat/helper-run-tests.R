@@ -82,6 +82,14 @@ runTests <- function(db, redshift=FALSE) {
     expect_equal(res$city, new_orders$city)
   })
 
+  # very important
+  test_that("can update what what just selected and get same result", {
+    all_orders <- dbxSelect(db, "SELECT * FROM orders ORDER BY id")
+    dbxUpdate(db, "orders", all_orders, where_cols=c("id"))
+    res <- dbxSelect(db, "SELECT * FROM orders ORDER BY id")
+    expect_equal(res, all_orders)
+  })
+
   test_that("update works", {
     update_orders <- data.frame(id=c(3), city=c("LA"))
     dbxUpdate(db, "orders", update_orders, where_cols=c("id"))
