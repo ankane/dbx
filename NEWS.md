@@ -1,6 +1,7 @@
 # dbx 0.2.0 [unreleased]
 
 - Added support for fractional seconds
+- Fixed error with updates
 - Fixed times for RSQLite
 - Fixed typecasting for dates, times, and booleans with RMySQL
 - Fixed error when writing binary objects with RPostgres and RPostgreSQL
