@@ -302,7 +302,7 @@ BLOB and BYTEA columns are returned as `raw` vectors.
 
 ### Dates & Times
 
-RSQLite does not currently provide [enough info](https://github.com/r-dbi/RSQLite/issues/263) to automatically typecast dates and times. You can manually typecast date columns with:
+RSQLite does not currently provide enough info to automatically typecast dates and times. You can manually typecast date columns with:
 
 ```r
 records$column <- as.Date(records$column)
@@ -317,7 +317,7 @@ attr(records$column, "tzone") <- Sys.timezone()
 
 ### Booleans
 
-RMariaDB and RSQLite do not currently provide [enough info](https://github.com/r-dbi/RMariaDB/issues/100) to automatically typecast booleans. You can manually typecast with:
+RMariaDB and RSQLite do not currently provide enough info to automatically typecast booleans. You can manually typecast with:
 
 ```r
 records$column <- records$column != 0
