@@ -226,7 +226,7 @@ dbxSelect <- function(conn, statement) {
 
     uncast_times <- which(sapply(records, isTime))
     for (i in uncast_times) {
-      records[, i] <- format(records[, i])
+      records[, i] <- as.character(records[, i])
     }
 
     uncast_blobs <- which(sapply(records, isBlob))
