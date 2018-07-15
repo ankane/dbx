@@ -235,6 +235,16 @@ runTests <- function(db, redshift=FALSE) {
     expect_equal(res, orders)
   })
 
+  test_that("integer works", {
+    dbxDelete(db, "events")
+
+    events <- data.frame(counter=c(1, 2))
+    dbxInsert(db, "events", events)
+
+    res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+    expect_equal(res$counter, events$counter)
+  })
+
   test_that("float works", {
     dbxDelete(db, "events")
 
