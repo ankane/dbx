@@ -46,7 +46,7 @@ jetpack::add("dbx", remote="ankane/dbx")
 Install the R package
 
 ```r
-install.packages("RPostgreSQL")
+install.packages("RPostgres")
 ```
 
 And use:
@@ -59,7 +59,7 @@ db <- dbxConnect(adapter="postgres", dbname="mydb")
 
 You can also pass `user`, `password`, `host`, `port`, and `url`.
 
-> Works with RPostgres as well
+> Works with RPostgreSQL as well
 
 ### MySQL
 
