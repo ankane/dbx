@@ -709,7 +709,8 @@ quoteRecords <- function(conn, records) {
         }
       }
     } else if (isSQLite(conn)) {
-      # since no standard, store dates and times in the same format as Rails
+      # since no standard, store dates and datetimes in the same format as Rails
+      # store times without dates as strings to keep things simple
       if (isDatetime(col)) {
         col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
       } else if (isDate(col)) {
