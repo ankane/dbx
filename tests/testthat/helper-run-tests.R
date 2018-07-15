@@ -432,5 +432,24 @@ runTests <- function(db, redshift=FALSE) {
     expect_equal(blob::as.blob(res$image), events$image)
   })
 
+  # very important
+  # shows typecasting is consistent
+  test_that("can update what what just selected and get same result", {
+    dbxDelete(db, "events")
+
+    df <- data.frame(
+      active=c(TRUE, FALSE),
+      created_on=as.Date(c("2018-01-01", "2018-02-01")),
+      updated_at=as.POSIXct(c("2018-01-01 12:30:55", "2018-01-01 16:59:59")),
+      open_time=c("09:30:55", "13:59:59"),
+      properties=c('{"hello": "world"}', '{"hello": "r"}')
+    )
+    dbxInsert(db, "events", df)
+    all <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+    dbxUpdate(db, "events", all, where_cols=c("id"))
+    res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+    expect_equal(res, all)
+  })
+
   dbxDisconnect(db)
 }

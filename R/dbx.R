@@ -293,7 +293,7 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
   inBatches(records, batch_size, function(batch) {
     quoted_records <- quoteRecords(conn, batch)
     colnames(quoted_records) <- colnames(batch)
-    groups <- split(quoted_records, quoted_records[update_cols])
+    groups <- split(quoted_records, quoted_records[update_cols], drop=TRUE)
 
     dbWithTransaction(conn, {
       for (group in groups) {
