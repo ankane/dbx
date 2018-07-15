@@ -10,7 +10,7 @@ Breaking
 - The `dbxInsert` and `dbxUpsert` functions no longer return a data frame by default. For MySQL and SQLite, the data frame was just the `records` argument. For Postgres, if you use auto-incrementing primary keys, the data frame contained ids of the newly inserted/upserted records. To keep the previous behavior, pass name of the column as the `returning` argument:
 
   ```r
-  ids <- dbxInsert(db, table, records, returning=c("id"))
+  dbxInsert(db, table, records, returning=c("id"))
   ```
 
 - `timestamp without time zone` columns in Postgres are now stored in UTC instead of local time by default. This does not affect `timestamp with time zone` columns. To keep the previous behavior, use:

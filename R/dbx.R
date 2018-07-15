@@ -560,7 +560,7 @@ selectOrExecute <- function(conn, sql, records, returning) {
     returning_clause = paste(lapply(returning, function(x) { if (x == "*") x else quoteIdent(conn, x) }), collapse=", ")
     sql <- paste(sql, "RETURNING", returning_clause)
 
-    invisible(dbxSelect(conn, sql))
+    dbxSelect(conn, sql)
   }
 }
 
