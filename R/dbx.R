@@ -241,6 +241,19 @@ dbxSelect <- function(conn, statement) {
     for (i in cast_datetimes) {
       records[, i] <- as.POSIXct(as.character())
     }
+
+    # doesn't like data frame with no columns
+    if (!isRPostgreSQL(conn)) {
+      uncast_times <- which(sapply(records, isTime))
+      for (i in uncast_times) {
+        records[, i] <- as.character()
+      }
+
+      uncast_blobs <- which(sapply(records, isBlob))
+      for (i in uncast_blobs) {
+        records[[colnames(records)[i]]] <- list()
+      }
+    }
   }
 
   records
