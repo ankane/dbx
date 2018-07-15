@@ -59,6 +59,7 @@ runTests <- function(db, redshift=FALSE) {
     dbxInsert(db, "events", data.frame(properties=NA))
     res <- dbxSelect(db, "SELECT * FROM events")
 
+    # dates and times
     if (isSQLite(db)) {
       # empty datetimes are numeric
       expect_equal(as.numeric(NA), res$created_on)
@@ -67,17 +68,33 @@ runTests <- function(db, redshift=FALSE) {
       expect_equal(as.Date(NA), res$created_on)
       expect_equal(as.POSIXct(NA), res$updated_at)
       expect_equal(as.POSIXct(NA), res$deleted_at)
+      expect_equal(as.character(NA), res$open_time)
     }
 
+    # booleans
     if (isRMariaDB(db) || isSQLite(db)) {
       # until proper typecasting
       expect_equal(as.numeric(NA), res$active)
     } else {
       expect_equal(NA, res$active)
     }
+
+    # binary
+    if (isRMySQL(db)) {
+      # no way to tell text and blobs apart
+      expect_equal(class(res$image), "character")
+    } else {
+      expect_equal(class(res$image), "list")
+
+      if (isRMariaDB(db)) {
+        expect_equal(class(res$image[[1]]), "NULL")
+      } else {
+        expect_equal(res$image[[1]], as.raw(NULL))
+      }
+    }
   })
 
-  test_that("missing select returns NA no data", {
+  test_that("missing select empty result", {
     # no columns
     skip_if(isRPostgreSQL(db))
 
@@ -477,20 +494,6 @@ runTests <- function(db, redshift=FALSE) {
     dbxUpdate(db, "events", all, where_cols=c("id"))
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
     expect_equal(res, all)
-
-    # empty binary handled in many different ways
-    if (isRMySQL(db)) {
-      # no way to tell text and blobs apart
-      expect_equal(class(res$image), "character")
-    } else {
-      expect_equal(class(res$image), "list")
-
-      if (isRMariaDB(db)) {
-        expect_equal(class(res$image[[1]]), "NULL")
-      } else {
-        expect_equal(res$image[[1]], as.raw(NULL))
-      }
-    }
   })
 
   dbxDisconnect(db)
