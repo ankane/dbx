@@ -1,31 +1,3 @@
-isRPostgreSQL <- function(conn) {
-  inherits(conn, "PostgreSQLConnection")
-}
-
-isRPostgres <- function(conn) {
-  inherits(conn, "PqConnection")
-}
-
-isPostgres <- function(conn) {
-  isRPostgreSQL(conn) || isRPostgres(conn)
-}
-
-isRMySQL <- function(conn) {
-  inherits(conn, "MySQLConnection")
-}
-
-isMySQL <- function(conn) {
-  isRMySQL(conn) || isRMariaDB(conn)
-}
-
-isRMariaDB <- function(conn) {
-  inherits(conn, "MariaDBConnection")
-}
-
-isSQLite <- function(conn) {
-  inherits(conn, "SQLiteConnection")
-}
-
 runTests <- function(db, redshift=FALSE) {
   orders <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
   new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFactors=FALSE)
@@ -53,7 +25,7 @@ runTests <- function(db, redshift=FALSE) {
     expect_equal(0, nrow(res))
   })
 
-  test_that("missing select empty result", {
+  test_that("empty result", {
     dbxDelete(db, "events")
 
     res <- dbxSelect(db, "SELECT * FROM events")
@@ -66,36 +38,42 @@ runTests <- function(db, redshift=FALSE) {
     # dates and times
     if (isSQLite(db)) {
       # empty datetimes are numeric
-      expect_equal(as.numeric(), res$created_on)
-      expect_equal(as.numeric(), res$updated_at)
+      expect_identical(res$created_on, as.numeric())
+      expect_identical(res$updated_at, as.numeric())
     } else {
-      expect_equal(as.Date(as.character()), res$created_on)
-      expect_equal(as.POSIXct(as.character()), res$updated_at)
-      expect_equal(as.POSIXct(as.character()), res$deleted_at)
-      expect_equal(as.character(), res$open_time)
+      expect_identical(res$created_on, as.Date(as.character()))
+
+      # not identical due to empty tzone attribute
+      expect_equal(res$updated_at, as.POSIXct(as.character()))
+      expect_equal(res$deleted_at, as.POSIXct(as.character()))
+
+      expect_identical(res$open_time, as.character())
     }
 
     # json
-    expect_equal(as.character(), res$properties)
+    expect_identical(res$properties, as.character())
 
     # booleans
-    if (isRMariaDB(db) || isSQLite(db)) {
+    if (isRMariaDB(db)) {
       # until proper typecasting
-      expect_equal(as.numeric(), res$active)
+      expect_identical(res$active, as.integer())
+    } else if (isSQLite(db)) {
+      # until proper typecasting
+      expect_identical(res$active, as.numeric())
     } else {
-      expect_equal(as.logical(), res$active)
+      expect_identical(res$active, as.logical())
     }
 
     # binary
     if (isRMySQL(db)) {
       # no way to tell text and blobs apart
-      expect_equal(class(res$image), "character")
+      expect_identical(class(res$image), "character")
     } else {
-      expect_equal(class(res$image), "list")
+      expect_identical(class(res$image), "list")
     }
   })
 
-  test_that("missing select returns NA", {
+  test_that("empty cells", {
     dbxDelete(db, "events")
 
     dbxInsert(db, "events", data.frame(properties=NA))
@@ -109,37 +87,43 @@ runTests <- function(db, redshift=FALSE) {
     # dates and times
     if (isSQLite(db)) {
       # empty datetimes are numeric
-      expect_equal(as.numeric(NA), res$created_on)
-      expect_equal(as.numeric(NA), res$updated_at)
+      expect_identical(res$created_on, as.numeric(NA))
+      expect_identical(res$updated_at, as.numeric(NA))
     } else {
-      expect_equal(as.Date(NA), res$created_on)
-      expect_equal(as.POSIXct(NA), res$updated_at)
-      expect_equal(as.POSIXct(NA), res$deleted_at)
-      expect_equal(as.character(NA), res$open_time)
+      expect_identical(res$created_on, as.Date(NA))
+
+      # not identical due to empty tzone attribute
+      expect_equal(res$updated_at, as.POSIXct(NA))
+      expect_equal(res$deleted_at, as.POSIXct(NA))
+
+      expect_identical(res$open_time, as.character(NA))
     }
 
     # json
-    expect_equal(as.character(NA), res$properties)
+    expect_identical(res$properties, as.character(NA))
 
     # booleans
-    if (isRMariaDB(db) || isSQLite(db)) {
+    if (isRMariaDB(db)) {
       # until proper typecasting
-      expect_equal(as.numeric(NA), res$active)
+      expect_identical(res$active, as.integer(NA))
+    } else if (isSQLite(db)) {
+      # until proper typecasting
+      expect_identical(res$active, as.numeric(NA))
     } else {
-      expect_equal(NA, res$active)
+      expect_identical(res$active, NA)
     }
 
     # binary
     if (isRMySQL(db)) {
       # no way to tell text and blobs apart
-      expect_equal(class(res$image), "character")
+      expect_identical(class(res$image), "character")
     } else {
-      expect_equal(class(res$image), "list")
+      expect_identical(class(res$image), "list")
 
       if (isRMariaDB(db)) {
-        expect_equal(class(res$image[[1]]), "NULL")
+        expect_identical(class(res$image[[1]]), "NULL")
       } else {
-        expect_equal(res$image[[1]], as.raw(NULL))
+        expect_identical(res$image[[1]], as.raw(NULL))
       }
     }
   })
