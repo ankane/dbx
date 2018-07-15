@@ -53,11 +53,58 @@ runTests <- function(db, redshift=FALSE) {
     expect_equal(0, nrow(res))
   })
 
+  test_that("missing select empty result", {
+    dbxDelete(db, "events")
+
+    res <- dbxSelect(db, "SELECT * FROM events")
+
+    # numeric
+    expect_identical(res$counter, as.integer())
+    expect_identical(res$speed, as.numeric())
+    expect_identical(res$distance, as.numeric())
+
+    # dates and times
+    if (isSQLite(db)) {
+      # empty datetimes are numeric
+      expect_equal(as.numeric(), res$created_on)
+      expect_equal(as.numeric(), res$updated_at)
+    } else {
+      expect_equal(as.Date(as.character()), res$created_on)
+      expect_equal(as.POSIXct(as.character()), res$updated_at)
+      expect_equal(as.POSIXct(as.character()), res$deleted_at)
+      expect_equal(as.character(), res$open_time)
+    }
+
+    # json
+    expect_equal(as.character(), res$properties)
+
+    # booleans
+    if (isRMariaDB(db) || isSQLite(db)) {
+      # until proper typecasting
+      expect_equal(as.numeric(), res$active)
+    } else {
+      expect_equal(as.logical(), res$active)
+    }
+
+    # binary
+    if (isRMySQL(db)) {
+      # no way to tell text and blobs apart
+      expect_equal(class(res$image), "character")
+    } else {
+      expect_equal(class(res$image), "list")
+    }
+  })
+
   test_that("missing select returns NA", {
     dbxDelete(db, "events")
 
     dbxInsert(db, "events", data.frame(properties=NA))
     res <- dbxSelect(db, "SELECT * FROM events")
+
+    # numeric
+    expect_identical(res$counter, as.integer(NA))
+    expect_identical(res$speed, as.numeric(NA))
+    expect_identical(res$distance, as.numeric(NA))
 
     # dates and times
     if (isSQLite(db)) {
@@ -94,43 +141,6 @@ runTests <- function(db, redshift=FALSE) {
       } else {
         expect_equal(res$image[[1]], as.raw(NULL))
       }
-    }
-  })
-
-  test_that("missing select empty result", {
-    dbxDelete(db, "events")
-
-    res <- dbxSelect(db, "SELECT * FROM events")
-
-    # dates and times
-    if (isSQLite(db)) {
-      # empty datetimes are numeric
-      expect_equal(as.numeric(), res$created_on)
-      expect_equal(as.numeric(), res$updated_at)
-    } else {
-      expect_equal(as.Date(as.character()), res$created_on)
-      expect_equal(as.POSIXct(as.character()), res$updated_at)
-      expect_equal(as.POSIXct(as.character()), res$deleted_at)
-      expect_equal(as.character(), res$open_time)
-    }
-
-    # json
-    expect_equal(as.character(), res$properties)
-
-    # booleans
-    if (isRMariaDB(db) || isSQLite(db)) {
-      # until proper typecasting
-      expect_equal(as.numeric(), res$active)
-    } else {
-      expect_equal(as.logical(), res$active)
-    }
-
-    # binary
-    if (isRMySQL(db)) {
-      # no way to tell text and blobs apart
-      expect_equal(class(res$image), "character")
-    } else {
-      expect_equal(class(res$image), "list")
     }
   })
 
