@@ -144,6 +144,7 @@ dbxSelect <- function(conn, statement) {
   stringify_json <- list()
   unescape_blobs <- list()
   fix_timetz <- list()
+  column_info <- NULL
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown ("), {
     res <- dbSendQuery(conn, statement)
@@ -192,6 +193,21 @@ dbxSelect <- function(conn, statement) {
   })
 
   records <- combineResults(ret)
+
+  # fix for empty data frame
+  # until new RPostgreSQL version is published
+  # https://github.com/tomoakin/RPostgreSQL/commit/f93cb17cf584d57ced5045a46d16d2bfe05a2769
+  if (isRPostgreSQL(conn) && ncol(records) == 0) {
+    for (i in 1:nrow(column_info)) {
+      row <- column_info[i, ]
+      records[, i] <- emptyType(row$Sclass)
+    }
+    colnames(records) <- column_info$name
+
+    for (i in unescape_blobs) {
+      records[[colnames(records)[i]]] <- list()
+    }
+  }
 
   for (i in cast_booleans) {
     records[, i] <- records[, i] != 0
@@ -242,17 +258,14 @@ dbxSelect <- function(conn, statement) {
       records[, i] <- as.POSIXct(as.character())
     }
 
-    # doesn't like data frame with no columns
-    if (!isRPostgreSQL(conn)) {
-      uncast_times <- which(sapply(records, isTime))
-      for (i in uncast_times) {
-        records[, i] <- as.character()
-      }
+    uncast_times <- which(sapply(records, isTime))
+    for (i in uncast_times) {
+      records[, i] <- as.character()
+    }
 
-      uncast_blobs <- which(sapply(records, isBlob))
-      for (i in uncast_blobs) {
-        records[[colnames(records)[i]]] <- list()
-      }
+    uncast_blobs <- which(sapply(records, isBlob))
+    for (i in uncast_blobs) {
+      records[[colnames(records)[i]]] <- list()
     }
   }
 
@@ -417,6 +430,16 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   }
 
   invisible()
+}
+
+emptyType <- function(type) {
+  if (type == "Date") {
+    as.Date(character())
+  } else if (type == "POSIXct") {
+    as.POSIXct(character())
+  } else {
+    as(as.character(), type)
+  }
 }
 
 findAdapter <- function(adapter) {

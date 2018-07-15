@@ -98,9 +98,6 @@ runTests <- function(db, redshift=FALSE) {
   })
 
   test_that("missing select empty result", {
-    # no columns
-    skip_if(isRPostgreSQL(db))
-
     dbxDelete(db, "events")
 
     res <- dbxSelect(db, "SELECT * FROM events")
