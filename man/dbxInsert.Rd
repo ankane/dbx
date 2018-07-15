@@ -4,7 +4,7 @@
 \alias{dbxInsert}
 \title{Insert records}
 \usage{
-dbxInsert(conn, table, records, batch_size = NULL)
+dbxInsert(conn, table, records, batch_size = NULL, returning = NULL)
 }
 \arguments{
 \item{conn}{A DBIConnection object}
@@ -14,6 +14,8 @@ dbxInsert(conn, table, records, batch_size = NULL)
 \item{records}{A data frame of records to insert}
 
 \item{batch_size}{The number of records to insert in a single statement (defaults to all)}
+
+\item{returning}{Columns to return}
 }
 \description{
 Insert records
@@ -24,5 +26,5 @@ table <- "forecasts"
 DBI::dbCreateTable(db, table, data.frame(id=1:3, temperature=20:22))
 
 records <- data.frame(temperature=c(32, 25))
-inserts <- dbxInsert(db, table, records)
+dbxInsert(db, table, records)
 }

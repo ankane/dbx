@@ -4,7 +4,8 @@
 \alias{dbxUpsert}
 \title{Upsert records}
 \usage{
-dbxUpsert(conn, table, records, where_cols, batch_size = NULL)
+dbxUpsert(conn, table, records, where_cols, batch_size = NULL,
+  returning = NULL)
 }
 \arguments{
 \item{conn}{A DBIConnection object}
@@ -16,6 +17,8 @@ dbxUpsert(conn, table, records, where_cols, batch_size = NULL)
 \item{where_cols}{The columns to use for WHERE clause}
 
 \item{batch_size}{The number of records to upsert in a single statement (defaults to all)}
+
+\item{returning}{Columns to return}
 }
 \description{
 Upsert records
@@ -28,6 +31,6 @@ table <- "forecasts"
 DBI::dbCreateTable(db, table, data.frame(id=1:3, temperature=20:22))
 
 records <- data.frame(id=c(3, 4), temperature=c(20, 25))
-upserts <- dbxUpsert(db, table, records, where_cols=c("id"))
+dbxUpsert(db, table, records, where_cols=c("id"))
 }
 }

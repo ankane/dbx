@@ -76,7 +76,9 @@ runTests <- function(db) {
   })
 
   test_that("insert works", {
-    res <- dbxInsert(db, "orders", new_orders[c("city")])
+    dbxInsert(db, "orders", new_orders[c("city")])
+
+    res <- dbxSelect(db, "SELECT * FROM orders WHERE id > 2")
     expect_equal(res$city, new_orders$city)
   })
 
@@ -137,8 +139,23 @@ runTests <- function(db) {
     expect_equal(0, res$count)
   })
 
+  test_that("insert returning works", {
+    skip_if(!isPostgres(db))
+
+    res <- dbxInsert(db, "orders", orders[c("city")], returning=c("id", "city"))
+    expect_equal(res$id, c(5, 6))
+    expect_equal(res$city, orders$city)
+
+    res <- dbxInsert(db, "orders", orders[c("city")], returning="*")
+    expect_equal(res$id, c(7, 8))
+    expect_equal(res$city, orders$city)
+  })
+
   test_that("insert batch size works", {
-    res <- dbxInsert(db, "orders", orders, batch_size=1)
+    dbxDelete(db, "orders")
+    dbxInsert(db, "orders", orders, batch_size=1)
+
+    res <- dbxSelect(db, "SELECT id, city FROM orders")
     expect_equal(res, orders)
   })
 
@@ -152,9 +169,7 @@ runTests <- function(db) {
     dbxDelete(db, "events")
 
     events <- data.frame(active=c(TRUE, FALSE))
-    res <- dbxInsert(db, "events", events)
-
-    expect_equal(res$active, events$active)
+    dbxInsert(db, "events", events)
 
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
 
@@ -171,9 +186,7 @@ runTests <- function(db) {
     dbxDelete(db, "events")
 
     events <- data.frame(properties=c('{"hello": "world"}'), stringsAsFactors=FALSE)
-    res <- dbxInsert(db, "events", events)
-
-    expect_equal(res$properties, events$properties)
+    dbxInsert(db, "events", events)
 
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
     expect_equal(res$properties, events$properties)
@@ -185,9 +198,7 @@ runTests <- function(db) {
     dbxDelete(db, "events")
 
     events <- data.frame(propertiesb=c('{"hello": "world"}'), stringsAsFactors=FALSE)
-    res <- dbxInsert(db, "events", events)
-
-    expect_equal(res$propertiesb, events$propertiesb)
+    dbxInsert(db, "events", events)
 
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
     expect_equal(res$propertiesb, events$propertiesb)
@@ -199,9 +210,7 @@ runTests <- function(db) {
     dbxDelete(db, "events")
 
     events <- data.frame(propertiesb=c(jsonlite::toJSON(list(hello="world"))), stringsAsFactors=FALSE)
-    res <- dbxInsert(db, "events", events)
-
-    expect_equal(jsonlite::fromJSON(res$propertiesb), jsonlite::fromJSON(events$propertiesb))
+    dbxInsert(db, "events", events)
 
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
     expect_equal(jsonlite::fromJSON(res$propertiesb), jsonlite::fromJSON(events$propertiesb))
@@ -327,9 +336,7 @@ runTests <- function(db) {
     dbxDelete(db, "events")
 
     events <- data.frame(open_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
-    res <- dbxInsert(db, "events", events)
-
-    expect_equal(res$open_time, events$open_time)
+    dbxInsert(db, "events", events)
 
     # test returned time
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
@@ -346,9 +353,7 @@ runTests <- function(db) {
     dbxDelete(db, "events")
 
     events <- data.frame(close_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
-    res <- dbxInsert(db, "events", events)
-
-    expect_equal(res$close_time, events$close_time)
+    dbxInsert(db, "events", events)
 
     # test returned time
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")

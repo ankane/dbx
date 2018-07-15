@@ -244,6 +244,7 @@ dbxSelect <- function(conn, statement) {
 #' @param table The table name to insert
 #' @param records A data frame of records to insert
 #' @param batch_size The number of records to insert in a single statement (defaults to all)
+#' @param returning Columns to return
 #' @export
 #' @examples
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
@@ -251,11 +252,11 @@ dbxSelect <- function(conn, statement) {
 #' DBI::dbCreateTable(db, table, data.frame(id=1:3, temperature=20:22))
 #'
 #' records <- data.frame(temperature=c(32, 25))
-#' inserts <- dbxInsert(db, table, records)
-dbxInsert <- function(conn, table, records, batch_size=NULL) {
+#' dbxInsert(db, table, records)
+dbxInsert <- function(conn, table, records, batch_size=NULL, returning=NULL) {
   inBatches(records, batch_size, function(batch) {
     sql <- insertClause(conn, table, batch)
-    selectOrExecute(conn, sql, batch)
+    selectOrExecute(conn, sql, batch, returning=returning)
   })
 }
 
@@ -313,6 +314,7 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' @param records A data frame of records to upsert
 #' @param where_cols The columns to use for WHERE clause
 #' @param batch_size The number of records to upsert in a single statement (defaults to all)
+#' @param returning Columns to return
 #' @export
 #' @examples \dontrun{
 #'
@@ -321,9 +323,9 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
 #' DBI::dbCreateTable(db, table, data.frame(id=1:3, temperature=20:22))
 #'
 #' records <- data.frame(id=c(3, 4), temperature=c(20, 25))
-#' upserts <- dbxUpsert(db, table, records, where_cols=c("id"))
+#' dbxUpsert(db, table, records, where_cols=c("id"))
 #' }
-dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
+dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL, returning=NULL) {
   cols <- colnames(records)
 
   if (!identical(intersect(cols, where_cols), where_cols)) {
@@ -341,13 +343,13 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL) {
       sql <- insertClause(conn, table, batch)
       set_sql <- upsertSetClause(quoted_update_cols)
       sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
-      selectOrExecute(conn, sql, batch)
+      selectOrExecute(conn, sql, batch, returning=returning)
     } else {
       conflict_target <- colsClause(quoted_where_cols)
       sql <- insertClause(conn, table, batch)
       set_sql <- upsertSetClausePostgres(quoted_update_cols)
       sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
-      selectOrExecute(conn, sql, batch)
+      selectOrExecute(conn, sql, batch, returning=returning)
     }
   })
 }
@@ -546,22 +548,19 @@ isBlob <- function(col) {
   inherits(col, "blob")
 }
 
-selectOrExecute <- function(conn, sql, records) {
-  if (isPostgres(conn)) {
-    sql <- paste(sql, "RETURNING *")
-    ret <- dbxSelect(conn, sql)
-
-    ret_cols <- c()
-    for (i in colnames(ret)) {
-      if (i %in% colnames(records) || !all(is.na(ret[i]))) {
-        ret_cols <- c(ret_cols, i)
-      }
+selectOrExecute <- function(conn, sql, records, returning) {
+  if (is.null(returning)) {
+    execute(conn, sql)
+    invisible()
+  } else {
+    if (!isPostgres(conn)) {
+      stop("returning is only supported with Postgres")
     }
 
-    invisible(ret[, ret_cols])
-  } else {
-    execute(conn, sql)
-    invisible(records)
+    returning_clause = paste(lapply(returning, function(x) { if (x == "*") x else quoteIdent(conn, x) }), collapse=", ")
+    sql <- paste(sql, "RETURNING", returning_clause)
+
+    invisible(dbxSelect(conn, sql))
   }
 }
 

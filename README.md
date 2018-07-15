@@ -121,10 +121,14 @@ Insert records
 ```r
 table <- "forecasts"
 records <- data.frame(temperature=c(32, 25))
-inserts <- dbxInsert(db, table, records)
+dbxInsert(db, table, records)
 ```
 
-Returns a data frame of inserted rows. For Postgres, this includes auto-incremented primary keys.
+If you use auto-incrementing ids in Postgres, the ids of the newly inserted rows can be returned by passing the column name:
+
+```r
+ids <- dbxInsert(db, table, records, returning=c("id"))
+```
 
 ### Update
 
@@ -145,14 +149,18 @@ Use `where_cols` to specify the columns used for lookup. Other columns are writt
 
 ```r
 records <- data.frame(id=c(2, 3), temperature=c(20, 25))
-upserts <- dbxUpsert(db, table, records, where_cols=c("id"))
+dbxUpsert(db, table, records, where_cols=c("id"))
 ```
-
-Returns a data frame of upserted rows. For Postgres, this includes auto-incremented primary keys.
 
 Use `where_cols` to specify the columns used for lookup. There must be a unique index on them, or an error will be thrown.
 
 *Only available for PostgreSQL 9.5+, MySQL 5.5+, and SQLite 3.24+*
+
+If you use auto-incrementing ids in Postgres, the ids of the newly inserted rows can be returned by passing the column name:
+
+```r
+ids <- dbxUpsert(db, table, records, where_cols=c("id"), returning=c("id"))
+```
 
 ### Delete
 
