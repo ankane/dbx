@@ -30,7 +30,7 @@ runTests <- function(db, redshift=TRUE) {
   orders <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
   new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFactors=FALSE)
 
-  dbxInsert(db, "orders", orders[c("city")])
+  dbxInsert(db, "orders", orders)
 
   test_that("select works", {
     res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC")
@@ -56,7 +56,7 @@ runTests <- function(db, redshift=TRUE) {
   test_that("missing select returns NA", {
     dbxDelete(db, "events")
 
-    dbxInsert(db, "events", data.frame(id=1))
+    dbxInsert(db, "events", data.frame(properties=NA))
     res <- dbxSelect(db, "SELECT * FROM events")
 
     if (isSQLite(db)) {
@@ -76,9 +76,9 @@ runTests <- function(db, redshift=TRUE) {
   })
 
   test_that("insert works", {
-    dbxInsert(db, "orders", new_orders[c("city")])
+    dbxInsert(db, "orders", new_orders)
 
-    res <- dbxSelect(db, "SELECT * FROM orders WHERE id > 2")
+    res <- dbxSelect(db, "SELECT * FROM orders WHERE id > 2 ORDER BY id")
     expect_equal(res$city, new_orders$city)
   })
 
