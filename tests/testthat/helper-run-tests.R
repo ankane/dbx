@@ -71,6 +71,9 @@ runTests <- function(db, redshift=FALSE) {
       expect_equal(as.character(NA), res$open_time)
     }
 
+    # json
+    expect_equal(as.character(NA), res$properties)
+
     # booleans
     if (isRMariaDB(db) || isSQLite(db)) {
       # until proper typecasting
