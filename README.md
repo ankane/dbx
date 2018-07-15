@@ -271,7 +271,7 @@ DBI::dbWithTransaction(db, {
 
 Dates are returned as `Date` objects and times as `POSIXct` objects. Times are stored in the database in UTC and converted to your local time zone when retrieved.
 
-Times without dates are returned as `character` vectors since R has no built-in support for this type. If you use [hms](https://cran.r-project.org/package=hms), can you convert columns with:
+Times without dates are returned as `character` vectors since R has no built-in support for this type. If you use [hms](https://cran.r-project.org/package=hms), you can convert columns with:
 
 ```r
 records$column <- hms::as.hms(records$column)
