@@ -60,18 +60,20 @@ runTests <- function(db, redshift=FALSE) {
     res <- dbxSelect(db, "SELECT * FROM events")
 
     if (isSQLite(db)) {
+      # empty datetimes are numeric
       expect_equal(as.numeric(NA), res$created_on)
       expect_equal(as.numeric(NA), res$updated_at)
-      expect_equal(as.numeric(NA), res$active)
     } else {
       expect_equal(as.Date(NA), res$created_on)
       expect_equal(as.POSIXct(NA), res$updated_at)
       expect_equal(as.POSIXct(NA), res$deleted_at)
-      if (isRMariaDB(db)) {
-        expect_equal(as.numeric(NA), res$active)
-      } else {
-        expect_equal(NA, res$active)
-      }
+    }
+
+    if (isRMariaDB(db) || isSQLite(db)) {
+      # until proper typecasting
+      expect_equal(as.numeric(NA), res$active)
+    } else {
+      expect_equal(NA, res$active)
     }
   })
 
@@ -81,18 +83,20 @@ runTests <- function(db, redshift=FALSE) {
     res <- dbxSelect(db, "SELECT * FROM events")
 
     if (isSQLite(db)) {
+      # empty datetimes are numeric
       expect_equal(as.numeric(), res$created_on)
       expect_equal(as.numeric(), res$updated_at)
-      expect_equal(as.numeric(), res$active)
     } else {
       expect_equal(as.Date(as.character()), res$created_on)
       expect_equal(as.POSIXct(as.character()), res$updated_at)
       expect_equal(as.POSIXct(as.character()), res$deleted_at)
-      if (isRMariaDB(db)) {
-        expect_equal(as.numeric(), res$active)
-      } else {
-        expect_equal(as.logical(), res$active)
-      }
+    }
+
+    if (isRMariaDB(db) || isSQLite(db)) {
+      # until proper typecasting
+      expect_equal(as.numeric(), res$active)
+    } else {
+      expect_equal(as.logical(), res$active)
     }
   })
 
