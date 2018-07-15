@@ -26,7 +26,7 @@ isSQLite <- function(conn) {
   inherits(conn, "SQLiteConnection")
 }
 
-runTests <- function(db, redshift=TRUE) {
+runTests <- function(db, redshift=FALSE) {
   orders <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
   new_orders <- data.frame(id=c(3, 4), city=c("New York", "Atlanta"), stringsAsFactors=FALSE)
 
@@ -143,11 +143,11 @@ runTests <- function(db, redshift=TRUE) {
     skip_if(!isPostgres(db) || redshift)
 
     res <- dbxInsert(db, "orders", orders[c("city")], returning=c("id", "city"))
-    expect_equal(res$id, c(5, 6))
+    expect_equal(res$id, c(1, 2))
     expect_equal(res$city, orders$city)
 
     res <- dbxInsert(db, "orders", orders[c("city")], returning="*")
-    expect_equal(res$id, c(7, 8))
+    expect_equal(res$id, c(3, 4))
     expect_equal(res$city, orders$city)
   })
 
