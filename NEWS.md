@@ -1,4 +1,4 @@
-# dbx 0.2.0 [unreleased]
+# dbx 0.2.0
 
 - Added support for fractional seconds
 - Fixed error with updates

@@ -24,7 +24,7 @@ Install dbx
 
 ```r
 install.packages("devtools")
-devtools::install_github("ankane/dbx")
+devtools::install_github("ankane/dbx@v0.2.0")
 ```
 
 And follow the instructions for your database
@@ -38,7 +38,7 @@ And follow the instructions for your database
 To install with [Jetpack](https://github.com/ankane/jetpack), use:
 
 ```r
-jetpack::add("dbx", remote="ankane/dbx")
+jetpack::add("dbx", remote="ankane/dbx@v0.2.0")
 ```
 
 ### Postgres
@@ -359,7 +359,7 @@ dbGetInfo(db)
 
 ## Upgrading
 
-### 0.2.0 [unreleased]
+### 0.2.0
 
 Version 0.2.0 brings a number of fixes and improvements to data types.
 
