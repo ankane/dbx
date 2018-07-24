@@ -41,13 +41,3 @@ test_that("connect with url works", {
   exp <- data.frame(hi=c(1))
   expect_equal(res, exp)
 })
-
-test_that("pool works", {
-  pool <- dbxConnect(adapter="rpostgres", dbname="dbx_test", pool=3)
-  con2 <- pool::poolCheckout(pool)
-  res <- dbxSelect(con2, "SELECT 1 AS hi")
-  pool::poolReturn(con2)
-  pool::poolClose(pool)
-  exp <- data.frame(hi=c(1))
-  expect_equal(res, exp)
-})

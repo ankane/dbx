@@ -3,7 +3,6 @@
 #' @param url A database URL
 #' @param adapter The database adapter to use
 #' @param storage_tz The time zone timestamps are stored in
-#' @param pool The size of the connection pool
 #' @param ... Arguments to pass to dbConnect
 #' @export
 #' @examples
@@ -21,7 +20,7 @@
 #' # Others
 #' db <- dbxConnect(adapter=odbc(), database="mydb")
 #' }
-dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, pool=NULL, ...) {
+dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
   }
@@ -105,17 +104,6 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, pool=NULL, ...) 
     params$bigint <- "numeric"
   }
 
-  if (is.null(pool)) {
-    makeConnection(obj, params, storage_tz)
-  } else {
-    factory <- function() {
-      makeConnection(obj, params, storage_tz)
-    }
-    pool::poolCreate(factory, maxSize=pool)
-  }
-}
-
-makeConnection <- function(obj, params, storage_tz) {
   conn <- do.call(dbConnect, c(obj, params))
 
   if (!is.null(storage_tz)) {

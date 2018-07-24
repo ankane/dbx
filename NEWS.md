@@ -1,7 +1,6 @@
 # dbx 0.2.1 [unreleased]
 
 - Added `sslmode` and `sslrootcert` for RPostgreSQL
-- Added `pool` option to `dbxConnect`
 
 # dbx 0.2.0
 

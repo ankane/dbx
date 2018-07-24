@@ -361,37 +361,6 @@ With RMariaDB, use:
 db <- dbxConnect(adapter="rmariadb", ssl.ca="ca.pem")
 ```
 
-## Connection Pooling [master]
-
-Install the [pool](https://cran.r-project.org/package=pool) package
-
-```r
-install.packages("pool")
-```
-
-And specify the pool size when connecting
-
-```r
-pool <- dbxConnect(pool=5, ...)
-```
-
-To use a connection:
-
-```ruby
-library(pool)
-
-# checkout
-db <- poolCheckout(pool)
-
-# use
-dbxSelect(db, "SELECT * FROM forecasts")
-
-# run queries
-poolReturn(db)
-```
-
-In the future, dbx commands may work directly with pools.
-
 ## Reference
 
 To close a connection, use:
