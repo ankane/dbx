@@ -350,10 +350,16 @@ When connecting to a remote database, make sure your connection is secure.
 With Postgres, use:
 
 ```r
-db <- dbxConnect(adapter="postgres", sslmode="verify-full", sslrootcert="path/to/root.crt")
+db <- dbxConnect(adapter="postgres", sslmode="verify-full", sslrootcert="root.crt")
 ```
 
 > With RPostgreSQL, use `master` branch until next release
+
+With RMariaDB, use:
+
+```r
+db <- dbxConnect(adapter="rmariadb", ssl.ca="ca.pem")
+```
 
 ## Reference
 
