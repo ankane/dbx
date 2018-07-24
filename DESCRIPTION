@@ -11,4 +11,4 @@ License: MIT + file LICENSE
 LazyData: TRUE
 RoxygenNote: 6.0.1
 Imports: DBI (>= 1.0.0)
-Suggests: testthat (>= 1.0.2), urltools (>= 1.7.0), RSQLite (>= 1.1-2), RMariaDB, RMySQL, RPostgres, RPostgreSQL, dplyr (>= 0.5.0), hms, jsonlite, blob
+Suggests: testthat (>= 1.0.2), urltools (>= 1.7.0), RSQLite (>= 1.1-2), RMariaDB, RMySQL, RPostgres, RPostgreSQL, dplyr (>= 0.5.0), hms, jsonlite, blob, pool
