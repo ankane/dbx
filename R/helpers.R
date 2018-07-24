@@ -175,7 +175,11 @@ inBatches <- function(records, batch_size, f) {
 
 # https://stackoverflow.com/questions/2851327/convert-a-list-of-data-frames-into-one-data-frame
 combineResults <- function(ret) {
-  do.call(rbind, ret)
+  if (length(ret) == 1) {
+    ret[[1]]
+  } else {
+    do.call(rbind, ret)
+  }
 }
 
 storageTimeZone <- function(conn) {

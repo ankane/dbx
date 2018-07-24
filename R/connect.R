@@ -147,7 +147,7 @@ findAdapter <- function(adapter) {
       obj <- RMariaDB::MariaDB()
     } else if (adapter == "rmysql") {
       requireLib("RMySQL")
-      obj <- RMySQL::MySQL()
+      obj <- RMySQL::MySQL(fetch.default.rec=10000)
     } else if (adapter == "rpostgres") {
       requireLib("RPostgres")
       obj <- RPostgres::Postgres()
