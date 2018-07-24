@@ -361,6 +361,8 @@ With RMariaDB, use:
 db <- dbxConnect(adapter="rmariadb", ssl.ca="ca.pem")
 ```
 
+Please [let us know](https://github.com/ankane/dbx/issues/new) if you have a way that works with RMySQL.
+
 ## Connection Pooling
 
 Install the [pool](https://cran.r-project.org/package=pool) package
