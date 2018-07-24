@@ -1,3 +1,7 @@
+# dbx 0.2.1 [unreleased]
+
+- Added `sslmode` and `sslrootcert` for RPostgreSQL
+
 # dbx 0.2.0
 
 - Added support for fractional seconds

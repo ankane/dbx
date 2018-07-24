@@ -85,6 +85,21 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
     obj <- findAdapter(adapter)
   }
 
+  if (inherits(obj, "PostgreSQLDriver")) {
+    if (!is.null(params$sslmode) || !is.null(params$sslrootcert)) {
+      dbname <- list(dbname=params$dbname)
+      if (!is.null(params$sslmode)) {
+        dbname$sslmode <- params$sslmode
+        params$sslmode <- NULL
+      }
+      if (!is.null(params$sslrootcert)) {
+        dbname$sslrootcert <- params$sslrootcert
+        params$sslrootcert <- NULL
+      }
+      params$dbname <- toConnStr(dbname)
+    }
+  }
+
   if (is.null(params$bigint) && (inherits(obj, "PqDriver") || inherits(obj, "MariaDBDriver"))) {
     params$bigint <- "numeric"
   }
@@ -107,6 +122,15 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
   }
 
   conn
+}
+
+# escape connection string
+# https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING
+# To write an empty value, or a value containing spaces, surround it with single quotes,
+# e.g., keyword = 'a value'. Single quotes and backslashes within the value must be escaped
+# with a backslash, i.e., \' and \\.
+toConnStr <- function(x) {
+  paste0(mapply(function(x, i) paste0(i, "='", gsub("'", "\\'", gsub("\\", "\\\\", x, fixed=TRUE), fixed=TRUE), "'"), x, names(x)), collapse=" ")
 }
 
 findAdapter <- function(adapter) {

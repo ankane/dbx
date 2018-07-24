@@ -343,6 +343,18 @@ hexToRaw <- function(x) {
 records$column <- lapply(records$column, hexToRaw)
 ```
 
+## Security
+
+When connecting to a remote database, make sure your connection is secure.
+
+With Postgres, use:
+
+```r
+db <- dbxConnect(adapter="postgres", sslmode="verify-full", sslrootcert="path/to/ca.pem")
+```
+
+> With RPostgreSQL, use `master` branch until next release
+
 ## Reference
 
 To close a connection, use:
