@@ -361,6 +361,43 @@ With RMariaDB, use:
 db <- dbxConnect(adapter="rmariadb", ssl.ca="ca.pem")
 ```
 
+## Connection Pooling
+
+Install the [pool](https://cran.r-project.org/package=pool) package
+
+```r
+install.packages("pool")
+```
+
+Create a pool
+
+```r
+library(pool)
+
+factory <- function() {
+  dbxConnect(adapter="postgres", ...)
+}
+
+pool <- poolCreate(factory, maxSize=5)
+```
+
+Run queries
+
+```ruby
+# checkout
+conn <- poolCheckout(pool)
+
+tryCatch({
+  # run queries
+  dbxSelect(conn, "SELECT * FROM forecasts")
+}, finally={
+  # always return
+  poolReturn(conn)
+})
+```
+
+In the future, dbx commands may work directly with pools.
+
 ## Reference
 
 To close a connection, use:
