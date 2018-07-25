@@ -386,14 +386,11 @@ pool <- poolCreate(factory, maxSize=5)
 Run queries
 
 ```ruby
-# checkout
 conn <- poolCheckout(pool)
 
 tryCatch({
-  # run queries
   dbxSelect(conn, "SELECT * FROM forecasts")
 }, finally={
-  # always return
   poolReturn(conn)
 })
 ```
