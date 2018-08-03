@@ -24,7 +24,7 @@ Install dbx
 
 ```r
 install.packages("devtools")
-devtools::install_github("ankane/dbx@v0.2.0")
+devtools::install_github("ankane/dbx@v0.2.1")
 ```
 
 And follow the instructions for your database
@@ -38,7 +38,7 @@ And follow the instructions for your database
 To install with [Jetpack](https://github.com/ankane/jetpack), use:
 
 ```r
-jetpack::add("dbx", remote="ankane/dbx@v0.2.0")
+jetpack::add("dbx", remote="ankane/dbx@v0.2.1")
 ```
 
 ### Postgres

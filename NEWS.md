@@ -1,4 +1,4 @@
-# dbx 0.2.1 [unreleased]
+# dbx 0.2.1
 
 - Added `sslmode` and `sslrootcert` for RPostgreSQL
 - Fixed error with dplyr check
