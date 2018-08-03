@@ -235,15 +235,13 @@ When connecting to a remote database, make sure your connection is secure.
 With Postgres, use:
 
 ```r
-db <- dbxConnect(adapter="postgres", sslmode="verify-full", sslrootcert="root.crt")
+db <- dbxConnect(adapter="postgres", sslmode="verify-full", sslrootcert="ca.pem")
 ```
-
-> With RPostgreSQL, use `master` branch until next release
 
 With RMariaDB, use:
 
 ```r
-db <- dbxConnect(adapter="rmariadb", ssl.ca="ca.pem")
+db <- dbxConnect(adapter="mysql", ssl.ca="ca.pem")
 ```
 
 Please [let us know](https://github.com/ankane/dbx/issues/new) if you have a way that works with RMySQL.
