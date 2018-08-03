@@ -1,12 +1,6 @@
-## Resubmission
-
-This is a resubmission. In this version I have:
-
-* Added version numbers for dependencies
-
 ## Test environments
 
-* local OS X install, R 3.5.0
+* local OS X install, R 3.5.1
 * ubuntu 14.04 (on travis-ci), R 3.5.0
 * win-builder
 
@@ -14,10 +8,6 @@ This is a resubmission. In this version I have:
 
 There were no ERRORs or WARNINGs.
 
-There was 1 NOTE:
-
-* This is a new submission
-
 ## Downstream dependencies
 
-This is a new submission.
+There are currently no downstream dependencies for this package.
