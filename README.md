@@ -23,8 +23,7 @@ Supports Postgres, MySQL, SQLite, and more
 Install dbx
 
 ```r
-install.packages("devtools")
-devtools::install_github("ankane/dbx@v0.2.1")
+install.packages("dbx")
 ```
 
 And follow the instructions for your database
@@ -38,7 +37,7 @@ And follow the instructions for your database
 To install with [Jetpack](https://github.com/ankane/jetpack), use:
 
 ```r
-jetpack::add("dbx", remote="ankane/dbx@v0.2.1")
+jetpack::add("dbx")
 ```
 
 ### Postgres
