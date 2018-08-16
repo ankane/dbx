@@ -4,12 +4,14 @@
 \alias{dbxSelect}
 \title{Select records}
 \usage{
-dbxSelect(conn, statement)
+dbxSelect(conn, statement, retries = 0)
 }
 \arguments{
 \item{conn}{A DBIConnection object}
 
 \item{statement}{The SQL statement to use}
+
+\item{retries}{Max retries if query fails}
 }
 \description{
 Select records
