@@ -2,14 +2,13 @@
 #'
 #' @param conn A DBIConnection object
 #' @param statement The SQL statement to use
-#' @param retries Max retries if query fails
 #' @export
 #' @examples
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 #' DBI::dbCreateTable(db, "forecasts", data.frame(id=1:3, temperature=20:22))
 #'
 #' records <- dbxSelect(db, "SELECT * FROM forecasts")
-dbxSelect <- function(conn, statement, retries=0) {
+dbxSelect <- function(conn, statement) {
   statement <- processStatement(statement)
   cast_dates <- list()
   cast_datetimes <- list()
@@ -19,7 +18,7 @@ dbxSelect <- function(conn, statement, retries=0) {
   unescape_blobs <- list()
   fix_timetz <- list()
 
-  r <- withRetries(retries, function() { fetchRecords(conn, statement) })
+  r <- fetchRecords(conn, statement)
   records <- r$records
   column_info <- r$column_info
 
@@ -156,20 +155,6 @@ fetchRecords <- function(conn, statement) {
   })
 
   list(records=combineResults(ret), column_info=column_info)
-}
-
-withRetries <- function(retries, fn) {
-  err <- NULL
-
-  for (i in 1:(retries + 1)) {
-    tryCatch({
-      return(fn())
-    }, error=function(e) {
-      err <<- e
-    })
-  }
-
-  stop(err)
 }
 
 emptyType <- function(type) {

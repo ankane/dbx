@@ -437,12 +437,6 @@ All connections are simply [DBI](https://cran.r-project.org/package=DBI) connect
 dbGetInfo(db)
 ```
 
-Retry queries with: [master]
-
-```r
-dbxSelect(db, "SELECT COUNT(*) FROM large_table", retries=3)
-```
-
 ## Upgrading
 
 ### 0.2.0
