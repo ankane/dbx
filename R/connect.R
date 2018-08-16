@@ -86,10 +86,14 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
     obj <- findAdapter(adapter)
   }
 
+  if (is.null(params$fallback_application_name) && (inherits(obj, "PqDriver") || inherits(obj, "PostgreSQLDriver"))) {
+    params$fallback_application_name <- scriptName()
+  }
+
   if (inherits(obj, "PostgreSQLDriver")) {
     dbname <- list(dbname=params$dbname)
 
-    for (i in c("sslmode", "sslrootcert", "sslcert", "sslkey", "sslcrl", "connect_timeout")) {
+    for (i in c("sslmode", "sslrootcert", "sslcert", "sslkey", "sslcrl", "connect_timeout", "fallback_application_name")) {
       if (!is.null(params[[i]])) {
         dbname[[i]] <- params[[i]]
         params[[i]] <- NULL

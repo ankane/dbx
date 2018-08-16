@@ -137,12 +137,16 @@ processStatement <- function(statement) {
 
   if (!is.null(comment)) {
     if (isTRUE(comment)) {
-      comment <- paste0("script:", sub(".*=", "", commandArgs()[4]))
+      comment <- paste0("script:", scriptName())
     }
     statement <- paste0(statement, " /*", comment, "*/")
   }
 
   statement
+}
+
+scriptName <- function() {
+  sub(".*=", "", commandArgs()[4])
 }
 
 timeStatement <- function(statement, code) {
