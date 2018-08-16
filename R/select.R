@@ -26,38 +26,9 @@ dbxSelect <- function(conn, statement) {
       res <- dbSendQuery(conn, statement)
     })
 
-    if (isRPostgreSQL(conn)) {
+    # breaks empty results with SQLite
+    if (!isSQLite(conn)) {
       column_info <- dbColumnInfo(res)
-      sql_types <- tolower(column_info$type)
-
-      if (storageTimeZone(conn) != currentTimeZone()) {
-        convert_tz <- which(sql_types == "timestamp")
-      }
-
-      unescape_blobs <- which(sql_types == "bytea")
-      fix_timetz <- which(sql_types == "timetzoid")
-    } else if (isRPostgres(conn)) {
-      column_info <- dbColumnInfo(res)
-      sql_types <- column_info$`.typname`
-
-      if (storageTimeZone(conn) != currentTimeZone()) {
-        convert_tz <- which(sql_types == "timestamp")
-      }
-
-      stringify_json <- which(sql_types %in% c("json", "jsonb"))
-    } else if (isRMySQL(conn)) {
-      column_info <- dbColumnInfo(res)
-      sql_types <- tolower(column_info$type)
-
-      cast_dates <- which(sql_types == "date")
-      cast_datetimes <- which(sql_types %in% c("datetime", "timestamp"))
-      cast_booleans <- which(sql_types == "tinyint" & column_info$length == 1)
-    } else if (isRMariaDB(conn)) {
-      # TODO cast booleans for RMariaDB
-      # waiting on https://github.com/r-dbi/RMariaDB/issues/100
-    } else if (isSQLite(conn)) {
-      # TODO cast dates and times for RSQLite
-      # waiting on https://github.com/r-dbi/RSQLite/issues/263
     }
 
     # always fetch at least once
@@ -70,6 +41,38 @@ dbxSelect <- function(conn, statement) {
   })
 
   records <- combineResults(ret)
+
+  # typecasting
+  if (isRPostgreSQL(conn)) {
+    sql_types <- tolower(column_info$type)
+
+    if (storageTimeZone(conn) != currentTimeZone()) {
+      convert_tz <- which(sql_types == "timestamp")
+    }
+
+    unescape_blobs <- which(sql_types == "bytea")
+    fix_timetz <- which(sql_types == "timetzoid")
+  } else if (isRPostgres(conn)) {
+    sql_types <- column_info$`.typname`
+
+    if (storageTimeZone(conn) != currentTimeZone()) {
+      convert_tz <- which(sql_types == "timestamp")
+    }
+
+    stringify_json <- which(sql_types %in% c("json", "jsonb"))
+  } else if (isRMySQL(conn)) {
+    sql_types <- tolower(column_info$type)
+
+    cast_dates <- which(sql_types == "date")
+    cast_datetimes <- which(sql_types %in% c("datetime", "timestamp"))
+    cast_booleans <- which(sql_types == "tinyint" & column_info$length == 1)
+  } else if (isRMariaDB(conn)) {
+    # TODO cast booleans for RMariaDB
+    # waiting on https://github.com/r-dbi/RMariaDB/issues/100
+  } else if (isSQLite(conn)) {
+    # TODO cast dates and times for RSQLite
+    # waiting on https://github.com/r-dbi/RSQLite/issues/263
+  }
 
   # fix for empty data frame
   # until new RPostgreSQL version is published
