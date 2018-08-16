@@ -4,12 +4,14 @@
 \alias{dbxSelect}
 \title{Select records}
 \usage{
-dbxSelect(conn, statement)
+dbxSelect(conn, statement, cache = FALSE)
 }
 \arguments{
 \item{conn}{A DBIConnection object}
 
 \item{statement}{The SQL statement to use}
+
+\item{cache}{Cache the result}
 }
 \description{
 Select records
