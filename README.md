@@ -245,6 +245,14 @@ db <- dbxConnect(adapter="mysql", ssl.ca="ca.pem")
 
 Please [let us know](https://github.com/ankane/dbx/issues/new) if you have a way that works with RMySQL.
 
+## Variables
+
+Set session variables with: [master]
+
+```r
+db <- dbxConnect(variables=list(statement_timeout=250, search_path="archive"))
+```
+
 ## Batching
 
 By default, operations are performed in a single statement or transaction. This is better for performance and prevents partial writes on failures. However, when working with large data frames on production systems, it can be better to break writes into batches. Use the `batch_size` option to do this.

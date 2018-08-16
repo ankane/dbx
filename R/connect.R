@@ -3,6 +3,7 @@
 #' @param url A database URL
 #' @param adapter The database adapter to use
 #' @param storage_tz The time zone timestamps are stored in
+#' @param variables Session variables
 #' @param ... Arguments to pass to dbConnect
 #' @export
 #' @examples
@@ -20,7 +21,7 @@
 #' # Others
 #' db <- dbxConnect(adapter=odbc(), database="mydb")
 #' }
-dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
+dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list(), ...) {
   if (is.null(adapter) && is.null(url)) {
     url <- Sys.getenv("DATABASE_URL")
   }
@@ -119,6 +120,11 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, ...) {
     dbExecute(conn, "SET timezone TO 'UTC'")
   } else if (isRMySQL(conn)) {
     dbExecute(conn, "SET time_zone = '+00:00'")
+  }
+
+  for (k in names(variables)) {
+    # variable not protected against injection
+    dbExecute(conn, paste0("SET ", k, " = ", variables[[k]]))
   }
 
   conn
