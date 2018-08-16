@@ -89,7 +89,7 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
   if (inherits(obj, "PostgreSQLDriver")) {
     dbname <- list(dbname=params$dbname)
 
-    for (i in c("sslmode", "sslrootcert", "connect_timeout")) {
+    for (i in c("sslmode", "sslrootcert", "sslcert", "sslkey", "sslcrl", "connect_timeout")) {
       if (!is.null(params[[i]])) {
         dbname[[i]] <- params[[i]]
         params[[i]] <- NULL

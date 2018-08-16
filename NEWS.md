@@ -3,7 +3,7 @@
 - Added statement duration to logging
 - Added logging for `dbxUpdate` transaction
 - Added `variables` to `dbxConnect`
-- Added `connect_timeout` for RPostgreSQL
+- Added `connect_timeout`, `sslcert`, `sslkey`, and `sslcrl` for RPostgreSQL
 
 # dbx 0.2.1
 
