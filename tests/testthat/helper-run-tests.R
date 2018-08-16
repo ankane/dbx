@@ -517,6 +517,16 @@ runTests <- function(db, redshift=FALSE) {
     expect_equal(blob::as.blob(res$image), events$image)
   })
 
+  test_that("difftime uses seconds", {
+    dbxDelete(db, "events")
+
+    events <- data.frame(counter=as.difftime(c("12:30:00", "16:59:59")))
+    dbxInsert(db, "events", events)
+
+    res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+    expect_equal(res$counter, c(45000, 61199))
+  })
+
   test_that("ts uses observation values", {
     dbxDelete(db, "events")
 
