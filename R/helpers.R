@@ -155,7 +155,7 @@ timeStatement <- function(statement, code) {
   tryCatch(code, finally={
     duration <- round(as.double(difftime(Sys.time(), started_at)) * 1000, 1)
 
-    verbose <- getOption("dbx_verbose")
+    verbose <- getOption("dbx_logging", getOption("dbx_verbose"))
     if (is.function(verbose)) {
       verbose(statement)
     } else if (any(verbose)) {
