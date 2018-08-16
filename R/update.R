@@ -32,7 +32,7 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
     colnames(quoted_records) <- colnames(batch)
     groups <- split(quoted_records, quoted_records[update_cols], drop=TRUE)
 
-    dbWithTransaction(conn, {
+    withTransaction(conn, {
       for (group in groups) {
         row <- group[1,, drop=FALSE]
         sql <- paste("UPDATE", quoted_table, "SET", setClause(quoted_update_cols, row[update_cols]), "WHERE", whereClause(quoted_where_cols, group[where_cols]))
@@ -42,4 +42,15 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
   })
 
   invisible()
+}
+
+withTransaction <- function(conn, code) {
+  tryCatch({
+    execute(conn, "BEGIN")
+    eval(code)
+    execute(conn, "COMMIT")
+  }, error=function(err) {
+    execute(conn, "ROLLBACK")
+    stop(err)
+  })
 }

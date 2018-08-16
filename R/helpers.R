@@ -1,4 +1,4 @@
-#' @importFrom DBI dbConnect dbDisconnect dbExecute dbQuoteIdentifier dbQuoteLiteral dbSendQuery dbFetch dbClearResult dbHasCompleted dbColumnInfo dbWithTransaction
+#' @importFrom DBI dbConnect dbDisconnect dbExecute dbQuoteIdentifier dbQuoteLiteral dbSendQuery dbFetch dbClearResult dbHasCompleted dbColumnInfo
 
 isRPostgreSQL <- function(conn) {
   inherits(conn, "PostgreSQLConnection")

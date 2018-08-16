@@ -1,6 +1,7 @@
 # dbx 0.2.2 [unreleased]
 
 - Added statement duration to logging
+- Added logging for `dbxUpdate` transaction
 
 # dbx 0.2.1
 
