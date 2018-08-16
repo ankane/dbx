@@ -268,7 +268,7 @@ db <- dbxConnect(variables=list(max_execution_time=1000)) # ms
 db <- dbxConnect(variables=list(max_statement_time=1)) # sec
 ```
 
-With RPostgres, set a connect timeout with:
+With Postgres, set a connect timeout with:
 
 ```r
 db <- dbxConnect(connect_timeout=3)

@@ -87,16 +87,16 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
   }
 
   if (inherits(obj, "PostgreSQLDriver")) {
-    if (!is.null(params$sslmode) || !is.null(params$sslrootcert)) {
-      dbname <- list(dbname=params$dbname)
-      if (!is.null(params$sslmode)) {
-        dbname$sslmode <- params$sslmode
-        params$sslmode <- NULL
+    dbname <- list(dbname=params$dbname)
+
+    for (i in c("sslmode", "sslrootcert", "connect_timeout")) {
+      if (!is.null(params[[i]])) {
+        dbname[[i]] <- params[[i]]
+        params[[i]] <- NULL
       }
-      if (!is.null(params$sslrootcert)) {
-        dbname$sslrootcert <- params$sslrootcert
-        params$sslrootcert <- NULL
-      }
+    }
+
+    if (length(dbname) > 1) {
       params$dbname <- toConnStr(dbname)
     }
   }
