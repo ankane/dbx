@@ -2,7 +2,6 @@
 
 - Added statement duration to logging
 - Added logging for `dbxUpdate` transaction
-- Added support for `difftime`
 
 # dbx 0.2.1
 
