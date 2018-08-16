@@ -26,13 +26,11 @@ dbxSelect <- function(conn, statement) {
       res <- dbSendQuery(conn, statement)
     })
 
-    # breaks empty results with SQLite
-    if (!isSQLite(conn)) {
-      column_info <- dbColumnInfo(res)
-    }
-
     # always fetch at least once
     ret[[length(ret) + 1]] <- dbFetch(res)
+
+    # must come after first fetch call for SQLite
+    column_info <- dbColumnInfo(res)
 
     while (!dbHasCompleted(res)) {
       ret[[length(ret) + 1]] <- dbFetch(res)
