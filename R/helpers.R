@@ -127,7 +127,9 @@ selectOrExecute <- function(conn, sql, records, returning) {
 
 execute <- function(conn, statement) {
   statement <- processStatement(statement)
-  dbExecute(conn, statement)
+  timeStatement(statement, {
+    dbExecute(conn, statement)
+  })
 }
 
 processStatement <- function(statement) {
@@ -140,14 +142,22 @@ processStatement <- function(statement) {
     statement <- paste0(statement, " /*", comment, "*/")
   }
 
-  verbose <- getOption("dbx_verbose")
-  if (is.function(verbose)) {
-    verbose(statement)
-  } else if (any(verbose)) {
-    message(statement)
-  }
-
   statement
+}
+
+timeStatement <- function(statement, code) {
+  started_at <- Sys.time()
+
+  tryCatch(code, finally={
+    duration <- round(as.double(difftime(Sys.time(), started_at)) * 1000, 1)
+
+    verbose <- getOption("dbx_verbose")
+    if (is.function(verbose)) {
+      verbose(statement)
+    } else if (any(verbose)) {
+      message(paste0("(", duration, "ms) ", statement))
+    }
+  })
 }
 
 inBatches <- function(records, batch_size, f) {

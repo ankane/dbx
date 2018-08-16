@@ -1,3 +1,7 @@
+# dbx 0.2.2 [unreleased]
+
+- Added statement duration to logging
+
 # dbx 0.2.1
 
 - Added `sslmode` and `sslrootcert` for RPostgreSQL

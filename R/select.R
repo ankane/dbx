@@ -21,7 +21,10 @@ dbxSelect <- function(conn, statement) {
   column_info <- NULL
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown (", "Decimal MySQL column"), {
-    res <- dbSendQuery(conn, statement)
+    res <- NULL
+    timeStatement(statement, {
+      res <- dbSendQuery(conn, statement)
+    })
 
     if (isRPostgreSQL(conn)) {
       column_info <- dbColumnInfo(res)
