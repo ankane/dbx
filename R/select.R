@@ -2,13 +2,14 @@
 #'
 #' @param conn A DBIConnection object
 #' @param statement The SQL statement to use
+#' @param cache Cache the result
 #' @export
 #' @examples
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 #' DBI::dbCreateTable(db, "forecasts", data.frame(id=1:3, temperature=20:22))
 #'
 #' records <- dbxSelect(db, "SELECT * FROM forecasts")
-dbxSelect <- function(conn, statement) {
+dbxSelect <- function(conn, statement, cache=FALSE) {
   statement <- processStatement(statement)
   cast_dates <- list()
   cast_datetimes <- list()
@@ -18,7 +19,7 @@ dbxSelect <- function(conn, statement) {
   unescape_blobs <- list()
   fix_timetz <- list()
 
-  r <- fetchRecords(conn, statement)
+  r <- if (cache) fetchRecordsCached(conn, statement) else fetchRecords(conn, statement)
   records <- r$records
   column_info <- r$column_info
 
@@ -130,6 +131,31 @@ dbxSelect <- function(conn, statement) {
   }
 
   records
+}
+
+statementCacheKey <- function(statement) {
+  sum(utf8ToInt(statement))
+}
+
+fetchRecordsCached <- function(conn, statement) {
+  # TODO add non-sensitive conn info
+  cache_key <- paste0(statementCacheKey(statement), ".rds")
+  # TODO use persistent dir
+  cache_dir <- tempdir()
+
+  cache_path <- file.path(cache_dir, cache_key)
+
+  res <- NULL
+
+  tryCatch({
+    res <- suppressWarnings(readRDS(cache_path))
+  }, error=function(err) {
+    # file does not exist
+    res <<- fetchRecords(conn, statement)
+    saveRDS(res, cache_path)
+  })
+
+  res
 }
 
 fetchRecords <- function(conn, statement) {

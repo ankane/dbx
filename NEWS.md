@@ -2,6 +2,7 @@
 
 - Added statement duration to logging
 - Added logging for `dbxUpdate` transaction
+- Added `cache` option to `dbxSelect`
 
 # dbx 0.2.1
 

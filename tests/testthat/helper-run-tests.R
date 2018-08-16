@@ -19,6 +19,14 @@ runTests <- function(db, redshift=FALSE) {
     expect_equal(res, orders[c("id")])
   })
 
+  test_that("select cache works", {
+    res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC", cache=TRUE)
+    expect_equal(res, orders)
+
+    res <- dbxSelect(db, "SELECT id, city FROM orders ORDER BY id ASC", cache=TRUE)
+    expect_equal(res, orders)
+  })
+
   test_that("empty select works", {
     dbxDelete(db, "events")
     res <- dbxSelect(db, "SELECT * FROM events")
