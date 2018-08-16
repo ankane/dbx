@@ -123,7 +123,7 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
   }
 
   for (k in names(variables)) {
-    # variable not protected against injection
+    # variables not protected against injection
     dbExecute(conn, paste0("SET ", k, " = ", variables[[k]]))
   }
 
