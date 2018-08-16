@@ -245,12 +245,33 @@ db <- dbxConnect(adapter="mysql", ssl.ca="ca.pem")
 
 Please [let us know](https://github.com/ankane/dbx/issues/new) if you have a way that works with RMySQL.
 
-## Variables
+## Variables [master]
 
-Set session variables with: [master]
+Set session variables with:
 
 ```r
-db <- dbxConnect(variables=list(statement_timeout=250, search_path="archive"))
+db <- dbxConnect(variables=list(search_path="archive"))
+```
+
+## Timeouts [master]
+
+Set a statement timeout with:
+
+```r
+# Postgres
+db <- dbxConnect(variables=list(statement_timeout=1000)) # ms
+
+# MySQL
+db <- dbxConnect(variables=list(max_execution_time=1000)) # ms
+
+# MariaDB
+db <- dbxConnect(variables=list(max_statement_time=1)) # sec
+```
+
+With RPostgres, set a connect timeout with:
+
+```r
+db <- dbxConnect(connect_timeout=3)
 ```
 
 ## Batching
