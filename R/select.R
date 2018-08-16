@@ -10,7 +10,6 @@
 #' records <- dbxSelect(db, "SELECT * FROM forecasts")
 dbxSelect <- function(conn, statement) {
   statement <- processStatement(statement)
-  ret <- list()
   cast_dates <- list()
   cast_datetimes <- list()
   convert_tz <- list()
@@ -18,27 +17,10 @@ dbxSelect <- function(conn, statement) {
   stringify_json <- list()
   unescape_blobs <- list()
   fix_timetz <- list()
-  column_info <- NULL
 
-  silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown (", "Decimal MySQL column"), {
-    res <- NULL
-    timeStatement(statement, {
-      res <- dbSendQuery(conn, statement)
-    })
-
-    # always fetch at least once
-    ret[[length(ret) + 1]] <- dbFetch(res)
-
-    # must come after first fetch call for SQLite
-    column_info <- dbColumnInfo(res)
-
-    while (!dbHasCompleted(res)) {
-      ret[[length(ret) + 1]] <- dbFetch(res)
-    }
-    dbClearResult(res)
-  })
-
-  records <- combineResults(ret)
+  r <- fetchRecords(conn, statement)
+  records <- r$records
+  column_info <- r$column_info
 
   # typecasting
   if (isRPostgreSQL(conn)) {
@@ -148,6 +130,31 @@ dbxSelect <- function(conn, statement) {
   }
 
   records
+}
+
+fetchRecords <- function(conn, statement) {
+  ret <- list()
+  column_info <- NULL
+
+  silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown (", "Decimal MySQL column"), {
+    res <- NULL
+    timeStatement(statement, {
+      res <- dbSendQuery(conn, statement)
+    })
+
+    # always fetch at least once
+    ret[[length(ret) + 1]] <- dbFetch(res)
+
+    # must come after first fetch call for SQLite
+    column_info <- dbColumnInfo(res)
+
+    while (!dbHasCompleted(res)) {
+      ret[[length(ret) + 1]] <- dbFetch(res)
+    }
+    dbClearResult(res)
+  })
+
+  list(records=combineResults(ret), column_info=column_info)
 }
 
 emptyType <- function(type) {
