@@ -517,6 +517,16 @@ runTests <- function(db, redshift=FALSE) {
     expect_equal(blob::as.blob(res$image), events$image)
   })
 
+  test_that("ts uses observation values", {
+    dbxDelete(db, "events")
+
+    events <- data.frame(counter=ts(1:3, start=c(2018, 1), end=c(2018, 3), frequency=12))
+    dbxInsert(db, "events", events)
+
+    res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+    expect_equal(res$counter, as.integer(events$counter))
+  })
+
   # very important
   # shows typecasting is consistent
   test_that("can update what what just selected and get same result", {
