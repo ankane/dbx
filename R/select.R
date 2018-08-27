@@ -60,6 +60,7 @@ dbxSelect <- function(conn, statement) {
     # print(column_info)
     sql_types = column_info$type
     change_tz <- which(sql_types == 93)
+    cast_booleans <- which(sql_types == -6)
   }
 
   # fix for empty data frame

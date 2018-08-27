@@ -54,7 +54,7 @@ runTests <- function(db, redshift=FALSE) {
     expect_identical(res$properties, as.character())
 
     # booleans
-    if (isRMariaDB(db) || isODBCMySQL(db)) {
+    if (isRMariaDB(db)) {
       # until proper typecasting
       expect_identical(res$active, as.integer())
     } else if (isSQLite(db)) {
@@ -105,7 +105,7 @@ runTests <- function(db, redshift=FALSE) {
     expect_identical(res$properties, as.character(NA))
 
     # booleans
-    if (isRMariaDB(db) || isODBCMySQL(db)) {
+    if (isRMariaDB(db)) {
       # until proper typecasting
       expect_identical(res$active, as.integer(NA))
     } else if (isSQLite(db)) {
@@ -275,7 +275,7 @@ runTests <- function(db, redshift=FALSE) {
 
     if (isSQLite(db) || isRMariaDB(db)) {
       res$active <- res$active != 0
-    } else if (isODBC(db)) {
+    } else if (isODBCPostgres(db)) {
       res$active <- res$active != "0"
     }
 
