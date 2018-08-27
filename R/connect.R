@@ -105,7 +105,7 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
     }
   }
 
-  if (is.null(params$bigint) && (inherits(obj, "PqDriver") || inherits(obj, "MariaDBDriver"))) {
+  if (is.null(params$bigint) && (inherits(obj, "PqDriver") || inherits(obj, "MariaDBDriver") || inherits(obj, "OdbcDriver"))) {
     params$bigint <- "numeric"
   }
 
@@ -120,7 +120,7 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
   }
 
   # other adapters do this automatically
-  if (isRPostgreSQL(conn)) {
+  if (isRPostgreSQL(conn) || isODBCPostgres(conn)) {
     dbExecute(conn, "SET timezone TO 'UTC'")
   } else if (isRMySQL(conn)) {
     dbExecute(conn, "SET time_zone = '+00:00'")

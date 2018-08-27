@@ -9,7 +9,11 @@ isRPostgres <- function(conn) {
 }
 
 isPostgres <- function(conn) {
-  isRPostgreSQL(conn) || isRPostgres(conn)
+  isRPostgreSQL(conn) || isRPostgres(conn) || isODBCPostgres(conn)
+}
+
+isODBCPostgres <- function(conn) {
+  inherits(conn, "PostgreSQL")
 }
 
 isRMySQL <- function(conn) {
@@ -226,7 +230,7 @@ quoteRecords <- function(conn, records) {
         col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6 %Z")
       } else if (isTime(col)) {
         col <- format(col)
-      } else if (isLogical(col) && isRPostgreSQL(conn)) {
+      } else if (isLogical(col) && (isRPostgreSQL(conn) || isODBCPostgres(conn))) {
         col <- as.character(col)
       } else if (isBinary(col)) {
         if (isRPostgreSQL(conn)) {

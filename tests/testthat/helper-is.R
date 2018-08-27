@@ -7,7 +7,11 @@ isRPostgres <- function(conn) {
 }
 
 isPostgres <- function(conn) {
-  isRPostgreSQL(conn) || isRPostgres(conn)
+  isRPostgreSQL(conn) || isRPostgres(conn) || isODBCPostgres(conn)
+}
+
+isODBCPostgres <- function(conn) {
+  inherits(conn, "PostgreSQL")
 }
 
 isRMySQL <- function(conn) {

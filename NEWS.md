@@ -5,6 +5,7 @@
 - Added `variables` to `dbxConnect`
 - Added `connect_timeout`, `sslcert`, `sslkey`, and `sslcrl` for RPostgreSQL
 - Prefer `dbx_logging` over `dbx_verbose`
+- Added support for ODBC Postgres
 
 # dbx 0.2.1
 

@@ -17,6 +17,7 @@ dbxSelect <- function(conn, statement) {
   stringify_json <- list()
   unescape_blobs <- list()
   fix_timetz <- list()
+  change_tz <- list()
 
   r <- fetchRecords(conn, statement)
   records <- r$records
@@ -52,6 +53,13 @@ dbxSelect <- function(conn, statement) {
   } else if (isSQLite(conn)) {
     # TODO cast dates and times for RSQLite
     # waiting on https://github.com/r-dbi/RSQLite/issues/263
+  } else if (isODBCPostgres(conn)) {
+    # TODO cast booleans for Postgres ODBC
+    # https://github.com/r-dbi/odbc/issues/108
+    # booleans currently returned as VARCHAR
+    # print(column_info)
+    sql_types = column_info$type
+    change_tz <- which(sql_types == 93)
   }
 
   # fix for empty data frame
@@ -75,6 +83,10 @@ dbxSelect <- function(conn, statement) {
 
   for (i in stringify_json) {
     records[, i] <- as.character(records[, i])
+  }
+
+  for (i in change_tz) {
+    attr(records[, i], "tzone") <- currentTimeZone()
   }
 
   if (nrow(records) > 0) {

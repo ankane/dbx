@@ -60,6 +60,8 @@ runTests <- function(db, redshift=FALSE) {
     } else if (isSQLite(db)) {
       # until proper typecasting
       expect_identical(res$active, as.numeric())
+    } else if (isODBCPostgres(db)) {
+      expect_identical(res$active, as.character())
     } else {
       expect_identical(res$active, as.logical())
     }
@@ -109,6 +111,8 @@ runTests <- function(db, redshift=FALSE) {
     } else if (isSQLite(db)) {
       # until proper typecasting
       expect_identical(res$active, as.numeric(NA))
+    } else if (isODBCPostgres(db)) {
+      expect_identical(res$active, as.character(NA))
     } else {
       expect_identical(res$active, NA)
     }
@@ -271,6 +275,8 @@ runTests <- function(db, redshift=FALSE) {
 
     if (isSQLite(db) || isRMariaDB(db)) {
       res$active <- res$active != 0
+    } else if (isODBCPostgres(db)) {
+      res$active <- res$active != "0"
     }
 
     expect_equal(res$active, events$active)
@@ -453,7 +459,12 @@ runTests <- function(db, redshift=FALSE) {
 
     # test returned time
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-    expect_equal(res$close_time, events$close_time)
+
+    if (isODBCPostgres(db)) {
+      expect_equal(res$close_time, paste0(events$close_time, "+00"))
+    } else {
+      expect_equal(res$close_time, events$close_time)
+    }
 
     # test stored time
     res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE close_time = '12:30:55'")
