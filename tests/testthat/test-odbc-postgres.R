@@ -1,7 +1,6 @@
 context("odbc-postgres")
 
-skip_on_cran()
-skip_on_travis()
+skip("odbc")
 
 db <- dbxConnect(adapter=odbc::odbc(),
   driver = "/usr/local/Cellar/psqlodbc/10.03.0000/lib/psqlodbca.so",
