@@ -122,7 +122,7 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
   # other adapters do this automatically
   if (isRPostgreSQL(conn) || isODBCPostgres(conn)) {
     dbExecute(conn, "SET timezone TO 'UTC'")
-  } else if (isRMySQL(conn)) {
+  } else if (isRMySQL(conn) || isODBCMySQL(conn)) {
     dbExecute(conn, "SET time_zone = '+00:00'")
   }
 

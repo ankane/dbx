@@ -53,7 +53,7 @@ dbxSelect <- function(conn, statement) {
   } else if (isSQLite(conn)) {
     # TODO cast dates and times for RSQLite
     # waiting on https://github.com/r-dbi/RSQLite/issues/263
-  } else if (isODBCPostgres(conn)) {
+  } else if (isODBC(conn)) {
     # TODO cast booleans for Postgres ODBC
     # https://github.com/r-dbi/odbc/issues/108
     # booleans currently returned as VARCHAR

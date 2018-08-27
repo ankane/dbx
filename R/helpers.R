@@ -1,15 +1,15 @@
 #' @importFrom DBI dbConnect dbDisconnect dbExecute dbQuoteIdentifier dbQuoteLiteral dbSendQuery dbFetch dbClearResult dbHasCompleted dbColumnInfo
 
+isPostgres <- function(conn) {
+  isRPostgreSQL(conn) || isRPostgres(conn) || isODBCPostgres(conn)
+}
+
 isRPostgreSQL <- function(conn) {
   inherits(conn, "PostgreSQLConnection")
 }
 
 isRPostgres <- function(conn) {
   inherits(conn, "PqConnection")
-}
-
-isPostgres <- function(conn) {
-  isRPostgreSQL(conn) || isRPostgres(conn) || isODBCPostgres(conn)
 }
 
 isODBCPostgres <- function(conn) {
@@ -21,7 +21,7 @@ isRMySQL <- function(conn) {
 }
 
 isMySQL <- function(conn) {
-  isRMySQL(conn) || isRMariaDB(conn)
+  isRMySQL(conn) || isRMariaDB(conn) || isODBCMySQL(conn)
 }
 
 isRMariaDB <- function(conn) {
@@ -30,6 +30,14 @@ isRMariaDB <- function(conn) {
 
 isSQLite <- function(conn) {
   inherits(conn, "SQLiteConnection")
+}
+
+isODBCMySQL <- function(conn) {
+  inherits(conn, "MySQL")
+}
+
+isODBC <- function(conn) {
+  !is.null(attr(conn, "info")$odbc.version)
 }
 
 equalClause <- function(cols, row) {
