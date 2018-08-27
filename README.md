@@ -124,7 +124,7 @@ For Redshift, follow the [Postgres instructions](#postgres).
 Install the appropriate R package and use:
 
 ```r
-db <- dbxConnect(adapter=odbc(), database="mydb")
+db <- dbxConnect(adapter=odbc::odbc(), database="mydb")
 ```
 
 ## Operations
