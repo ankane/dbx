@@ -2,7 +2,7 @@ context("odbc-sqlserver")
 
 skip("odbc")
 
-db <- dbConnect(odbc::odbc(), driver="/usr/local/lib/libtdsodbc.so", database="dbx_test", server="localhost", port=1433, uid="SA", pwd="YourNewStrong!Passw0rd")
+db <- dbxConnect(adapter=odbc::odbc(), driver="/usr/local/lib/libtdsodbc.so", database="dbx_test", server="localhost", port=1433, uid="SA", pwd="YourNewStrong!Passw0rd")
 
 dbExecute(db, "DROP TABLE IF EXISTS orders")
 dbExecute(db, "CREATE TABLE orders (id INT NOT NULL PRIMARY KEY, city VARCHAR(255))")
