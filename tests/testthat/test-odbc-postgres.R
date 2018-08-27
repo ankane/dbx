@@ -2,12 +2,7 @@ context("odbc-postgres")
 
 skip("odbc")
 
-db <- dbxConnect(adapter=odbc::odbc(),
-  driver = "/usr/local/Cellar/psqlodbc/10.03.0000/lib/psqlodbca.so",
-  database = "dbx_test",
-  host = "localhost",
-  port = 5432
-)
+db <- dbxConnect(adapter=odbc::odbc(), driver="/usr/local/lib/psqlodbca.so", database="dbx_test")
 
 dbExecute(db, "DROP TABLE IF EXISTS orders")
 dbExecute(db, "CREATE TABLE orders (id SERIAL PRIMARY KEY, city text)")
