@@ -34,6 +34,10 @@ isODBCMySQL <- function(conn) {
   inherits(conn, "MySQL")
 }
 
+isSQLServer <- function(conn) {
+  inherits(conn, "Microsoft SQL Server")
+}
+
 isODBC <- function(conn) {
   !is.null(attr(conn, "info")$odbc.version)
 }

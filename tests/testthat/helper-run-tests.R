@@ -152,7 +152,7 @@ runTests <- function(db, redshift=FALSE) {
   })
 
   test_that("upsert works", {
-    skip_if(isSQLite(db) || redshift)
+    skip_if(isSQLite(db) || redshift || isSQLServer(db))
 
     upsert_orders <- data.frame(id=c(3, 5), city=c("Boston", "Chicago"))
     dbxUpsert(db, "orders", upsert_orders, where_cols=c("id"))
@@ -425,7 +425,7 @@ runTests <- function(db, redshift=FALSE) {
 
   test_that("time zone is UTC", {
     # always utc
-    skip_if(isSQLite(db))
+    skip_if(isSQLite(db) || isSQLServer(db))
 
     if (isPostgres(db)) {
       expect_equal("UTC", dbxSelect(db, "SHOW timezone")$TimeZone)
@@ -487,7 +487,7 @@ runTests <- function(db, redshift=FALSE) {
   })
 
   test_that("binary works", {
-    skip_if(redshift)
+    skip_if(redshift || isODBCPostgres(db) || isSQLServer(db))
 
     dbxDelete(db, "events")
 
@@ -508,7 +508,7 @@ runTests <- function(db, redshift=FALSE) {
   })
 
   test_that("blob with binary works", {
-    skip_if(redshift)
+    skip_if(redshift || isODBCPostgres(db) || isSQLServer(db))
 
     dbxDelete(db, "events")
 
@@ -541,6 +541,8 @@ runTests <- function(db, redshift=FALSE) {
   # very important
   # shows typecasting is consistent
   test_that("can update what what just selected and get same result", {
+    skip_if(isODBCPostgres(db) || isSQLServer(db))
+
     dbxDelete(db, "events")
 
     df <- data.frame(

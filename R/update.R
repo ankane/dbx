@@ -45,12 +45,16 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
 }
 
 withTransaction <- function(conn, code) {
-  tryCatch({
+  if (isSQLServer(conn)) {
+    DBI::dbWithTransaction(conn, code)
+  } else {
     execute(conn, "BEGIN")
-    eval(code)
-    execute(conn, "COMMIT")
-  }, error=function(err) {
-    execute(conn, "ROLLBACK")
-    stop(err)
-  })
+    tryCatch({
+      eval(code)
+      execute(conn, "COMMIT")
+    }, error=function(err) {
+      execute(conn, "ROLLBACK")
+      stop(err)
+    })
+  }
 }

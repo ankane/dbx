@@ -1,4 +1,4 @@
-#' @importFrom DBI dbConnect dbDisconnect dbExecute dbQuoteIdentifier dbQuoteLiteral dbSendQuery dbFetch dbClearResult dbHasCompleted dbColumnInfo
+#' @importFrom DBI dbConnect dbDisconnect dbExecute dbQuoteIdentifier dbQuoteLiteral dbSendQuery dbFetch dbClearResult dbHasCompleted dbColumnInfo dbWithTransaction
 
 isPostgres <- function(conn) {
   isRPostgreSQL(conn) || isRPostgres(conn) || isODBCPostgres(conn)
@@ -34,6 +34,10 @@ isSQLite <- function(conn) {
 
 isODBCMySQL <- function(conn) {
   inherits(conn, "MySQL")
+}
+
+isSQLServer <- function(conn) {
+  inherits(conn, "Microsoft SQL Server")
 }
 
 isODBC <- function(conn) {
@@ -251,6 +255,14 @@ quoteRecords <- function(conn, records) {
     } else if (isSQLite(conn)) {
       # since no standard, store dates and datetimes in the same format as Rails
       # store times without dates as strings to keep things simple
+      if (isDatetime(col)) {
+        col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
+      } else if (isDate(col)) {
+        col <- format(col)
+      } else if (isTime(col)) {
+        col <- format(col)
+      }
+    } else if (isSQLServer(conn)) {
       if (isDatetime(col)) {
         col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
       } else if (isDate(col)) {
