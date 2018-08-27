@@ -31,6 +31,7 @@ And follow the instructions for your database
 - [Postgres](#postgres)
 - [MySQL](#mysql)
 - [SQLite](#sqlite)
+- [SQL Server](#sql-server)
 - [Redshift](#redshift)
 - [Others](#others)
 
@@ -95,6 +96,24 @@ library(dbx)
 
 db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 ```
+
+### SQL Server
+
+Install the R package
+
+```r
+install.packages("odbc")
+```
+
+And use:
+
+```r
+library(dbx)
+
+db <- dbxConnect(adapter=odbc::odbc(), database="mydb")
+```
+
+You can also pass `uid`, `pwd`, `server`, and `port`.
 
 ### Redshift
 
