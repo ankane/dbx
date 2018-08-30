@@ -7,3 +7,6 @@ inTimeZone <- function(tz, code) {
     Sys.setenv(TZ=previous_tz)
   })
 }
+
+# set time zone
+Sys.setenv(TZ="America/Los_Angeles")
