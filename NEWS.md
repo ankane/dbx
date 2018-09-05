@@ -1,4 +1,4 @@
-# dbx 0.2.2 [unreleased]
+# dbx 0.2.2
 
 - Added statement duration to logging
 - Added logging for `dbxUpdate` transaction
@@ -6,6 +6,7 @@
 - Added `connect_timeout`, `sslcert`, `sslkey`, and `sslcrl` for RPostgreSQL
 - Prefer `dbx_logging` over `dbx_verbose`
 - Improved support for ODBC
+- Fixed error with `dbxUpsert`
 
 # dbx 0.2.1
 

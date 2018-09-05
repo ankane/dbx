@@ -205,7 +205,7 @@ dbxDelete(db, table)
 Log all SQL queries with:
 
 ```r
-options(dbx_verbose=TRUE)
+options(dbx_logging=TRUE)
 ```
 
 Customize logging by passing a function
@@ -215,7 +215,7 @@ logQuery <- function(sql) {
   # your logging code
 }
 
-options(dbx_verbose=logQuery)
+options(dbx_logging=logQuery)
 ```
 
 ## Database Credentials
@@ -264,7 +264,7 @@ db <- dbxConnect(adapter="mysql", ssl.ca="ca.pem")
 
 Please [let us know](https://github.com/ankane/dbx/issues/new) if you have a way that works with RMySQL.
 
-## Variables [master]
+## Variables
 
 Set session variables with:
 
@@ -272,7 +272,7 @@ Set session variables with:
 db <- dbxConnect(variables=list(search_path="archive"))
 ```
 
-## Timeouts [master]
+## Timeouts
 
 Set a statement timeout with:
 
