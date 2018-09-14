@@ -246,53 +246,6 @@ If you have multiple databases, use a different variable name, and:
 db <- dbxConnect(url=Sys.getenv("OTHER_DATABASE_URL"))
 ```
 
-## Security
-
-When connecting to a remote database, make sure your connection is secure.
-
-With Postgres, use:
-
-```r
-db <- dbxConnect(adapter="postgres", sslmode="verify-full", sslrootcert="ca.pem")
-```
-
-With RMariaDB, use:
-
-```r
-db <- dbxConnect(adapter="mysql", ssl.ca="ca.pem")
-```
-
-Please [let us know](https://github.com/ankane/dbx/issues/new) if you have a way that works with RMySQL.
-
-## Variables
-
-Set session variables with:
-
-```r
-db <- dbxConnect(variables=list(search_path="archive"))
-```
-
-## Timeouts
-
-Set a statement timeout with:
-
-```r
-# Postgres
-db <- dbxConnect(variables=list(statement_timeout=1000)) # ms
-
-# MySQL 5.7.8+
-db <- dbxConnect(variables=list(max_execution_time=1000)) # ms
-
-# MariaDB 10.1.1+
-db <- dbxConnect(variables=list(max_statement_time=1)) # sec
-```
-
-With Postgres, set a connect timeout with:
-
-```r
-db <- dbxConnect(connect_timeout=3)
-```
-
 ## Batching
 
 By default, operations are performed in a single statement or transaction. This is better for performance and prevents partial writes on failures. However, when working with large data frames on production systems, it can be better to break writes into batches. Use the `batch_size` option to do this.
@@ -441,6 +394,53 @@ tryCatch({
 ```
 
 In the future, dbx commands may work directly with pools.
+
+## Security
+
+When connecting to a database over a network you don’t fully trust, make sure your connection is secure.
+
+With Postgres, use:
+
+```r
+db <- dbxConnect(adapter="postgres", sslmode="verify-full", sslrootcert="ca.pem")
+```
+
+With RMariaDB, use:
+
+```r
+db <- dbxConnect(adapter="mysql", ssl.ca="ca.pem")
+```
+
+Please [let us know](https://github.com/ankane/dbx/issues/new) if you have a way that works with RMySQL.
+
+## Variables
+
+Set session variables with:
+
+```r
+db <- dbxConnect(variables=list(search_path="archive"))
+```
+
+## Timeouts
+
+Set a statement timeout with:
+
+```r
+# Postgres
+db <- dbxConnect(variables=list(statement_timeout=1000)) # ms
+
+# MySQL 5.7.8+
+db <- dbxConnect(variables=list(max_execution_time=1000)) # ms
+
+# MariaDB 10.1.1+
+db <- dbxConnect(variables=list(max_statement_time=1)) # sec
+```
+
+With Postgres, set a connect timeout with:
+
+```r
+db <- dbxConnect(connect_timeout=3)
+```
 
 ## Reference
 
