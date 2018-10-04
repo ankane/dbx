@@ -137,6 +137,16 @@ Create a data frame of records from a SQL query
 records <- dbxSelect(db, "SELECT * FROM forecasts")
 ```
 
+Pass parameters [master]
+
+```r
+dbxSelect(db, "SELECT * FROM forecasts WHERE period = ? AND temperature > ?", params=list("hour", 27))
+```
+
+> For Postgres, use positional placeholders like `$1` and `$2` instead of `?`
+
+> Parameters are not supported with RMySQL
+
 ### Insert
 
 Insert records

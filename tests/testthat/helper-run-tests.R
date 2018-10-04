@@ -574,5 +574,9 @@ runTests <- function(db, redshift=FALSE) {
     expect_equal(res, all)
   })
 
+  if (!isRMySQL(db)) {
+    runParamsTests(db)
+  }
+
   dbxDisconnect(db)
 }

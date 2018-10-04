@@ -1,4 +1,4 @@
-#' @importFrom DBI dbConnect dbDisconnect dbExecute dbQuoteIdentifier dbQuoteLiteral dbSendQuery dbFetch dbClearResult dbHasCompleted dbColumnInfo dbWithTransaction
+#' @importFrom DBI dbConnect dbDisconnect dbExecute dbQuoteIdentifier dbQuoteLiteral dbSendQuery dbFetch dbClearResult dbHasCompleted dbColumnInfo dbBind
 
 isPostgres <- function(conn) {
   isRPostgreSQL(conn) || isRPostgres(conn) || isODBCPostgres(conn)
@@ -228,50 +228,57 @@ quoteIdent <- function(conn, cols) {
 quoteRecords <- function(conn, records) {
   quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
   for (i in 1:ncol(records)) {
-    col <- records[, i]
-    if (isMySQL(conn)) {
-      if (isDatetime(col)) {
-        col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
-      } else if (isDate(col)) {
-        col <- format(col)
-      } else if (isTime(col)) {
-        col <- format(col)
-      }
-    } else if (isPostgres(conn)) {
-      if (isDatetime(col)) {
-        col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6 %Z")
-      } else if (isTime(col)) {
-        col <- format(col)
-      } else if (isLogical(col) && (isRPostgreSQL(conn) || isODBCPostgres(conn))) {
-        col <- as.character(col)
-      } else if (isBinary(col)) {
-        if (isRPostgreSQL(conn)) {
-          col <- as.character(lapply(col, function(x) { RPostgreSQL::postgresqlEscapeBytea(conn, x) }))
-        } else {
-          # removes AsIs
-          col <- blob::as.blob(lapply(col, function(x) { x }))
-        }
-      }
-    } else if (isSQLite(conn)) {
-      # since no standard, store dates and datetimes in the same format as Rails
-      # store times without dates as strings to keep things simple
-      if (isDatetime(col)) {
-        col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
-      } else if (isDate(col)) {
-        col <- format(col)
-      } else if (isTime(col)) {
-        col <- format(col)
-      }
-    } else if (isSQLServer(conn)) {
-      if (isDatetime(col)) {
-        col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
-      } else if (isDate(col)) {
-        col <- format(col)
-      } else if (isTime(col)) {
-        col <- format(col)
-      }
-    }
+    col <- castData(conn, records[, i])
     quoted_records[, i] <- dbQuoteLiteral(conn, col)
   }
   quoted_records
+}
+
+castData <- function(conn, col) {
+  if (isMySQL(conn)) {
+    if (isDatetime(col)) {
+      col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
+    } else if (isDate(col)) {
+      col <- format(col)
+    } else if (isTime(col)) {
+      col <- format(col)
+    }
+  } else if (isPostgres(conn)) {
+    if (isDatetime(col)) {
+      col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6 %Z")
+    } else if (isTime(col)) {
+      col <- format(col)
+    } else if (isLogical(col) && isRPostgreSQL(conn)) {
+      col <- as.character(col)
+    } else if (isDate(col) && isRPostgreSQL(conn)) {
+      col <- format(col)
+    } else if (isBinary(col)) {
+      if (isRPostgreSQL(conn)) {
+        col <- as.character(lapply(col, function(x) { RPostgreSQL::postgresqlEscapeBytea(conn, x) }))
+      } else {
+        # removes AsIs
+        col <- blob::as.blob(lapply(col, function(x) { x }))
+      }
+    }
+  } else if (isSQLite(conn)) {
+    # since no standard, store dates and datetimes in the same format as Rails
+    # store times without dates as strings to keep things simple
+    if (isDatetime(col)) {
+      col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
+    } else if (isDate(col)) {
+      col <- format(col)
+    } else if (isTime(col)) {
+      col <- format(col)
+    }
+  } else if (isSQLServer(conn)) {
+    if (isDatetime(col)) {
+      col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
+    } else if (isDate(col)) {
+      col <- format(col)
+    } else if (isTime(col)) {
+      col <- format(col)
+    }
+  }
+
+  col
 }

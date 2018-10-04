@@ -4,12 +4,14 @@
 \alias{dbxSelect}
 \title{Select records}
 \usage{
-dbxSelect(conn, statement)
+dbxSelect(conn, statement, params = NULL)
 }
 \arguments{
 \item{conn}{A DBIConnection object}
 
 \item{statement}{The SQL statement to use}
+
+\item{params}{Parameters to bind}
 }
 \description{
 Select records

@@ -2,13 +2,14 @@
 #'
 #' @param conn A DBIConnection object
 #' @param statement The SQL statement to use
+#' @param params Parameters to bind
 #' @export
 #' @examples
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
 #' DBI::dbCreateTable(db, "forecasts", data.frame(id=1:3, temperature=20:22))
 #'
 #' records <- dbxSelect(db, "SELECT * FROM forecasts")
-dbxSelect <- function(conn, statement) {
+dbxSelect <- function(conn, statement, params=NULL) {
   statement <- processStatement(statement)
   cast_dates <- list()
   cast_datetimes <- list()
@@ -19,7 +20,7 @@ dbxSelect <- function(conn, statement) {
   fix_timetz <- list()
   change_tz <- list()
 
-  r <- fetchRecords(conn, statement)
+  r <- fetchRecords(conn, statement, params)
   records <- r$records
   column_info <- r$column_info
 
@@ -145,14 +146,28 @@ dbxSelect <- function(conn, statement) {
   records
 }
 
-fetchRecords <- function(conn, statement) {
+fetchRecords <- function(conn, statement, params) {
   ret <- list()
   column_info <- NULL
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown (", "Decimal MySQL column"), {
     res <- NULL
     timeStatement(statement, {
-      res <- dbSendQuery(conn, statement)
+      if (!is.null(params)) {
+        # cast params
+        params <- lapply(params, function(x) { castData(conn, x) })
+
+        if (isRMySQL(conn)) {
+          # doesn't support params argument, but not working
+          # res <- dbSendQuery(conn, statement)
+          # dbBind(res, params)
+          stop("Params not supported with RMySQL")
+        } else {
+          res <- dbSendQuery(conn, statement, params=params)
+        }
+      } else {
+        res <- dbSendQuery(conn, statement)
+      }
     })
 
     # always fetch at least once
