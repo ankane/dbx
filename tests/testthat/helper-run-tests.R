@@ -9,7 +9,7 @@ runTests <- function(db, redshift=FALSE) {
   runUpdateTests(db)
   runUpsertTests(db, redshift=redshift)
   runDeleteTests(db)
-  runDataTypeTests(db)
+  runDataTypeTests(db, redshift=redshift)
 
   rm(".testthat_db", envir = .GlobalEnv)
 
