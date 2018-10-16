@@ -2,7 +2,7 @@
 Sys.setenv(TZ="America/Los_Angeles")
 
 runTests <- function(db, redshift=FALSE) {
-  assign(".testthat_db", db, envir = .GlobalEnv)
+  assign(".testthat_db", db, envir=.GlobalEnv)
 
   runSelectTests(db)
   runInsertTests(db, redshift=redshift)
@@ -11,7 +11,7 @@ runTests <- function(db, redshift=FALSE) {
   runDeleteTests(db)
   runDataTypeTests(db, redshift=redshift)
 
-  rm(".testthat_db", envir = .GlobalEnv)
+  rm(".testthat_db", envir=.GlobalEnv)
 
   dbxDisconnect(db)
 }
