@@ -1,6 +1,9 @@
-# dbx 0.2.2
+# dbx 0.2.3 [unreleased]
 
 - Added parameters for `dbxSelect`
+
+# dbx 0.2.2
+
 - Added statement duration to logging
 - Added logging for `dbxUpdate` transaction
 - Added `variables` to `dbxConnect`
