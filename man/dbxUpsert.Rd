@@ -5,7 +5,7 @@
 \title{Upsert records}
 \usage{
 dbxUpsert(conn, table, records, where_cols, batch_size = NULL,
-  returning = NULL)
+  returning = NULL, ignore_dups = FALSE)
 }
 \arguments{
 \item{conn}{A DBIConnection object}
@@ -19,6 +19,8 @@ dbxUpsert(conn, table, records, where_cols, batch_size = NULL,
 \item{batch_size}{The number of records to upsert in a single statement (defaults to all)}
 
 \item{returning}{Columns to return}
+
+\item{ignore_dups}{Ignore duplicate rows}
 }
 \description{
 Upsert records

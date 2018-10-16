@@ -29,6 +29,19 @@ runUpsertTests <- function(db, redshift=FALSE) {
     expect_equal(res$city, c("San Francisco", "Boston", NA))
   })
 
+  test_that("upsert ignore_dups works", {
+    skip_if_not(upsertSupported())
+
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+
+    upsert_events <- data.frame(id=c(2, 3), city=c("Chicago", "New York"))
+    dbxUpsert(db, "events", upsert_events, where_cols=c("id"), ignore_dups=TRUE)
+
+    res <- dbxSelect(db, "SELECT city FROM events ORDER BY id")
+    expect_equal(res$city, c("San Francisco", "Boston", "New York"))
+  })
+
   test_that("upsert missing column raises error", {
     skip_if_not(upsertSupported())
 

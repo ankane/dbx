@@ -6,6 +6,7 @@
 #' @param where_cols The columns to use for WHERE clause
 #' @param batch_size The number of records to upsert in a single statement (defaults to all)
 #' @param returning Columns to return
+#' @param ignore_dups Ignore duplicate rows
 #' @export
 #' @examples \dontrun{
 #'
@@ -16,7 +17,7 @@
 #' records <- data.frame(id=c(3, 4), temperature=c(20, 25))
 #' dbxUpsert(db, table, records, where_cols=c("id"))
 #' }
-dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL, returning=NULL) {
+dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL, returning=NULL, ignore_dups=FALSE) {
   cols <- colnames(records)
 
   if (!identical(intersect(cols, where_cols), where_cols)) {
@@ -35,14 +36,25 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL, returni
   inBatches(records, batch_size, function(batch) {
     if (isMySQL(conn)) {
       sql <- insertClause(conn, table, batch)
-      set_sql <- upsertSetClause(quoted_update_cols)
+      if (ignore_dups) {
+        # do not use INSERT IGNORE
+        # https://stackoverflow.com/questions/2366813/on-duplicate-key-ignore
+        set_sql <- upsertSetClause(quoted_where_cols)
+      } else {
+        set_sql <- upsertSetClause(quoted_update_cols)
+      }
       sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
       selectOrExecute(conn, sql, batch, returning=returning)
     } else {
       conflict_target <- colsClause(quoted_where_cols)
       sql <- insertClause(conn, table, batch)
-      set_sql <- upsertSetClausePostgres(quoted_update_cols)
-      sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO UPDATE SET ", set_sql)
+      sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO")
+      if (ignore_dups) {
+        sql <- paste(sql, "NOTHING")
+      } else {
+        set_sql <- upsertSetClausePostgres(quoted_update_cols)
+        sql <- paste(sql, "UPDATE SET", set_sql)
+      }
       selectOrExecute(conn, sql, batch, returning=returning)
     }
   })
