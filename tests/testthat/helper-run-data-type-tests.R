@@ -1,7 +1,5 @@
 runDataTypeTests <- function(db, redshift=FALSE) {
   test_that("integer works", {
-    dbxDelete(db, "events")
-
     events <- data.frame(counter=c(1, 2))
     dbxInsert(db, "events", events)
 
@@ -10,8 +8,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("float works", {
-    dbxDelete(db, "events")
-
     events <- data.frame(speed=c(1.2, 3.4))
     dbxInsert(db, "events", events)
 
@@ -20,8 +16,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("decimal works", {
-    dbxDelete(db, "events")
-
     events <- data.frame(distance=c(1.2, 3.4))
     dbxInsert(db, "events", events)
 
@@ -30,8 +24,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("boolean works", {
-    dbxDelete(db, "events")
-
     events <- data.frame(active=c(TRUE, FALSE))
     dbxInsert(db, "events", events)
 
@@ -49,8 +41,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   test_that("json works", {
     skip_if(isRMariaDB(db))
 
-    dbxDelete(db, "events")
-
     events <- data.frame(properties=c('{"hello": "world"}'), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
@@ -60,8 +50,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
 
   test_that("jsonb works", {
     skip_if(!isPostgres(db))
-
-    dbxDelete(db, "events")
 
     events <- data.frame(propertiesb=c('{"hello": "world"}'), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
@@ -73,8 +61,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   test_that("jsonlite with jsonb works", {
     skip_if(!isPostgres(db))
 
-    dbxDelete(db, "events")
-
     events <- data.frame(propertiesb=c(jsonlite::toJSON(list(hello="world"))), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
@@ -83,8 +69,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("dates works", {
-    dbxDelete(db, "events")
-
     events <- data.frame(created_on=as.Date(c("2018-01-01", "2018-01-02")))
     dbxInsert(db, "events", events)
 
@@ -101,8 +85,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("datetimes works", {
-    dbxDelete(db, "events")
-
     t1 <- as.POSIXct("2018-01-01 12:30:55")
     t2 <- as.POSIXct("2018-01-01 16:59:59")
     events <- data.frame(updated_at=c(t1, t2))
@@ -124,8 +106,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("datetimes with time zones works", {
-    dbxDelete(db, "events")
-
     t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
     t2 <- as.POSIXct("2018-01-01 16:59:59", tz="America/New_York")
     events <- data.frame(updated_at=c(t1, t2))
@@ -149,8 +129,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   test_that("timestamp with time zone works", {
     skip_if(isSQLite(db))
 
-    dbxDelete(db, "events")
-
     t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
     t2 <- as.POSIXct("2018-01-01 16:59:59", tz="America/New_York")
     events <- data.frame(deleted_at=c(t1, t2))
@@ -166,8 +144,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("datetimes have precision", {
-    dbxDelete(db, "events")
-
     t1 <- as.POSIXct("2018-01-01 12:30:55.123456")
     events <- data.frame(updated_at=c(t1))
     dbxInsert(db, "events", events)
@@ -199,8 +175,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("times work", {
-    dbxDelete(db, "events")
-
     events <- data.frame(open_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
@@ -215,8 +189,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
 
   test_that("times with time zone work", {
     skip_if(!isPostgres(db))
-
-    dbxDelete(db, "events")
 
     events <- data.frame(close_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
@@ -236,8 +208,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("hms with times work", {
-    dbxDelete(db, "events")
-
     events <- data.frame(open_time=c(hms::as.hms("12:30:55"), hms::as.hms("16:59:59")), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
@@ -252,8 +222,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
 
   test_that("binary works", {
     skip_if(redshift || isODBCPostgres(db) || isSQLServer(db))
-
-    dbxDelete(db, "events")
 
     images <- list(1:3, 4:6)
     serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
@@ -274,8 +242,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   test_that("blob with binary works", {
     skip_if(redshift || isODBCPostgres(db) || isSQLServer(db))
 
-    dbxDelete(db, "events")
-
     images <- list(1:3, 4:6)
     serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
 
@@ -293,8 +259,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("ts uses observation values", {
-    dbxDelete(db, "events")
-
     events <- data.frame(counter=ts(1:3, start=c(2018, 1), end=c(2018, 3), frequency=12))
     dbxInsert(db, "events", events)
 
@@ -306,8 +270,6 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   # shows typecasting is consistent
   test_that("can update what what just selected and get same result", {
     skip_if(isODBCPostgres(db) || isSQLServer(db))
-
-    dbxDelete(db, "events")
 
     df <- data.frame(
       active=c(TRUE, FALSE),

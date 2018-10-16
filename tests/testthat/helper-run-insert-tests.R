@@ -1,7 +1,5 @@
 runInsertTests <- function(db, redshift=FALSE) {
   test_that("insert works", {
-    dbxDelete(db, "events")
-
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
@@ -10,16 +8,12 @@ runInsertTests <- function(db, redshift=FALSE) {
   })
 
   test_that("empty insert works", {
-    dbxDelete(db, "events")
-
     dbxInsert(db, "events", data.frame())
     expect(TRUE)
   })
 
   test_that("insert returning works", {
     skip_if(!isPostgres(db) || redshift)
-
-    dbxDelete(db, "events")
 
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     res <- dbxInsert(db, "events", events, returning=c("id", "city"))
@@ -31,8 +25,6 @@ runInsertTests <- function(db, redshift=FALSE) {
   test_that("insert returning star works", {
     skip_if(!isPostgres(db) || redshift)
 
-    dbxDelete(db, "events")
-
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     res <- dbxInsert(db, "events", events, returning=c("*"))
 
@@ -41,8 +33,6 @@ runInsertTests <- function(db, redshift=FALSE) {
   })
 
   test_that("insert batch size works", {
-    dbxDelete(db, "events")
-
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events, batch_size=1)
 

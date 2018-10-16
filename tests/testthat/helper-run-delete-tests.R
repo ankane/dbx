@@ -7,8 +7,6 @@ runDeleteTests <- function(db) {
   })
 
   test_that("delete empty does not delete rows", {
-    dbxDelete(db, "events")
-
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
@@ -20,8 +18,6 @@ runDeleteTests <- function(db) {
   })
 
   test_that("delete one column works", {
-    dbxDelete(db, "events")
-
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
@@ -33,8 +29,6 @@ runDeleteTests <- function(db) {
   })
 
   test_that("delete multiple columns works", {
-    dbxDelete(db, "events")
-
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 

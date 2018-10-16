@@ -1,7 +1,5 @@
 runSelectTests <- function(db) {
   test_that("select works", {
-    dbxDelete(db, "events")
-
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
@@ -10,8 +8,6 @@ runSelectTests <- function(db) {
   })
 
   test_that("select order works", {
-    dbxDelete(db, "events")
-
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
@@ -20,8 +16,6 @@ runSelectTests <- function(db) {
   })
 
   test_that("select columns works", {
-    dbxDelete(db, "events")
-
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
@@ -30,15 +24,11 @@ runSelectTests <- function(db) {
   })
 
   test_that("empty select works", {
-    dbxDelete(db, "events")
-
     res <- dbxSelect(db, "SELECT * FROM events")
     expect_equal(nrow(res), 0)
   })
 
   test_that("empty result", {
-    dbxDelete(db, "events")
-
     res <- dbxSelect(db, "SELECT * FROM events")
 
     # numeric
@@ -87,8 +77,6 @@ runSelectTests <- function(db) {
   })
 
   test_that("empty cells", {
-    dbxDelete(db, "events")
-
     dbxInsert(db, "events", data.frame(properties=NA))
     res <- dbxSelect(db, "SELECT * FROM events")
 
@@ -146,8 +134,6 @@ runSelectTests <- function(db) {
   test_that("integer params works", {
     skip_if(isRMySQL(db))
 
-    dbxDelete(db, "events")
-
     events <- data.frame(counter=c(1, 2))
     dbxInsert(db, "events", events)
 
@@ -159,8 +145,6 @@ runSelectTests <- function(db) {
 
   test_that("float params works", {
     skip_if(isRMySQL(db))
-
-    dbxDelete(db, "events")
 
     events <- data.frame(speed=c(1.2, 3.4))
     dbxInsert(db, "events", events)
@@ -174,8 +158,6 @@ runSelectTests <- function(db) {
   test_that("decimal params works", {
     skip_if(isRMySQL(db))
 
-    dbxDelete(db, "events")
-
     events <- data.frame(distance=c(1.2, 3.4))
     dbxInsert(db, "events", events)
 
@@ -187,8 +169,6 @@ runSelectTests <- function(db) {
 
   test_that("boolean params works", {
     skip_if(isRMySQL(db))
-
-    dbxDelete(db, "events")
 
     events <- data.frame(active=c(TRUE, FALSE))
     dbxInsert(db, "events", events)
@@ -202,8 +182,6 @@ runSelectTests <- function(db) {
   test_that("dates params works", {
     skip_if(isRMySQL(db))
 
-    dbxDelete(db, "events")
-
     events <- data.frame(created_on=as.Date(c("2018-01-01", "2018-01-02")))
     dbxInsert(db, "events", events)
 
@@ -215,8 +193,6 @@ runSelectTests <- function(db) {
 
   test_that("datetimes params works", {
     skip_if(isRMySQL(db))
-
-    dbxDelete(db, "events")
 
     t1 <- as.POSIXct("2018-01-01 12:30:55")
     t2 <- as.POSIXct("2018-01-01 16:59:59")
@@ -231,8 +207,6 @@ runSelectTests <- function(db) {
 
   test_that("times work", {
     skip_if(isRMySQL(db))
-
-    dbxDelete(db, "events")
 
     events <- data.frame(open_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
