@@ -195,10 +195,10 @@ If you use auto-incrementing ids in Postgres, you can get the ids of newly upser
 dbxUpsert(db, table, records, where_cols=c("id"), returning=c("id"))
 ```
 
-To ignore duplicates instead of updating them, use: [master]
+To skip existing rows instead of updating them, use: [master]
 
 ```r
-dbxUpsert(db, table, records, where_cols=c("id"), ignore_dups=TRUE)
+dbxUpsert(db, table, records, where_cols=c("id"), skip_existing=TRUE)
 ```
 
 ### Delete
