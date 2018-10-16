@@ -189,16 +189,16 @@ Use `where_cols` to specify the columns used for lookup. There must be a unique 
 
 *Only available for PostgreSQL 9.5+, MySQL 5.5+, and SQLite 3.24+*
 
-If you use auto-incrementing ids in Postgres, you can get the ids of newly upserted rows by passing the column name:
-
-```r
-dbxUpsert(db, table, records, where_cols=c("id"), returning=c("id"))
-```
-
 To skip existing rows instead of updating them, use: [master]
 
 ```r
 dbxUpsert(db, table, records, where_cols=c("id"), skip_existing=TRUE)
+```
+
+If you use auto-incrementing ids in Postgres, you can get the ids of newly upserted rows by passing the column name:
+
+```r
+dbxUpsert(db, table, records, where_cols=c("id"), returning=c("id"))
 ```
 
 ### Delete
