@@ -7,11 +7,11 @@ runTests <- function(db, redshift=FALSE) {
 
   # dbxInsert(db, "orders", orders)
 
-  runSelectTests(db, redshift=redshift)
+  runSelectTests(db)
   runInsertTests(db, redshift=redshift)
-  runUpdateTests(db, redshift=redshift)
+  runUpdateTests(db)
   runUpsertTests(db, redshift=redshift)
-  runDeleteTests(db, redshift=redshift)
+  runDeleteTests(db)
 
   dbxDisconnect(db)
 }

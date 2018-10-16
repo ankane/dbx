@@ -1,4 +1,4 @@
-runUpdateTests <- function(db, redshift=FALSE) {
+runUpdateTests <- function(db) {
   test_that("update works", {
     dbxDelete(db, "events")
 
