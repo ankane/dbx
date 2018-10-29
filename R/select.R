@@ -158,7 +158,7 @@ fetchRecords <- function(conn, statement, params) {
         params <- lapply(params, function(x) { castData(conn, x) })
 
         if (isPostgres(conn)) {
-          for (i in 1:nchar("?")) {
+          for (i in 1:(nchar("?") + 1)) {
             # TODO better regex
             # TODO support escaping
             # knex uses \? https://github.com/tgriesser/knex/pull/1058/files

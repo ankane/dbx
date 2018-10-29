@@ -216,4 +216,16 @@ runSelectTests <- function(db) {
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 1)
   })
+
+  test_that("multiple params works", {
+    skip_if(isRMySQL(db))
+
+    events <- data.frame(counter=c(1, 2))
+    dbxInsert(db, "events", events)
+
+    params <- list(1, 2)
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE counter = ? OR counter = ?"
+    res <- dbxSelect(db, sql, params=params)
+    expect_equal(res$count, 2)
+  })
 }
