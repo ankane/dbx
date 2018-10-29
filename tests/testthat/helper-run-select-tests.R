@@ -138,7 +138,7 @@ runSelectTests <- function(db) {
     dbxInsert(db, "events", events)
 
     params <- list(1)
-    sql <- bindSQL(db, "SELECT COUNT(*) AS count FROM events WHERE counter = $1")
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE counter = ?"
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 1)
   })
@@ -150,7 +150,7 @@ runSelectTests <- function(db) {
     dbxInsert(db, "events", events)
 
     params <- list(1.3)
-    sql <- bindSQL(db, "SELECT COUNT(*) AS count FROM events WHERE speed < $1")
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE speed < ?"
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 1)
   })
@@ -162,7 +162,7 @@ runSelectTests <- function(db) {
     dbxInsert(db, "events", events)
 
     params <- list(1.2)
-    sql <- bindSQL(db, "SELECT COUNT(*) AS count FROM events WHERE distance = $1")
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE distance = ?"
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 1)
   })
@@ -174,7 +174,7 @@ runSelectTests <- function(db) {
     dbxInsert(db, "events", events)
 
     params <- list(TRUE)
-    sql <- bindSQL(db, "SELECT COUNT(*) AS count FROM events WHERE active = $1")
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE active = ?"
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 1)
   })
@@ -186,7 +186,7 @@ runSelectTests <- function(db) {
     dbxInsert(db, "events", events)
 
     params <- list(as.Date(c("2018-01-01")))
-    sql <- bindSQL(db, "SELECT COUNT(*) AS count FROM events WHERE created_on = $1")
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE created_on = ?"
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 1)
   })
@@ -200,7 +200,7 @@ runSelectTests <- function(db) {
     dbxInsert(db, "events", events)
 
     params <- list(t1)
-    sql <- bindSQL(db, "SELECT COUNT(*) AS count FROM events WHERE updated_at = $1")
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE updated_at = ?"
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 1)
   })
@@ -212,7 +212,7 @@ runSelectTests <- function(db) {
     dbxInsert(db, "events", events)
 
     params <- list(c("12:30:55"))
-    sql <- bindSQL(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = $1")
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE open_time = ?"
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 1)
   })

@@ -143,8 +143,6 @@ Pass parameters [master]
 dbxSelect(db, "SELECT * FROM forecasts WHERE period = ? AND temperature > ?", params=list("hour", 27))
 ```
 
-> For Postgres, use positional placeholders like `$1` and `$2` instead of `?`
-
 > Parameters are not supported with RMySQL
 
 ### Insert
