@@ -204,11 +204,11 @@ runSelectTests <- function(db) {
   })
 
   test_that("multiple params works", {
-    events <- data.frame(counter=c(1, 2))
+    events <- data.frame(counter=c(1, 2), city=c("Boston", "Chicago"))
     dbxInsert(db, "events", events)
 
-    params <- list(1, 2)
-    sql <- "SELECT COUNT(*) AS count FROM events WHERE counter = ? OR counter = ?"
+    params <- list(1, "Chicago")
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE counter = ? OR city = ?"
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 2)
   })
