@@ -168,10 +168,11 @@ fetchRecords <- function(conn, statement, params) {
         }
 
         if (isRMySQL(conn)) {
-          # doesn't support params argument, but not working
-          # res <- dbSendQuery(conn, statement)
-          # dbBind(res, params)
-          stop("Params not supported with RMySQL")
+          # doesn't support params argument, and dbBind not working
+          statement <- gsub("?", "%s", statement, fixed=TRUE)
+          args <- c(list(statement), lapply(params, function(x) { dbQuoteLiteral(conn, x) }))
+          statement <- do.call(sprintf, args)
+          res <- dbSendQuery(conn, statement)
         } else {
           res <- dbSendQuery(conn, statement, params=params)
         }

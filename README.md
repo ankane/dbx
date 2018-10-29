@@ -143,8 +143,6 @@ Pass parameters [master]
 dbxSelect(db, "SELECT * FROM forecasts WHERE period = ? AND temperature > ?", params=list("hour", 27))
 ```
 
-> Parameters are not supported with RMySQL
-
 ### Insert
 
 Insert records
