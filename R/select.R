@@ -157,16 +157,6 @@ fetchRecords <- function(conn, statement, params) {
         # cast params
         params <- lapply(params, function(x) { castData(conn, x) })
 
-        if (isPostgres(conn)) {
-          for (i in 1:(nchar("?") + 1)) {
-            # TODO better regex
-            # TODO support escaping
-            # knex uses \? https://github.com/tgriesser/knex/pull/1058/files
-            # odbc uses ?? https://stackoverflow.com/questions/14779896/does-the-jdbc-spec-prevent-from-being-used-as-an-operator-outside-of-quotes
-            statement <- sub("?", paste0("$", i), statement, fixed=TRUE)
-          }
-        }
-
         if (isRMySQL(conn)) {
           # doesn't support params argument, and dbBind not working
           statement <- gsub("?", "%s", statement, fixed=TRUE)
@@ -174,6 +164,16 @@ fetchRecords <- function(conn, statement, params) {
           statement <- do.call(sprintf, args)
           res <- dbSendQuery(conn, statement)
         } else {
+          if (isPostgres(conn)) {
+            for (i in 1:(nchar("?") + 1)) {
+              # TODO better regex
+              # TODO support escaping
+              # knex uses \? https://github.com/tgriesser/knex/pull/1058/files
+              # odbc uses ?? https://stackoverflow.com/questions/14779896/does-the-jdbc-spec-prevent-from-being-used-as-an-operator-outside-of-quotes
+              statement <- sub("?", paste0("$", i), statement, fixed=TRUE)
+            }
+          }
+
           res <- dbSendQuery(conn, statement, params=params)
         }
       } else {
