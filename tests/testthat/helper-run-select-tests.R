@@ -213,7 +213,7 @@ runSelectTests <- function(db) {
     expect_equal(res$count, 2)
   })
 
-  test_that("array params works", {
+  test_that("vector params works", {
     events <- data.frame(counter=c(1, 2))
     dbxInsert(db, "events", events)
 
@@ -223,7 +223,7 @@ runSelectTests <- function(db) {
     expect_equal(res$count, 2)
   })
 
-  test_that("empty array params works", {
+  test_that("empty vector params works", {
     events <- data.frame(counter=c(1, 2))
     dbxInsert(db, "events", events)
 
