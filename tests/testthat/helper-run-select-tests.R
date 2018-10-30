@@ -227,7 +227,7 @@ runSelectTests <- function(db) {
     events <- data.frame(counter=c(1, 2))
     dbxInsert(db, "events", events)
 
-    params <- list(list())
+    params <- list(c())
     sql <- "SELECT COUNT(*) AS count FROM events WHERE counter IN (?)"
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 0)
