@@ -33,8 +33,8 @@ runInsertTests <- function(db, redshift=FALSE) {
   })
 
   test_that("insert batch size works", {
-    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
-    dbxInsert(db, "events", events, batch_size=1)
+    events <- data.frame(id=c(1, 2, 3), city=c("San Francisco", "Boston", "Chicago"), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events, batch_size=2)
 
     res <- dbxSelect(db, "SELECT id, city FROM events")
     expect_equal(res, events)

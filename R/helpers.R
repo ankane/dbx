@@ -186,7 +186,7 @@ inBatches <- function(records, batch_size, f) {
       f(records)
     } else {
       row_count <- nrow(records)
-      batch_count <- row_count / batch_size
+      batch_count <- ceiling(row_count / batch_size)
       ret <- list()
       for(i in 1:batch_count) {
         start <- ((i - 1) * batch_size) + 1
