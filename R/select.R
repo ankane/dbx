@@ -156,27 +156,23 @@ fetchRecords <- function(conn, statement, params) {
     res <- NULL
     timeStatement(statement, {
       if (!is.null(params)) {
-        quoteParam <- function(x) {
-          dbQuoteLiteral(conn, castData(conn, x))
-        }
-
-        params <- lapply(params, function(x) {
-          if (is.vector(x)) {
-            if (length(x) == 0) {
-              dbQuoteLiteral(conn, as.character(NA))
-            } else {
-              paste(lapply(x, quoteParam), collapse=",")
-            }
-          } else {
-            quoteParam(x)
-          }
-        })
-
         # count number of occurences in base R
         expected <- lengths(regmatches(statement, gregexpr("?", statement, fixed=TRUE)))
         if (length(params) != expected) {
           stop("Wrong number of params")
         }
+
+        quoteParam <- function(x) {
+          dbQuoteLiteral(conn, castData(conn, x))
+        }
+
+        params <- lapply(params, function(x) {
+          if (length(x) == 0) {
+            dbQuoteLiteral(conn, as.character(NA))
+          } else {
+            paste(lapply(x, quoteParam), collapse=",")
+          }
+        })
 
         for (param in params) {
           # TODO better regex
