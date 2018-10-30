@@ -10,5 +10,6 @@ BugReports: https://github.com/ankane/dbx/issues
 License: MIT + file LICENSE
 LazyData: TRUE
 RoxygenNote: 6.1.0
+Encoding: UTF-8
 Imports: DBI (>= 1.0.0)
 Suggests: testthat (>= 1.0.2), urltools (>= 1.7.0), RSQLite (>= 1.1-2), RMariaDB, RMySQL, RPostgres, RPostgreSQL, hms, jsonlite, blob, odbc
