@@ -11,6 +11,8 @@
 #' dbxSelect(db, "SELECT * FROM forecasts")
 #'
 #' dbxSelect(db, "SELECT * FROM forecasts WHERE id = ?", params=list(1))
+#'
+#' dbxSelect(db, "SELECT * FROM forecasts WHERE id IN (?)", params=list(1:3))
 dbxSelect <- function(conn, statement, params=NULL) {
   statement <- processStatement(statement)
   cast_dates <- list()

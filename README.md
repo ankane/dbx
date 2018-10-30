@@ -143,7 +143,11 @@ Pass parameters [master]
 dbxSelect(db, "SELECT * FROM forecasts WHERE period = ? AND temperature > ?", params=list("hour", 27))
 ```
 
-You also use `glue_sql` from [glue](https://github.com/tidyverse/glue) to construct queries.
+Parameters can also be vectors [master]
+
+```r
+dbxSelect(db, "SELECT * FROM forecasts WHERE id IN (?)", params=list(1:3))
+```
 
 ### Insert
 
