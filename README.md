@@ -137,13 +137,13 @@ Create a data frame of records from a SQL query
 records <- dbxSelect(db, "SELECT * FROM forecasts")
 ```
 
-Pass parameters [master]
+Pass parameters
 
 ```r
 dbxSelect(db, "SELECT * FROM forecasts WHERE period = ? AND temperature > ?", params=list("hour", 27))
 ```
 
-Parameters can also be vectors [master]
+Parameters can also be vectors
 
 ```r
 dbxSelect(db, "SELECT * FROM forecasts WHERE id IN (?)", params=list(1:3))
@@ -191,7 +191,7 @@ Use `where_cols` to specify the columns used for lookup. There must be a unique 
 
 *Only available for PostgreSQL 9.5+, MySQL 5.5+, and SQLite 3.24+*
 
-To skip existing rows instead of updating them, use: [master]
+To skip existing rows instead of updating them, use:
 
 ```r
 dbxUpsert(db, table, records, where_cols=c("id"), skip_existing=TRUE)

@@ -1,4 +1,4 @@
-# dbx 0.2.3 [unreleased]
+# dbx 0.2.3
 
 - Added parameters for `dbxSelect`
 - Added `skip_existing` option to `dbxUpsert`
