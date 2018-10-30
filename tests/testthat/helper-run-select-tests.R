@@ -212,4 +212,33 @@ runSelectTests <- function(db) {
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 2)
   })
+
+  test_that("array params works", {
+    events <- data.frame(counter=c(1, 2))
+    dbxInsert(db, "events", events)
+
+    params <- list(events$counter)
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE counter IN (?)"
+    res <- dbxSelect(db, sql, params=params)
+    expect_equal(res$count, 2)
+  })
+
+  test_that("empty array params works", {
+    events <- data.frame(counter=c(1, 2))
+    dbxInsert(db, "events", events)
+
+    params <- list(list())
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE counter IN (?)"
+    res <- dbxSelect(db, sql, params=params)
+    expect_equal(res$count, 0)
+  })
+
+  test_that("wrong params", {
+    events <- data.frame(counter=c(1, 2))
+    dbxInsert(db, "events", events)
+
+    params <- list(1)
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE id = ? AND counter = ?"
+    expect_error(dbxSelect(db, sql, params=params), "Wrong number of params")
+  })
 }

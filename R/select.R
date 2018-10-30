@@ -156,31 +156,38 @@ fetchRecords <- function(conn, statement, params) {
     res <- NULL
     timeStatement(statement, {
       if (!is.null(params)) {
-        # cast params
-        params <- lapply(params, function(x) { castData(conn, x) })
-
-        if (isRMySQL(conn)) {
-          # doesn't support params argument, and dbBind not working
-          statement <- gsub("?", "%s", statement, fixed=TRUE)
-          args <- c(list(statement), lapply(params, function(x) { dbQuoteLiteral(conn, x) }))
-          statement <- do.call(sprintf, args)
-          res <- dbSendQuery(conn, statement)
-        } else {
-          if (isPostgres(conn)) {
-            for (i in 1:(nchar("?") + 1)) {
-              # TODO better regex
-              # TODO support escaping
-              # knex uses \? https://github.com/tgriesser/knex/pull/1058/files
-              # odbc uses ?? https://stackoverflow.com/questions/14779896/does-the-jdbc-spec-prevent-from-being-used-as-an-operator-outside-of-quotes
-              statement <- sub("?", paste0("$", i), statement, fixed=TRUE)
-            }
-          }
-
-          res <- dbSendQuery(conn, statement, params=params)
+        quoteParam <- function(x) {
+          dbQuoteLiteral(conn, castData(conn, x))
         }
-      } else {
-        res <- dbSendQuery(conn, statement)
+
+        params <- lapply(params, function(x) {
+          if (is.vector(x)) {
+            if (length(x) == 0) {
+              dbQuoteLiteral(conn, as.character(NA))
+            } else {
+              paste(lapply(x, quoteParam), collapse=",")
+            }
+          } else {
+            quoteParam(x)
+          }
+        })
+
+        # count number of occurences in base R
+        expected <- lengths(regmatches(statement, gregexpr("?", statement, fixed=TRUE)))
+        if (length(params) != expected) {
+          stop("Wrong number of params")
+        }
+
+        for (param in params) {
+          # TODO better regex
+          # TODO support escaping
+          # knex uses \? https://github.com/tgriesser/knex/pull/1058/files
+          # odbc uses ?? https://stackoverflow.com/questions/14779896/does-the-jdbc-spec-prevent-from-being-used-as-an-operator-outside-of-quotes
+          statement <- sub("?", param, statement, fixed=TRUE)
+        }
       }
+
+      res <- dbSendQuery(conn, statement)
     })
 
     # always fetch at least once
