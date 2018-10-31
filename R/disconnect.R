@@ -7,5 +7,5 @@
 #'
 #' dbxDisconnect(db)
 dbxDisconnect <- function(conn) {
-  dbDisconnect(conn)
+  DBI::dbDisconnect(conn)
 }

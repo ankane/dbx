@@ -109,11 +109,11 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
     params$bigint <- "numeric"
   }
 
-  conn <- do.call(dbConnect, c(obj, params))
+  conn <- do.call(DBI::dbConnect, c(obj, params))
 
   if (!is.null(storage_tz)) {
     if (!isPostgres(conn)) {
-      dbDisconnect(conn)
+      dbxDisconnect(conn)
       stop("storage_tz is only supported with Postgres")
     }
     attr(conn, "dbx_storage_tz") <- storage_tz
@@ -121,14 +121,14 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
 
   # other adapters do this automatically
   if (isRPostgreSQL(conn) || isODBCPostgres(conn)) {
-    dbExecute(conn, "SET timezone TO 'UTC'")
+    DBI::dbExecute(conn, "SET timezone TO 'UTC'")
   } else if (isRMySQL(conn) || isODBCMySQL(conn)) {
-    dbExecute(conn, "SET time_zone = '+00:00'")
+    DBI::dbExecute(conn, "SET time_zone = '+00:00'")
   }
 
   for (k in names(variables)) {
     # variables not protected against injection
-    dbExecute(conn, paste0("SET ", k, " = ", variables[[k]]))
+    DBI::dbExecute(conn, paste0("SET ", k, " = ", variables[[k]]))
   }
 
   conn

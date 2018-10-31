@@ -165,12 +165,12 @@ fetchRecords <- function(conn, statement, params) {
         }
 
         quoteParam <- function(x) {
-          dbQuoteLiteral(conn, castData(conn, x))
+          DBI::dbQuoteLiteral(conn, castData(conn, x))
         }
 
         params <- lapply(params, function(x) {
           if (length(x) == 0) {
-            dbQuoteLiteral(conn, as.character(NA))
+            DBI::dbQuoteLiteral(conn, as.character(NA))
           } else {
             paste(lapply(x, quoteParam), collapse=",")
           }
@@ -185,19 +185,19 @@ fetchRecords <- function(conn, statement, params) {
         }
       }
 
-      res <- dbSendQuery(conn, statement)
+      res <- DBI::dbSendQuery(conn, statement)
     })
 
     # always fetch at least once
-    ret[[length(ret) + 1]] <- dbFetch(res)
+    ret[[length(ret) + 1]] <- DBI::dbFetch(res)
 
     # must come after first fetch call for SQLite
-    column_info <- dbColumnInfo(res)
+    column_info <- DBI::dbColumnInfo(res)
 
-    while (!dbHasCompleted(res)) {
-      ret[[length(ret) + 1]] <- dbFetch(res)
+    while (!DBI::dbHasCompleted(res)) {
+      ret[[length(ret) + 1]] <- DBI::dbFetch(res)
     }
-    dbClearResult(res)
+    DBI::dbClearResult(res)
   })
 
   list(records=combineResults(ret), column_info=column_info)
