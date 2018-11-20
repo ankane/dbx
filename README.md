@@ -415,7 +415,7 @@ In the future, dbx commands may work directly with pools.
 
 ## Security
 
-When connecting to a database over a network you don’t fully trust, make sure your connection is secure.
+When connecting to a database over a network you don’t fully trust, make sure your [connection is secure](https://ankane.org/postgres-sslmode-explained).
 
 With Postgres, use:
 
@@ -457,7 +457,7 @@ db <- dbxConnect(variables=list(max_statement_time=1)) # sec
 With Postgres, set a connect timeout with:
 
 ```r
-db <- dbxConnect(connect_timeout=3)
+db <- dbxConnect(connect_timeout=3) # sec
 ```
 
 ## Reference
