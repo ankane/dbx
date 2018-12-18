@@ -2,7 +2,7 @@
 % Please edit documentation in R/execute.R
 \name{dbxExecute}
 \alias{dbxExecute}
-\title{Execute statement}
+\title{Execute a statement}
 \usage{
 dbxExecute(conn, statement, params = NULL)
 }
@@ -14,7 +14,7 @@ dbxExecute(conn, statement, params = NULL)
 \item{params}{Parameters to bind}
 }
 \description{
-Execute statement
+Execute a statement
 }
 \examples{
 db <- dbxConnect(adapter="sqlite", dbname=":memory:")

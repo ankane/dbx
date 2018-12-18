@@ -220,7 +220,7 @@ dbxDelete(db, table)
 
 ### Execute [master]
 
-Execute statement
+Execute a statement
 
 ```r
 dbxExecute(db, "UPDATE forecasts SET temperature = temperature + 1")

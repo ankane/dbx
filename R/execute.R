@@ -1,4 +1,4 @@
-#' Execute statement
+#' Execute a statement
 #'
 #' @param conn A DBIConnection object
 #' @param statement The SQL statement to use
