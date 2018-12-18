@@ -146,6 +146,38 @@ execute <- function(conn, statement) {
   })
 }
 
+addParams <- function(conn, statement, params) {
+  if (!is.null(params)) {
+    # count number of occurences in base R
+    expected <- lengths(regmatches(statement, gregexpr("?", statement, fixed=TRUE)))
+    if (length(params) != expected) {
+      stop("Wrong number of params")
+    }
+
+    quoteParam <- function(x) {
+      DBI::dbQuoteLiteral(conn, castData(conn, x))
+    }
+
+    params <- lapply(params, function(x) {
+      if (length(x) == 0) {
+        DBI::dbQuoteLiteral(conn, as.character(NA))
+      } else {
+        paste(lapply(x, quoteParam), collapse=",")
+      }
+    })
+
+    for (param in params) {
+      # TODO better regex
+      # TODO support escaping
+      # knex uses \? https://github.com/tgriesser/knex/pull/1058/files
+      # odbc uses ?? https://stackoverflow.com/questions/14779896/does-the-jdbc-spec-prevent-from-being-used-as-an-operator-outside-of-quotes
+      statement <- sub("?", param, statement, fixed=TRUE)
+    }
+  }
+
+  statement
+}
+
 processStatement <- function(statement) {
   comment <- getOption("dbx_comment")
 
