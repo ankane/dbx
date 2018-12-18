@@ -3,6 +3,7 @@
 export(dbxConnect)
 export(dbxDelete)
 export(dbxDisconnect)
+export(dbxExecute)
 export(dbxInsert)
 export(dbxSelect)
 export(dbxUpdate)

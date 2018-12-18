@@ -218,6 +218,20 @@ Delete all records (uses `TRUNCATE` when possible for performance)
 dbxDelete(db, table)
 ```
 
+### Execute [master]
+
+Execute statement
+
+```r
+dbxExecute(db, "UPDATE forecasts SET temperature = temperature + 1")
+```
+
+Pass parameters
+
+```r
+dbxExecute(db, "UPDATE forecasts SET temperature = ? WHERE id IN (?)", params=list(27, 1:3))
+```
+
 ## Logging
 
 Log all SQL queries with:

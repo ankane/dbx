@@ -155,10 +155,10 @@ fetchRecords <- function(conn, statement, params) {
   column_info <- NULL
 
   silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown (", "Decimal MySQL column"), {
-    res <- NULL
+    statement <- addParams(conn, statement, params)
 
+    res <- NULL
     timeStatement(statement, {
-      statement <- addParams(conn, statement, params)
       res <- DBI::dbSendQuery(conn, statement)
     })
 

@@ -1,3 +1,7 @@
+# dbx 0.2.4 [unreleased]
+
+- Added `dbxExecute` function
+
 # dbx 0.2.3
 
 - Added parameters for `dbxSelect`
