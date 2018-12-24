@@ -123,7 +123,7 @@ runSelectTests <- function(db) {
     } else {
       expect_identical(class(res$image), "list")
 
-      if (isRMariaDB(db)) {
+      if (isRMariaDB(db) || isRPostgreSQL(db)) {
         expect_identical(class(res$image[[1]]), "NULL")
       } else {
         expect_identical(res$image[[1]], as.raw(NULL))
