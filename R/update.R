@@ -28,17 +28,26 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
   quoted_update_cols <- quoteIdent(conn, update_cols)
 
   inBatches(records, batch_size, function(batch) {
-    quoted_records <- quoteRecords(conn, batch)
-    colnames(quoted_records) <- colnames(batch)
-    groups <- split(quoted_records, quoted_records[update_cols], drop=TRUE)
+    if (isPostgres(conn)) {
+      set_sql <- paste(updateSetClause(conn, update_cols), collapse=", ")
+      where_sql <- paste(updateWhereClause(conn, where_cols), collapse=" AND ")
+      quoted_cols <- DBI::dbQuoteIdentifier(conn, as.character(cols))
+      cols_sql <- paste(quoted_cols, collapse=", ")
+      sql <- paste0("UPDATE ", quoted_table, " AS t SET ", set_sql, " FROM (VALUES ", valuesClause(conn, batch), ") AS c(", cols_sql, ") WHERE ", where_sql)
+      execute(conn, sql)
+    } else {
+      quoted_records <- quoteRecords(conn, batch)
+      colnames(quoted_records) <- colnames(batch)
+      groups <- split(quoted_records, quoted_records[update_cols], drop=TRUE)
 
-    withTransaction(conn, {
-      for (group in groups) {
-        row <- group[1,, drop=FALSE]
-        sql <- paste("UPDATE", quoted_table, "SET", setClause(quoted_update_cols, row[update_cols]), "WHERE", whereClause(quoted_where_cols, group[where_cols]))
-        execute(conn, sql)
-      }
-    })
+      withTransaction(conn, {
+        for (group in groups) {
+          row <- group[1,, drop=FALSE]
+          sql <- paste("UPDATE", quoted_table, "SET", setClause(quoted_update_cols, row[update_cols]), "WHERE", whereClause(quoted_where_cols, group[where_cols]))
+          execute(conn, sql)
+        }
+      })
+    }
   })
 
   invisible()
@@ -57,4 +66,20 @@ withTransaction <- function(conn, code) {
       stop(err)
     })
   }
+}
+
+updateSetClause <- function(conn, cols) {
+  set <- c()
+  for (i in cols) {
+    set <- c(set, paste0(DBI::dbQuoteIdentifier(conn, i), " = c.", DBI::dbQuoteIdentifier(conn, i)))
+  }
+  set
+}
+
+updateWhereClause <- function(conn, cols) {
+  set <- c()
+  for (i in cols) {
+    set <- c(set, paste0("c.", DBI::dbQuoteIdentifier(conn, i), " = t.", DBI::dbQuoteIdentifier(conn, i)))
+  }
+  set
 }
