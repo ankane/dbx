@@ -293,7 +293,7 @@ castData <- function(conn, col) {
         # removes AsIs
         col <- blob::as.blob(lapply(col, function(x) { x }))
       }
-    } else if (isRPostgres(conn) && isDifftime(col)) {
+    } else if (isDifftime(col) && isRPostgres(conn)) {
       col <- as.character(col)
     }
   } else if (isSQLite(conn)) {
