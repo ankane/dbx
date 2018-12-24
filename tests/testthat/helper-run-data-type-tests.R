@@ -297,6 +297,7 @@ runDataTypeTests <- function(db, redshift=FALSE) {
     expect_equal(nrow(res), 1)
 
     if (isRMySQL(db)) {
+      # RMySQL cannot return binary data
       expect_equal(res$image[[1]], as.character(NA))
     } else {
       expect_null(res$image[[1]])

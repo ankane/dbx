@@ -118,7 +118,7 @@ runSelectTests <- function(db) {
 
     # binary
     if (isRMySQL(db)) {
-      # no way to tell text and blobs apart
+      # RMySQL cannot return binary data
       expect_identical(class(res$image), "character")
     } else {
       expect_identical(class(res$image), "list")
