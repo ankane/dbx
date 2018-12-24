@@ -393,6 +393,14 @@ hexToRaw <- function(x) {
 records$column <- lapply(records$column, hexToRaw)
 ```
 
+### Bigint
+
+BIGINT columns are returned as `numeric` vectors. The `numeric` type in R rounds values above 2<sup>53</sup>. Some libraries (RPostgres, RMariaDB, RSQLite, ODBC) support returning `bit64::integer64` vectors instead.
+
+```r
+dbxConnect(bigint="integer64")
+```
+
 ## Connection Pooling
 
 Install the [pool](https://cran.r-project.org/package=pool) package
