@@ -125,7 +125,10 @@ dbxSelect <- function(conn, statement, params=NULL) {
 
     uncast_blobs <- which(sapply(records, isBlob))
     for (i in uncast_blobs) {
-      records[[colnames(records)[i]]] <- lapply(records[, i], as.raw)
+      col <- lapply(records[, i], as.raw)
+      null_vector <- as.raw(NULL)
+      col <- lapply(col, function(x) { if (identical(x, null_vector)) NULL else x })
+      records[[colnames(records)[i]]] <- col
     }
   } else {
     for (i in cast_dates) {

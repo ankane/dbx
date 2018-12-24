@@ -2,6 +2,7 @@
 
 - Added `dbxExecute` function
 - Added support for complex types
+- Fixed issues with NULL blobs with Postgres and SQLite
 
 # dbx 0.2.3
 
