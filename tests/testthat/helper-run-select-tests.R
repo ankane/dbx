@@ -131,7 +131,7 @@ runSelectTests <- function(db) {
     }
   })
 
-  test_that("string params works", {
+  test_that("string (character) params works", {
     events <- data.frame(city=c("Boston", "San Francisco"))
     dbxInsert(db, "events", events)
 
@@ -151,7 +151,7 @@ runSelectTests <- function(db) {
     expect_equal(res$count, 1)
   })
 
-  test_that("float params works", {
+  test_that("float (double) params works", {
     events <- data.frame(speed=c(1.2, 3.4))
     dbxInsert(db, "events", events)
 
@@ -161,7 +161,7 @@ runSelectTests <- function(db) {
     expect_equal(res$count, 1)
   })
 
-  test_that("decimal params works", {
+  test_that("decimal (double) params works", {
     events <- data.frame(distance=c(1.2, 3.4))
     dbxInsert(db, "events", events)
 
@@ -171,7 +171,7 @@ runSelectTests <- function(db) {
     expect_equal(res$count, 1)
   })
 
-  test_that("boolean params works", {
+  test_that("boolean (logical) params works", {
     events <- data.frame(active=c(TRUE, FALSE))
     dbxInsert(db, "events", events)
 
