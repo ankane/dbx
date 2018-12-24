@@ -105,11 +105,11 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
     }
   }
 
-  if (is.null(params$bigint) && (inherits(obj, "PqDriver") || inherits(obj, "MariaDBDriver") || inherits(obj, "OdbcDriver") || inherits(obj, "SQLiteDriver"))) {
-    params$bigint <- "numeric"
-  }
-
   conn <- do.call(DBI::dbConnect, c(obj, params))
+
+  if (is.null(params$bigint)) {
+    attr(conn, "dbx_cast_bigint") <- TRUE
+  }
 
   if (!is.null(storage_tz)) {
     if (!isPostgres(conn)) {

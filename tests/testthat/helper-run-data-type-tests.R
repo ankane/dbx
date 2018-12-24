@@ -19,14 +19,14 @@ runDataTypeTests <- function(db, redshift=FALSE) {
     dbxExecute(db, "INSERT INTO events (bigcounter) VALUES (9007199254740991)")
     dbxSelect(db, "SELECT * FROM events ORDER BY id")
     dbxExecute(db, "INSERT INTO events (bigcounter) VALUES (9007199254740992)")
-    # expect_error(dbxSelect(db, "SELECT * FROM events ORDER BY id"), "bigint value outside range of numeric")
+    expect_error(dbxSelect(db, "SELECT * FROM events ORDER BY id"), "bigint value outside range of numeric")
   })
 
   test_that("small bigint", {
     dbxExecute(db, "INSERT INTO events (bigcounter) VALUES (-9007199254740991)")
     dbxSelect(db, "SELECT * FROM events ORDER BY id")
     dbxExecute(db, "INSERT INTO events (bigcounter) VALUES (-9007199254740992)")
-    # expect_error(dbxSelect(db, "SELECT * FROM events ORDER BY id"), "bigint value outside range of numeric")
+    expect_error(dbxSelect(db, "SELECT * FROM events ORDER BY id"), "bigint value outside range of numeric")
   })
 
   test_that("float works", {

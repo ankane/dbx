@@ -1,6 +1,10 @@
-# dbx 0.2.4 [unreleased]
+# dbx 0.3.0 [unreleased]
 
 - Added `dbxExecute` function
+
+Breaking
+
+- Raise error when bigint value outside range of numeric
 
 # dbx 0.2.3
 

@@ -23,6 +23,7 @@ dbxSelect <- function(conn, statement, params=NULL) {
   unescape_blobs <- list()
   fix_timetz <- list()
   change_tz <- list()
+  check_bigint <- list()
 
   r <- fetchRecords(conn, statement, params)
   records <- r$records
@@ -38,6 +39,7 @@ dbxSelect <- function(conn, statement, params=NULL) {
 
     unescape_blobs <- which(sql_types == "bytea")
     fix_timetz <- which(sql_types == "timetzoid")
+    check_bigint <- which(sql_types == "bigint")
   } else if (isRPostgres(conn)) {
     sql_types <- column_info$`.typname`
 
@@ -52,6 +54,7 @@ dbxSelect <- function(conn, statement, params=NULL) {
     cast_dates <- which(sql_types == "date")
     cast_datetimes <- which(sql_types %in% c("datetime", "timestamp"))
     cast_booleans <- which(sql_types == "tinyint" & column_info$length == 1)
+    check_bigint <- which(sql_types == "bigint")
   } else if (isRMariaDB(conn)) {
     # TODO cast booleans for RMariaDB
     # waiting on https://github.com/r-dbi/RMariaDB/issues/100
@@ -93,6 +96,30 @@ dbxSelect <- function(conn, statement, params=NULL) {
 
   for (i in change_tz) {
     attr(records[, i], "tzone") <- currentTimeZone()
+  }
+
+  bigint_message <- "bigint value outside range of numeric"
+  for (i in check_bigint) {
+    max_bigint <- 9007199254740992 # 2**53
+    col <- records[, i]
+    if (any(!is.na(col) & (col >= max_bigint | col <= -max_bigint))) {
+      stop(bigint_message)
+    }
+  }
+
+  if (isTRUE(attr(conn, "dbx_cast_bigint"))) {
+    for (i in 1:ncol(records)) {
+      col <- records[, i]
+      if (inherits(col, "integer64")) {
+        tryCatch({
+          records[, i] <- as.numeric(col)
+        }, warning=function(w) {
+          if (grepl("integer precision lost", conditionMessage(w), fixed=TRUE)) {
+            stop(bigint_message)
+          }
+        })
+      }
+    }
   }
 
   if (nrow(records) > 0) {
