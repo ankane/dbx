@@ -131,6 +131,16 @@ runSelectTests <- function(db) {
     }
   })
 
+  test_that("string params works", {
+    events <- data.frame(city=c("Boston", "San Francisco"))
+    dbxInsert(db, "events", events)
+
+    params <- list("Boston")
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE city = ?"
+    res <- dbxSelect(db, sql, params=params)
+    expect_equal(res$count, 1)
+  })
+
   test_that("integer params works", {
     events <- data.frame(counter=c(1, 2))
     dbxInsert(db, "events", events)
@@ -209,6 +219,16 @@ runSelectTests <- function(db) {
 
     params <- list(as.difftime(c("12:30:55")))
     sql <- "SELECT COUNT(*) AS count FROM events WHERE distance = ?"
+    res <- dbxSelect(db, sql, params=params)
+    expect_equal(res$count, 1)
+  })
+
+  test_that("factor params works", {
+    events <- data.frame(city=c("Boston", "San Francisco"))
+    dbxInsert(db, "events", events)
+
+    params <- list(factor("Boston"))
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE city = ?"
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 1)
   })
