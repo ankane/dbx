@@ -7,14 +7,14 @@ runDataTypeTests <- function(db, redshift=FALSE) {
     expect_equal(res$counter, events$counter)
   })
 
-  # test_that("bigint works", {
-  #   events <- data.frame(bigcounter=c(1000000000000000000, 1000000000000000001))
-  #   dbxExecute(db, "INSERT INTO events (bigcounter) VALUES (1000000000000000000), (1000000000000000001)")
+  test_that("bigint works", {
+    events <- data.frame(bigcounter=c(1000000000000000000, 1000000000000000001))
+    dbxExecute(db, "INSERT INTO events (bigcounter) VALUES (1000000000000000000), (1000000000000000001)")
 
-  #   res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-  #   expect_equal(res$bigcounter, events$bigcounter)
-  #   expect_false(all.equal(res$bigcounter, 1000000000000000002))
-  # })
+    res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+    expect_equal(res$bigcounter, events$bigcounter)
+    # expect_false(all.equal(res$bigcounter, 1000000000000000002))
+  })
 
   test_that("small bigint works", {
     events <- data.frame(bigcounter=c(1, 2))
