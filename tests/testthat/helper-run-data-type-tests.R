@@ -288,6 +288,15 @@ runDataTypeTests <- function(db, redshift=FALSE) {
     expect_equal(res$counter, as.integer(events$counter))
   })
 
+  # TODO raise error?
+  test_that("difftime works", {
+    events <- data.frame(city=as.difftime(c("12:30:55", "16:59:59")))
+    dbxInsert(db, "events", events)
+
+    res <- dbxSelect(db, "SELECT * FROM events")
+    expect_equal(res$city, as.character(events$city))
+  })
+
   # very important
   # shows typecasting is consistent
   test_that("can update what what just selected and get same result", {

@@ -123,6 +123,10 @@ isBlob <- function(col) {
   inherits(col, "blob")
 }
 
+isDifftime <- function(col) {
+  inherits(col, "difftime")
+}
+
 selectOrExecute <- function(conn, sql, records, returning) {
   if (is.null(returning)) {
     execute(conn, sql)
@@ -289,6 +293,8 @@ castData <- function(conn, col) {
         # removes AsIs
         col <- blob::as.blob(lapply(col, function(x) { x }))
       }
+    } else if (isRPostgres(conn) && isDifftime(col)) {
+      col <- as.character(col)
     }
   } else if (isSQLite(conn)) {
     # since no standard, store dates and datetimes in the same format as Rails
