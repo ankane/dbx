@@ -395,7 +395,7 @@ records$column <- lapply(records$column, hexToRaw)
 
 ### Bigint
 
-BIGINT columns are returned as `numeric` vectors. The `numeric` type in R rounds values above 2<sup>53</sup>. Some libraries (RPostgres, RMariaDB, RSQLite, ODBC) support returning `bit64::integer64` vectors instead.
+BIGINT columns are returned as `numeric` vectors. The `numeric` type in R loses precision above 2<sup>53</sup>. Some libraries (RPostgres, RMariaDB, RSQLite, ODBC) support returning `bit64::integer64` vectors instead.
 
 ```r
 dbxConnect(bigint="integer64")
