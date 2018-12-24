@@ -142,7 +142,7 @@ runSelectTests <- function(db) {
   })
 
   test_that("integer params works", {
-    events <- data.frame(counter=c(1, 2))
+    events <- data.frame(counter=c(1L, 2L))
     dbxInsert(db, "events", events)
 
     params <- list(1)
