@@ -7,6 +7,14 @@ runDataTypeTests <- function(db, redshift=FALSE) {
     expect_equal(res$counter, events$counter)
   })
 
+  test_that("small bigint works", {
+    events <- data.frame(bigcounter=c(1, 2))
+    dbxInsert(db, "events", events)
+
+    res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
+    expect_equal(res$bigcounter, events$bigcounter)
+  })
+
   test_that("float works", {
     events <- data.frame(speed=c(1.2, 3.4))
     dbxInsert(db, "events", events)
