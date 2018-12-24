@@ -141,6 +141,16 @@ runSelectTests <- function(db) {
     expect_equal(res$count, 1)
   })
 
+  test_that("string (complex) params works", {
+    events <- data.frame(city=c(1+4i, 2+2i))
+    dbxInsert(db, "events", events)
+
+    params <- list(1+4i)
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE city = ?"
+    res <- dbxSelect(db, sql, params=params)
+    expect_equal(res$count, 1)
+  })
+
   test_that("integer params works", {
     events <- data.frame(counter=c(1L, 2L))
     dbxInsert(db, "events", events)

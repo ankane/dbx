@@ -127,6 +127,10 @@ isDifftime <- function(col) {
   inherits(col, "difftime")
 }
 
+isComplex <- function(col) {
+  inherits(col, "complex")
+}
+
 selectOrExecute <- function(conn, sql, records, returning) {
   if (is.null(returning)) {
     execute(conn, sql)
@@ -314,6 +318,10 @@ castData <- function(conn, col) {
     } else if (isTime(col)) {
       col <- format(col)
     }
+  }
+
+  if (isComplex(col)) {
+    col <- format(col)
   }
 
   col
