@@ -288,6 +288,27 @@ runDataTypeTests <- function(db, redshift=FALSE) {
     expect_equal(blob::as.blob(res$image), events$image)
   })
 
+  test_that("empty blob works", {
+    events <- data.frame(city=c("Boston"))
+    dbxInsert(db, "events", events)
+
+    sql <- "SELECT id, image FROM events WHERE image IS NULL"
+    res <- dbxSelect(db, sql)
+    expect_equal(nrow(res), 1)
+
+    if (isRMariaDB(db))  {
+      expect_null(res$image[[1]])
+    } else if (isRMySQL(db)) {
+      expect_equal(res$image[[1]], as.character(NA))
+    } else {
+      expect_equal(res$image[[1]], as.raw(NULL))
+    }
+
+    # dbxUpdate(db, "events", res, where_cols=c("id"))
+    # res <- dbxSelect(db, sql)
+    # expect_equal(nrow(res), 1)
+  })
+
   test_that("ts uses observation values", {
     events <- data.frame(counter=ts(1:3, start=c(2018, 1), end=c(2018, 3), frequency=12))
     dbxInsert(db, "events", events)
