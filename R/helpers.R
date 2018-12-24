@@ -112,7 +112,7 @@ isTime <- function(col) {
 }
 
 isBinary <- function(col) {
-  is.raw(col[[1]])
+  any(sapply(col, is.raw))
 }
 
 isBlob <- function(col) {
