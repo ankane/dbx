@@ -265,7 +265,9 @@ quoteRecords <- function(conn, records) {
 }
 
 castData <- function(conn, col) {
-  if (isMySQL(conn)) {
+  if (isMySQL(conn) || isSQLite(conn) || isSQLServer(conn)) {
+    # since no standard for SQLite, store dates and datetimes in the same format as Rails
+    # store times without dates as strings to keep things simple
     if (isDatetime(col)) {
       col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
     } else if (isDate(col)) {
@@ -291,24 +293,6 @@ castData <- function(conn, col) {
       }
     } else if (isDifftime(col) && isRPostgres(conn)) {
       col <- as.character(col)
-    }
-  } else if (isSQLite(conn)) {
-    # since no standard, store dates and datetimes in the same format as Rails
-    # store times without dates as strings to keep things simple
-    if (isDatetime(col)) {
-      col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
-    } else if (isDate(col)) {
-      col <- format(col)
-    } else if (isTime(col)) {
-      col <- format(col)
-    }
-  } else if (isSQLServer(conn)) {
-    if (isDatetime(col)) {
-      col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6")
-    } else if (isDate(col)) {
-      col <- format(col)
-    } else if (isTime(col)) {
-      col <- format(col)
     }
   }
 
