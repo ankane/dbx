@@ -39,4 +39,12 @@ runInsertTests <- function(db, redshift=FALSE) {
     res <- dbxSelect(db, "SELECT id, city FROM events")
     expect_equal(res, events)
   })
+
+  test_that("insert factors work", {
+    events <- data.frame(city=c("San Francisco", "Boston"))
+    dbxInsert(db, "events", events)
+
+    res <- dbxSelect(db, "SELECT * FROM events")
+    expect_equal(res$city, as.character(events$city))
+  })
 }
