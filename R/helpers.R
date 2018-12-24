@@ -111,10 +111,6 @@ isTime <- function(col) {
   inherits(col, "hms")
 }
 
-isLogical <- function(col) {
-  inherits(col, "logical")
-}
-
 isBinary <- function(col) {
   is.raw(col[[1]])
 }
@@ -125,10 +121,6 @@ isBlob <- function(col) {
 
 isDifftime <- function(col) {
   inherits(col, "difftime")
-}
-
-isComplex <- function(col) {
-  inherits(col, "complex")
 }
 
 selectOrExecute <- function(conn, sql, records, returning) {
@@ -286,7 +278,7 @@ castData <- function(conn, col) {
       col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6 %Z")
     } else if (isTime(col)) {
       col <- format(col)
-    } else if (isLogical(col) && isRPostgreSQL(conn)) {
+    } else if (is.logical(col) && isRPostgreSQL(conn)) {
       col <- as.character(col)
     } else if (isDate(col) && isRPostgreSQL(conn)) {
       col <- format(col)
@@ -320,7 +312,7 @@ castData <- function(conn, col) {
     }
   }
 
-  if (isComplex(col)) {
+  if (is.complex(col)) {
     col <- format(col)
   }
 
