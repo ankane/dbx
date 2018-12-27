@@ -1,4 +1,4 @@
-# dbx 0.2.4 [unreleased]
+# dbx 0.2.4
 
 - Added `dbxExecute` function
 - Added support for complex types

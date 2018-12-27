@@ -218,7 +218,7 @@ Delete all records (uses `TRUNCATE` when possible for performance)
 dbxDelete(db, table)
 ```
 
-### Execute [master]
+### Execute
 
 Execute a statement
 
