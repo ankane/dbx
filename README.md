@@ -278,6 +278,8 @@ If you have multiple databases, use a different variable name, and:
 db <- dbxConnect(url=Sys.getenv("OTHER_DATABASE_URL"))
 ```
 
+You can also use a package like [keyring](https://cran.r-project.org/package=keyring).
+
 ## Batching
 
 By default, operations are performed in a single statement or transaction. This is better for performance and prevents partial writes on failures. However, when working with large data frames on production systems, it can be better to break writes into batches. Use the `batch_size` option to do this.
