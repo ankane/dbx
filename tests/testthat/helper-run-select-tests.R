@@ -258,6 +258,16 @@ runSelectTests <- function(db) {
     expect_equal(res$count, 2)
   })
 
+  test_that("vector string params works", {
+    events <- data.frame(city=c("San Francisco", "Boston"))
+    dbxInsert(db, "events", events)
+
+    params <- list(events$city)
+    sql <- "SELECT COUNT(*) AS count FROM events WHERE city IN (?)"
+    res <- dbxSelect(db, sql, params=params)
+    expect_equal(res$count, 2)
+  })
+
   test_that("empty vector params works", {
     events <- data.frame(counter=c(1, 2))
     dbxInsert(db, "events", events)
