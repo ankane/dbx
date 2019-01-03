@@ -482,18 +482,26 @@ With Postgres, set a connect timeout with:
 db <- dbxConnect(connect_timeout=3) # sec
 ```
 
+## Compatibility
+
+All connections are simply [DBI](https://cran.r-project.org/package=DBI) connections, so you can use them anywhere you use DBI.
+
+```r
+dbCreateTable(db, ...)
+```
+
+Install [dbplyr](https://cran.r-project.org/package=dbplyr) to use data with [dplyr](https://cran.r-project.org/package=dplyr).
+
+```r
+forecasts_db <- tbl(db, "forecasts")
+```
+
 ## Reference
 
 To close a connection, use:
 
 ```r
 dbxDisconnect(db)
-```
-
-All connections are simply [DBI](https://cran.r-project.org/package=DBI) connections, so you can use them with DBI functions as well.
-
-```r
-dbGetInfo(db)
 ```
 
 ## Upgrading
