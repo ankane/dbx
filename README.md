@@ -12,7 +12,7 @@
 
 Designed for both research and production environments
 
-Supports Postgres, MySQL, SQLite, and more
+Supports Postgres, MySQL, MariaDB, SQLite, and more
 
 ![Screenshot](https://gist.github.com/ankane/b6988db2802aca68a589b31e41b44195/raw/619e19addf388c14e905ed475121fe5806bf8991/dbx.png)
 
@@ -29,7 +29,7 @@ install.packages("dbx")
 And follow the instructions for your database
 
 - [Postgres](#postgres)
-- [MySQL](#mysql)
+- [MySQL & MariaDB](#mysql-mariadb)
 - [SQLite](#sqlite)
 - [SQL Server](#sql-server)
 - [Redshift](#redshift)
@@ -61,7 +61,7 @@ You can also pass `user`, `password`, `host`, `port`, and `url`.
 
 > Works with RPostgreSQL as well
 
-### MySQL
+### MySQL & MariaDB
 
 Install the R package
 
