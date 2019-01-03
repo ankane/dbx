@@ -495,7 +495,7 @@ dbCreateTable(db, ...)
 Install [dbplyr](https://cran.r-project.org/package=dbplyr) to use data with [dplyr](https://cran.r-project.org/package=dplyr).
 
 ```r
-forecasts_db <- tbl(db, "forecasts")
+forecasts <- tbl(db, "forecasts")
 ```
 
 ## Reference
