@@ -181,17 +181,17 @@ fetchRecords <- function(conn, statement, params) {
 }
 
 emptyType <- function(type) {
-  if (type == "Date") {
+  if (identical(type, "Date")) {
     as.Date(as.character())
-  } else if (type == "POSIXct") {
+  } else if (identical(type, "POSIXct")) {
     as.POSIXct(as.character())
-  } else if (type == "integer") {
+  } else if (identical(type, "integer")) {
     as.integer()
-  } else if (type == "numeric") {
+  } else if (identical(type, "numeric")) {
     as.numeric()
-  } else if (type == "double") {
+  } else if (identical(type, "double")) {
     as.double()
-  } else if (type == "logical") {
+  } else if (identical(type, "logical")) {
     as.logical()
   } else {
     as.character()
