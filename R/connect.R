@@ -37,6 +37,10 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
     creds <- urltools::get_credentials(url)
     adapter <- uri$scheme
 
+    if (is.na(adapter)) {
+      stop("Invalid url")
+    }
+
     params$dbname <- uri$path
 
     if (!is.na(uri$domain)) {
@@ -149,19 +153,19 @@ findAdapter <- function(adapter) {
     obj <- adapter
   } else {
     adapter <- tolower(adapter)
-    if (adapter == "rsqlite") {
+    if (identical(adapter, "rsqlite")) {
       requireLib("RSQLite")
       obj <- RSQLite::SQLite()
-    } else if (adapter == "rmariadb") {
+    } else if (identical(adapter, "rmariadb")) {
       requireLib("RMariaDB")
       obj <- RMariaDB::MariaDB()
-    } else if (adapter == "rmysql") {
+    } else if (identical(adapter, "rmysql")) {
       requireLib("RMySQL")
       obj <- RMySQL::MySQL(fetch.default.rec=10000)
-    } else if (adapter == "rpostgres") {
+    } else if (identical(adapter, "rpostgres")) {
       requireLib("RPostgres")
       obj <- RPostgres::Postgres()
-    } else if (adapter == "rpostgresql") {
+    } else if (identical(adapter, "rpostgresql")) {
       requireLib("RPostgreSQL")
       obj <- RPostgreSQL::PostgreSQL()
     }

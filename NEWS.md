@@ -1,3 +1,7 @@
+# dbx 0.2.5 [unreleased]
+
+- Improved error message for invalid database URL
+
 # dbx 0.2.4
 
 - Added `dbxExecute` function
