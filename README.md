@@ -29,7 +29,7 @@ install.packages("dbx")
 And follow the instructions for your database
 
 - [Postgres](#postgres)
-- [MySQL & MariaDB](#mysql-mariadb)
+- [MySQL & MariaDB](#mysql--mariadb)
 - [SQLite](#sqlite)
 - [SQL Server](#sql-server)
 - [Redshift](#redshift)
