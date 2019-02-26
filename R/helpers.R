@@ -258,7 +258,7 @@ quoteIdent <- function(conn, cols) {
 quoteRecords <- function(conn, records) {
   quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
   for (i in 1:ncol(records)) {
-    col <- castData(conn, records[, i])
+    col <- castData(conn, records[, i, drop=T])
     quoted_records[, i] <- DBI::dbQuoteLiteral(conn, col)
   }
   quoted_records
