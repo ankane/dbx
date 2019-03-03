@@ -63,7 +63,7 @@ dbxSelect <- function(conn, statement, params=NULL) {
     # https://github.com/r-dbi/odbc/issues/108
     # booleans currently returned as VARCHAR
     # print(column_info)
-    sql_types = column_info$type
+    sql_types <- column_info$type
     change_tz <- which(sql_types == 93)
     cast_booleans <- which(sql_types == -6)
   }

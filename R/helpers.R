@@ -43,7 +43,7 @@ isODBC <- function(conn) {
 }
 
 equalClause <- function(cols, row) {
-  lapply(1:length(cols), function (i) { paste(cols[i] , "=", row[[i]]) })
+  lapply(1:length(cols), function (i) { paste(cols[i], "=", row[[i]]) })
 }
 
 upsertSetClause <- function(cols) {
@@ -68,7 +68,7 @@ setClause <- function(cols, row) {
 
 whereClause <- function(cols, records) {
   if (length(cols) == 1) {
-    paste0(cols[1], " IN (", paste(records[, 1], collapse=", ") , ")")
+    paste0(cols[1], " IN (", paste(records[, 1], collapse=", "), ")")
   } else {
     clauses <- apply(records, 1, function(x) { paste0("(", whereClause2(cols, x), ")") })
     paste(clauses, collapse=" OR ")
@@ -132,7 +132,7 @@ selectOrExecute <- function(conn, sql, records, returning) {
       stop("returning is only supported with Postgres")
     }
 
-    returning_clause = paste(lapply(returning, function(x) { if (x == "*") x else quoteIdent(conn, x) }), collapse=", ")
+    returning_clause <- paste(lapply(returning, function(x) { if (x == "*") x else quoteIdent(conn, x) }), collapse=", ")
     sql <- paste(sql, "RETURNING", returning_clause)
 
     dbxSelect(conn, sql)
@@ -218,7 +218,7 @@ inBatches <- function(records, batch_size, f) {
       row_count <- nrow(records)
       batch_count <- ceiling(row_count / batch_size)
       ret <- list()
-      for(i in 1:batch_count) {
+      for (i in 1:batch_count) {
         start <- ((i - 1) * batch_size) + 1
         end <- start + batch_size - 1
         if (end > row_count) {
