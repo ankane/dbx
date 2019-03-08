@@ -20,7 +20,7 @@
 dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL, returning=NULL, skip_existing=FALSE) {
   cols <- colnames(records)
 
-  if (!identical(intersect(cols, where_cols), where_cols)) {
+  if (!setequal(intersect(cols, where_cols), where_cols)) {
     stop("where_cols not in records")
   }
 

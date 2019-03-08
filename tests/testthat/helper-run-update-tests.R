@@ -10,6 +10,28 @@ runUpdateTests <- function(db) {
     expect_equal(res$city, c("LA"))
   })
 
+  test_that("update multiple columns works", {
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), counter=c(10, 11), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+
+    update_events <- data.frame(id=c(1, 2), city=c("LA", "Boston"), counter=c(20, 21))
+    dbxUpdate(db, "events", update_events, where_cols=c("id", "city"))
+
+    res <- dbxSelect(db, "SELECT counter FROM events")
+    expect_equal(res$counter, c(10, 21))
+  })
+
+  test_that("update multiple columns where_cols order not important", {
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), counter=c(10, 11), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+
+    update_events <- data.frame(id=c(1, 2), city=c("LA", "Boston"), counter=c(20, 21))
+    dbxUpdate(db, "events", update_events, where_cols=c("city", "id"))
+
+    res <- dbxSelect(db, "SELECT counter FROM events")
+    expect_equal(res$counter, c(10, 21))
+  })
+
   test_that("update missing column raises error", {
     update_events <- data.frame(id=c(2), city=c("LA"))
     expect_error(dbxUpdate(db, "events", update_events, where_cols=c("missing")), "where_cols not in records")

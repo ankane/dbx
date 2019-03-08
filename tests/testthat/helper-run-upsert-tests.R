@@ -42,6 +42,9 @@ runUpsertTests <- function(db, redshift=FALSE) {
     expect_equal(res$city, c("San Francisco", "Boston", "New York"))
   })
 
+  # TODO test upsert multiple columns works
+  # TODO test upsert multiple columns where_cols order not important
+
   test_that("upsert missing column raises error", {
     skip_if_not(upsertSupported())
 
