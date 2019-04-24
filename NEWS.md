@@ -1,4 +1,4 @@
-# dbx 0.2.5 [unreleased]
+# dbx 0.2.5
 
 - Added support for tibbles
 - Improved error message for invalid database URL
