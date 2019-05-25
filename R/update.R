@@ -50,7 +50,7 @@ maybeAtomic <- function(atomic, conn, code) {
   if (isTRUE(atomic)) {
     withTransaction(conn, code)
   } else {
-    code
+    eval(code)
   }
 }
 
