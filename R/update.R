@@ -33,20 +33,20 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL, allow_t
     colnames(quoted_records) <- colnames(batch)
     groups <- split(quoted_records, quoted_records[update_cols], drop=TRUE)
 
-    if (allow_transation_inside) {
+    update_execution <- function(conn, groups, quoted_table, quoted_update_cols, update_cols, quoted_where_cols, where_cols) {
+      for (group in groups) {
+        row <- group[1, , drop=FALSE]
+        sql <- paste("UPDATE", quoted_table, "SET", setClause(quoted_update_cols, row[update_cols]), "WHERE", whereClause(quoted_where_cols, group[where_cols]))
+        execute(conn, sql)
+      }
+    }
+    
+    if (allow_transaction_inside) {
       withTransaction(conn, {
-        for (group in groups) {
-          row <- group[1, , drop=FALSE]
-          sql <- paste("UPDATE", quoted_table, "SET", setClause(quoted_update_cols, row[update_cols]), "WHERE", whereClause(quoted_where_cols, group[where_cols]))
-          execute(conn, sql)
-        }
+        update_execution(conn, groups, quoted_table, quoted_update_cols, update_cols, quoted_where_cols, where_cols)
       })
      } else {
-        for (group in groups) {
-          row <- group[1, , drop=FALSE]
-          sql <- paste("UPDATE", quoted_table, "SET", setClause(quoted_update_cols, row[update_cols]), "WHERE", whereClause(quoted_where_cols, group[where_cols]))
-          execute(conn, sql)
-        }
+        update_execution(conn, groups, quoted_table, quoted_update_cols, update_cols, quoted_where_cols, where_cols)
      }
   })
 
