@@ -33,7 +33,7 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL, allow_t
     colnames(quoted_records) <- colnames(batch)
     groups <- split(quoted_records, quoted_records[update_cols], drop=TRUE)
     
-    withTransaction(!allow_transaction_inside, conn, {
+    withTransaction(!isTRUE(allow_transaction_inside), conn, {
       for (group in groups) {
         row <- group[1, , drop=FALSE]
         sql <- paste("UPDATE", quoted_table, "SET", setClause(quoted_update_cols, row[update_cols]), "WHERE", whereClause(quoted_where_cols, group[where_cols]))
@@ -47,7 +47,7 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL, allow_t
 }
 
 withTransaction <- function(disable_transaction, conn, code) {
-  if (disable_transaction) {
+  if (isTRUE(disable_transaction)) {
     eval(code) 
   } else if (isSQLServer(conn)) {
     DBI::dbWithTransaction(conn, code)
