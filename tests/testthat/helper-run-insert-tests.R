@@ -9,7 +9,7 @@ runInsertTests <- function(db, redshift=FALSE) {
 
   test_that("empty insert works", {
     dbxInsert(db, "events", data.frame())
-    expect(TRUE)
+    expect_true(TRUE)
   })
 
   test_that("insert returning works", {

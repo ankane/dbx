@@ -111,7 +111,7 @@ runDataTypeTests <- function(db, redshift=FALSE) {
     expect_equal(res$created_on, events$created_on)
 
     # dates always in UTC
-    expect(all(format(res$created_on, "%Z") == "UTC"))
+    expect_true(all(format(res$created_on, "%Z") == "UTC"))
   })
 
   test_that("datetimes works", {

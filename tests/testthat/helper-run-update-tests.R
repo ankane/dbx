@@ -39,6 +39,6 @@ runUpdateTests <- function(db) {
 
   test_that("empty update works", {
     dbxUpdate(db, "events", data.frame(id = as.numeric(), active = as.logical()), where_cols=c("id"))
-    expect(TRUE)
+    expect_true(TRUE)
   })
 }
