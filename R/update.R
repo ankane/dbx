@@ -5,7 +5,7 @@
 #' @param records A data frame of records to insert
 #' @param where_cols The columns to use for WHERE clause
 #' @param batch_size The number of records to update in a single transaction (defaults to all)
-#' @param atomic If true, do the update in a transactional block; otherwise, don't
+#' @param atomic Wrap the update in a transaction so its atomic (defaults to true)
 #' @export
 #' @examples
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
@@ -32,7 +32,7 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL, atomic=
     quoted_records <- quoteRecords(conn, batch)
     colnames(quoted_records) <- colnames(batch)
     groups <- split(quoted_records, quoted_records[update_cols], drop=TRUE)
-    
+
     maybeAtomic(atomic, conn, {
       for (group in groups) {
         row <- group[1, , drop=FALSE]
@@ -40,7 +40,6 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL, atomic=
         execute(conn, sql)
       }
     })
-    
   })
 
   invisible()

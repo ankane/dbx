@@ -1,3 +1,7 @@
+# dbx 0.2.6 [unreleased]
+
+- Added `atomic` option to `dbxUpdate`
+
 # dbx 0.2.5
 
 - Added support for tibbles
