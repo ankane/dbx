@@ -5,6 +5,7 @@
 #' @param records A data frame of records to insert
 #' @param where_cols The columns to use for WHERE clause
 #' @param batch_size The number of records to update in a single transaction (defaults to all)
+#' @param atomic If true, do the update in a transactional block; otherwise, don't
 #' @export
 #' @examples
 #' db <- dbxConnect(adapter="sqlite", dbname=":memory:")
@@ -13,7 +14,7 @@
 #'
 #' records <- data.frame(id=c(1, 2), temperature=c(16, 13))
 #' dbxUpdate(db, table, records, where_cols=c("id"))
-dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
+dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL, atomic=TRUE) {
   cols <- colnames(records)
 
   if (!setequal(intersect(cols, where_cols), where_cols)) {
@@ -31,17 +32,26 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL) {
     quoted_records <- quoteRecords(conn, batch)
     colnames(quoted_records) <- colnames(batch)
     groups <- split(quoted_records, quoted_records[update_cols], drop=TRUE)
-
-    withTransaction(conn, {
+    
+    maybeAtomic(atomic, conn, {
       for (group in groups) {
         row <- group[1, , drop=FALSE]
         sql <- paste("UPDATE", quoted_table, "SET", setClause(quoted_update_cols, row[update_cols]), "WHERE", whereClause(quoted_where_cols, group[where_cols]))
         execute(conn, sql)
       }
     })
+    
   })
 
   invisible()
+}
+
+maybeAtomic <- function(atomic, conn, code) {
+  if (isTRUE(atomic)) {
+    withTransaction(conn, code)
+  } else {
+    eval(code)
+  }
 }
 
 withTransaction <- function(conn, code) {
