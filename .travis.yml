@@ -1,7 +1,8 @@
 language: r
-r: 3.6.0
-sudo: false
+r: 3.6.2
 cache: packages
+services:
+  - mysql
 addons:
   postgresql: "9.6"
 before_install:
