@@ -14,8 +14,16 @@
 #' records <- data.frame(temperature=c(32, 25))
 #' dbxInsert(db, table, records)
 dbxInsert <- function(conn, table, records, batch_size=NULL, returning=NULL) {
-  inBatches(records, batch_size, function(batch) {
-    sql <- insertClause(conn, table, batch)
-    selectOrExecute(conn, sql, batch, returning=returning)
-  })
+  if (is(records, "SQL")) {
+    stopifnot(is.null(batch_size))
+    stopifnot(is.null(returning))
+
+    sql <- insertFromClause(conn, table, records)
+    selectOrExecute(conn, sql, batch)
+  } else {
+    inBatches(records, batch_size, function(batch) {
+      sql <- insertClause(conn, table, batch)
+      selectOrExecute(conn, sql, batch, returning=returning)
+    })
+  }
 }

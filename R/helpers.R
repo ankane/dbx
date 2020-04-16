@@ -99,6 +99,12 @@ insertClause <- function(conn, table, records) {
   paste0("INSERT INTO ", quoted_table, " (", cols_sql, ") VALUES ", records_sql)
 }
 
+insertFromClause <- function(conn, table, sql) {
+  # quote
+  quoted_table <- quoteIdent(conn, table)
+  paste0("INSERT INTO ", quoted_table, " ", sql)
+}
+
 isDate <- function(col) {
   inherits(col, "Date")
 }
