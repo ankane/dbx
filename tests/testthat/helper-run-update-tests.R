@@ -41,4 +41,17 @@ runUpdateTests <- function(db) {
     dbxUpdate(db, "events", data.frame(id = as.numeric(), active = as.logical()), where_cols=c("id"))
     expect_true(TRUE)
   })
+
+  test_that("update with transaction works", {
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+
+    update_events <- data.frame(id=c(2), city=c("LA"))
+    DBI::dbWithTransaction(db, {
+      dbxUpdate(db, "events", update_events, where_cols=c("id"), transaction=FALSE)
+    })
+
+    res <- dbxSelect(db, "SELECT city FROM events WHERE id = 2")
+    expect_equal(res$city, c("LA"))
+  })
 }

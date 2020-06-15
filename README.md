@@ -322,10 +322,10 @@ DBI::dbWithTransaction(db, {
 })
 ```
 
-For updates inside a transaction, use: [master]
+For updates inside a transaction, use: [unreleased]
 
 ```r
-dbxUpdate(db, atomic=FALSE)
+dbxUpdate(db, transaction=FALSE)
 ```
 
 ## Data Type Notes

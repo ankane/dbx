@@ -1,6 +1,6 @@
 # dbx 0.2.6 [unreleased]
 
-- Added `atomic` option to `dbxUpdate`
+- Added `transaction` option to `dbxUpdate`
 - Added unsafe version check for RMySQL
 
 # dbx 0.2.5
