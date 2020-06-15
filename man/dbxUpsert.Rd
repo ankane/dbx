@@ -4,8 +4,15 @@
 \alias{dbxUpsert}
 \title{Upsert records}
 \usage{
-dbxUpsert(conn, table, records, where_cols, batch_size = NULL,
-  returning = NULL, skip_existing = FALSE)
+dbxUpsert(
+  conn,
+  table,
+  records,
+  where_cols,
+  batch_size = NULL,
+  returning = NULL,
+  skip_existing = FALSE
+)
 }
 \arguments{
 \item{conn}{A DBIConnection object}

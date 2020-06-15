@@ -4,8 +4,13 @@
 \alias{dbxConnect}
 \title{Create a database connection}
 \usage{
-dbxConnect(url = NULL, adapter = NULL, storage_tz = NULL,
-  variables = list(), ...)
+dbxConnect(
+  url = NULL,
+  adapter = NULL,
+  storage_tz = NULL,
+  variables = list(),
+  ...
+)
 }
 \arguments{
 \item{url}{A database URL}

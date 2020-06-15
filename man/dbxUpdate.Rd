@@ -4,8 +4,7 @@
 \alias{dbxUpdate}
 \title{Update records}
 \usage{
-dbxUpdate(conn, table, records, where_cols, batch_size = NULL,
-  atomic = TRUE)
+dbxUpdate(conn, table, records, where_cols, batch_size = NULL, atomic = TRUE)
 }
 \arguments{
 \item{conn}{A DBIConnection object}

@@ -115,6 +115,10 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
 
   conn <- do.call(DBI::dbConnect, c(obj, params))
 
+  if (isRMySQL(conn) && utils::packageVersion("RMySQL") < "0.10.20") {
+    stop("This version of RMySQL has a bug that can lead to SQL injection (CVE-2020-10380). Upgrade to RMySQL 0.10.20 or greater.")
+  }
+
   if (!is.null(storage_tz)) {
     if (!isPostgres(conn)) {
       dbxDisconnect(conn)
