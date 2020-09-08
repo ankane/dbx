@@ -147,6 +147,8 @@ runDataTypeTests <- function(db, redshift=FALSE) {
     if (isSQLite(db)) {
       res$updated_at <- as.POSIXct(res$updated_at, tz="Etc/UTC")
       attr(res$updated_at, "tzone") <- Sys.timezone()
+      # for R-devel
+      attr(events$updated_at, "tzone") <- Sys.timezone()
     }
 
     expect_equal(res$updated_at, events$updated_at)

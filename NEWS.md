@@ -1,3 +1,7 @@
+# dbx 0.2.7 (unreleased)
+
+- Fixed CRAN check with R-devel
+
 # dbx 0.2.6 (2020-06-14)
 
 - Added `transaction` option to `dbxUpdate`

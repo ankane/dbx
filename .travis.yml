@@ -1,10 +1,11 @@
 language: r
-r: 3.6.2
+r:
+  - release
+  - devel
 cache: packages
 services:
   - mysql
-addons:
-  postgresql: "9.6"
+  - postgresql
 before_install:
   - mysql -e 'create database dbx_test;'
   - psql -c 'create database dbx_test;' -U postgres
