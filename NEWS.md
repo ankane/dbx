@@ -1,4 +1,4 @@
-# dbx 0.2.7 (unreleased)
+# dbx 0.2.7 (2020-09-07)
 
 - Fixed CRAN check with R-devel
 
