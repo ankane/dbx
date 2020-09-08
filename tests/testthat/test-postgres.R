@@ -19,6 +19,9 @@ test_that("datetimes with storage_tz works", {
     events <- data.frame(updated_at=c(t1, t2))
     dbxInsert(db2, "events", events)
 
+    # for R-devel
+    attr(events$updated_at, "tzone") <- Sys.timezone()
+
     # test returned time
     res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
     expect_equal(res$updated_at, events$updated_at)
