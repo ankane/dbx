@@ -5,7 +5,8 @@ r:
 cache: packages
 services:
   - mysql
-  - postgresql
+addons:
+  postgresql: "9.6"
 before_install:
   - mysql -e 'create database dbx_test;'
   - psql -c 'create database dbx_test;' -U postgres
