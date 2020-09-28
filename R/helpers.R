@@ -132,7 +132,12 @@ selectOrExecute <- function(conn, sql, records, returning) {
       stop("returning is only supported with Postgres")
     }
 
-    returning_clause <- paste(lapply(returning, function(x) { if (x == "*") x else quoteIdent(conn, x) }), collapse=", ")
+    if (is(returning, "SQL")) {
+      # should be a no-op, but quote for safety
+      returning_clause <- paste(quoteIdent(conn, returning), collapse=", ")
+    } else {
+      returning_clause <- paste(lapply(returning, function(x) { if (x == "*") x else quoteIdent(conn, x) }), collapse=", ")
+    }
     sql <- paste(sql, "RETURNING", returning_clause)
 
     dbxSelect(conn, sql)

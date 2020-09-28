@@ -1,3 +1,7 @@
+# dbx 0.2.8 (unreleased)
+
+- Added support for `SQL` with `returning` option
+
 # dbx 0.2.7 (2020-09-07)
 
 - Fixed CRAN check with R-devel
