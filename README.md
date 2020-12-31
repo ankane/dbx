@@ -328,6 +328,16 @@ For updates inside a transaction, use:
 dbxUpdate(db, transaction=FALSE)
 ```
 
+## Schemas
+
+To specify a schema in Postgres, use:
+
+```r
+table <- DBI::SQL("schema.table")
+# or
+table <- DBI::Id(schema="schema", table="table")
+```
+
 ## Data Type Notes
 
 ### Dates & Times
