@@ -47,4 +47,24 @@ runInsertTests <- function(db, redshift=FALSE) {
     res <- dbxSelect(db, "SELECT * FROM events")
     expect_equal(res$city, as.character(events$city))
   })
+
+  test_that("insert schema DBI::SQL works", {
+    skip_if(!isPostgres(db))
+
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
+    dbxInsert(db, DBI::SQL("public.events"), events)
+
+    res <- dbxSelect(db, "SELECT id, city FROM events ORDER BY id")
+    expect_equal(res, events)
+  })
+
+  test_that("insert schema DBI::Id works", {
+    skip_if(!isPostgres(db))
+
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
+    dbxInsert(db, DBI::Id(schema="public", table="events"), events)
+
+    res <- dbxSelect(db, "SELECT id, city FROM events ORDER BY id")
+    expect_equal(res, events)
+  })
 }

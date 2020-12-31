@@ -54,4 +54,30 @@ runUpdateTests <- function(db) {
     res <- dbxSelect(db, "SELECT city FROM events WHERE id = 2")
     expect_equal(res$city, c("LA"))
   })
+
+  test_that("update schema DBI::SQL works", {
+    skip_if(!isPostgres(db))
+
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+
+    update_events <- data.frame(id=c(2), city=c("LA"))
+    dbxUpdate(db, DBI::SQL("public.events"), update_events, where_cols=c("id"))
+
+    res <- dbxSelect(db, "SELECT city FROM events WHERE id = 2")
+    expect_equal(res$city, c("LA"))
+  })
+
+  test_that("update schema DBI:Id works", {
+    skip_if(!isPostgres(db))
+
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+
+    update_events <- data.frame(id=c(2), city=c("LA"))
+    dbxUpdate(db, DBI::Id(schema="public", table="events"), update_events, where_cols=c("id"))
+
+    res <- dbxSelect(db, "SELECT city FROM events WHERE id = 2")
+    expect_equal(res$city, c("LA"))
+  })
 }

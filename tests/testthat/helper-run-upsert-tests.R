@@ -78,4 +78,30 @@ runUpsertTests <- function(db, redshift=FALSE) {
 
     expect_equal(res$inserted, c(FALSE, TRUE))
   })
+
+  test_that("upsert schema DBI::SQL works", {
+    skip_if(!isPostgres(db))
+
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+
+    upsert_events <- data.frame(id=c(2, 3), city=c("Chicago", "New York"))
+    dbxUpsert(db, DBI::SQL("public.events"), upsert_events, where_cols=c("id"))
+
+    res <- dbxSelect(db, "SELECT city FROM events ORDER BY id")
+    expect_equal(res$city, c("San Francisco", "Chicago", "New York"))
+  })
+
+  test_that("upsert schema DBI::Id works", {
+    skip_if(!isPostgres(db))
+
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+
+    upsert_events <- data.frame(id=c(2, 3), city=c("Chicago", "New York"))
+    dbxUpsert(db, DBI::Id(schema="public", table="events"), upsert_events, where_cols=c("id"))
+
+    res <- dbxSelect(db, "SELECT city FROM events ORDER BY id")
+    expect_equal(res$city, c("San Francisco", "Chicago", "New York"))
+  })
 }
