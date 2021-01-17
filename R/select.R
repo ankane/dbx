@@ -41,7 +41,7 @@ dbxSelect <- function(conn, statement, params=NULL) {
   } else if (isRPostgres(conn)) {
     sql_types <- column_info$`.typname`
 
-    if (storageTimeZone(conn) != currentTimeZone()) {
+    if (storageTimeZone(conn) != currentTimeZone() && utils::packageVersion("RPostgres") < "1.3.0") {
       convert_tz <- which(sql_types == "timestamp")
     }
 

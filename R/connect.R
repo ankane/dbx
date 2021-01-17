@@ -113,6 +113,24 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
     params$bigint <- "numeric"
   }
 
+  if (inherits(obj, "PqDriver") && utils::packageVersion("RPostgres") >= "1.3.0") {
+    if (is.null(params$timezone)) {
+      params$timezone <- if(is.null(storage_tz)) "UTC" else storage_tz
+    }
+    if (is.null(params$timezone_out)) {
+      params$timezone_out <- currentTimeZone()
+    }
+  }
+
+  if (inherits(obj, "MariaDBDriver") && utils::packageVersion("RMariaDB") >= "1.1.0") {
+    if (is.null(params$timezone)) {
+      params$timezone <- "+00:00"
+    }
+    if (is.null(params$timezone_out)) {
+      params$timezone_out <- currentTimeZone()
+    }
+  }
+
   conn <- do.call(DBI::dbConnect, c(obj, params))
 
   if (isRMySQL(conn) && utils::packageVersion("RMySQL") < "0.10.20") {
