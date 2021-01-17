@@ -324,6 +324,8 @@ runDataTypeTests <- function(db, redshift=FALSE) {
 
   # TODO raise error?
   test_that("difftime works", {
+    skip_if(isRPostgres(db))
+
     events <- data.frame(city=as.difftime(c("12:30:55", "16:59:59")))
     dbxInsert(db, "events", events)
 

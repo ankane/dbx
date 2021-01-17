@@ -218,16 +218,6 @@ runSelectTests <- function(db) {
     expect_equal(res$count, 1)
   })
 
-  test_that("difftimes work", {
-    events <- data.frame(distance=as.difftime(c("12:30:55", "16:59:59")), stringsAsFactors=FALSE)
-    dbxInsert(db, "events", events)
-
-    params <- list(as.difftime(c("12:30:55")))
-    sql <- "SELECT COUNT(*) AS count FROM events WHERE distance = ?"
-    res <- dbxSelect(db, sql, params=params)
-    expect_equal(res$count, 1)
-  })
-
   test_that("factor params works", {
     events <- data.frame(city=c("Boston", "San Francisco"))
     dbxInsert(db, "events", events)
