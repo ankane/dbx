@@ -328,7 +328,7 @@ runDataTypeTests <- function(db, redshift=FALSE) {
     dbxInsert(db, "events", events)
 
     res <- dbxSelect(db, "SELECT * FROM events")
-    expect_equal(res$city, as.character(events$city))
+    expect_equal(as.difftime(res$city), events$city)
   })
 
   # very important
