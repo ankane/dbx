@@ -132,7 +132,7 @@ selectOrExecute <- function(conn, sql, records, returning) {
       stop("returning is only supported with Postgres")
     }
 
-    if (is(returning, "SQL")) {
+    if (inherits(returning, "SQL")) {
       # should be a no-op, but quote for safety
       returning_clause <- paste(quoteIdent(conn, returning), collapse=", ")
     } else {
