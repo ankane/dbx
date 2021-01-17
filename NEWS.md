@@ -1,4 +1,4 @@
-# dbx 0.2.8 (unreleased)
+# dbx 0.2.8 (2021-01-16)
 
 - Added support for `SQL` with `returning` option
 - Fixed time zones for RPostgres 1.3.0+ and RMariaDB 1.1.0+
