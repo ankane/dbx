@@ -244,7 +244,7 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("hms with times work", {
-    events <- data.frame(open_time=c(hms::as.hms("12:30:55"), hms::as.hms("16:59:59")), stringsAsFactors=FALSE)
+    events <- data.frame(open_time=c(hms::as_hms("12:30:55"), hms::as_hms("16:59:59")), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
     # test returned time
@@ -281,7 +281,7 @@ runDataTypeTests <- function(db, redshift=FALSE) {
     images <- list(1:3, 4:6)
     serialized_images <- lapply(images, function(x) { serialize(x, NULL) })
 
-    events <- data.frame(image=blob::as.blob(serialized_images))
+    events <- data.frame(image=blob::as_blob(serialized_images))
     dbxInsert(db, "events", events)
 
     if (isRMySQL(db)) {
@@ -291,7 +291,7 @@ runDataTypeTests <- function(db, redshift=FALSE) {
       res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
     }
 
-    expect_equal(blob::as.blob(res$image), events$image)
+    expect_equal(blob::as_blob(res$image), events$image)
   })
 
   test_that("empty blob works", {

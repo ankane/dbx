@@ -345,7 +345,7 @@ Dates are returned as `Date` objects and times as `POSIXct` objects. Times are s
 Times without dates are returned as `character` vectors since R has no built-in support for this type. If you use [hms](https://cran.r-project.org/package=hms), you can convert columns with:
 
 ```r
-records$column <- hms::as.hms(records$column)
+records$column <- hms::as_hms(records$column)
 ```
 
 SQLite does not have support for `TIME` columns, so we recommend storing as `VARCHAR`.
