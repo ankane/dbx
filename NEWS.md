@@ -1,36 +1,36 @@
-# dbx 0.2.8 (2021-01-16)
+# 0.2.8 (2021-01-16)
 
 - Added support for `SQL` with `returning` option
 - Fixed time zones for RPostgres 1.3.0+ and RMariaDB 1.1.0+
 
-# dbx 0.2.7 (2020-09-07)
+# 0.2.7 (2020-09-07)
 
 - Fixed CRAN check with R-devel
 
-# dbx 0.2.6 (2020-06-14)
+# 0.2.6 (2020-06-14)
 
 - Added `transaction` option to `dbxUpdate`
 - Added unsafe version check for RMySQL
 
-# dbx 0.2.5 (2019-04-24)
+# 0.2.5 (2019-04-24)
 
 - Added support for tibbles
 - Improved error message for invalid database URL
 - Fixed error when `where_cols` ordering different than data frame
 
-# dbx 0.2.4 (2018-12-27)
+# 0.2.4 (2018-12-27)
 
 - Added `dbxExecute` function
 - Added support for complex types
 - Fixed issues with NULL blobs with Postgres and SQLite
 
-# dbx 0.2.3 (2018-10-30)
+# 0.2.3 (2018-10-30)
 
 - Added parameters for `dbxSelect`
 - Added `skip_existing` option to `dbxUpsert`
 - Fixed issue with `batch_size` option skipping partial batches
 
-# dbx 0.2.2 (2018-09-05)
+# 0.2.2 (2018-09-05)
 
 - Added statement duration to logging
 - Added logging for `dbxUpdate` transaction
@@ -40,12 +40,12 @@
 - Improved support for ODBC
 - Fixed error with `dbxUpsert`
 
-# dbx 0.2.1 (2018-08-03)
+# 0.2.1 (2018-08-03)
 
 - Added `sslmode` and `sslrootcert` for RPostgreSQL
 - Fixed error with dplyr check
 
-# dbx 0.2.0 (2018-07-16)
+# 0.2.0 (2018-07-16)
 
 - Added support for fractional seconds
 - Fixed error with updates
@@ -70,6 +70,6 @@ Breaking
   dbxConnect(adapter="postgres", storage_tz=Sys.timezone(), ...)
   ```
 
-# dbx 0.1.0 (2018-07-05)
+# 0.1.0 (2018-07-05)
 
 - First release
