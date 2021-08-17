@@ -551,7 +551,7 @@ Everyone is encouraged to help improve this project. Here are a few ways you can
 - Write, clarify, or fix documentation
 - Suggest or add new features
 
-To get started with development and testing:
+To get started with development:
 
 ```sh
 git clone https://github.com/ankane/dbx.git
@@ -561,7 +561,7 @@ cd dbx
 createdb dbx_test
 
 # create MySQL database
-mysql -u root -e "CREATE DATABASE dbx_test"
+mysqladmin create dbx_test
 ```
 
 In R, do:
