@@ -23,6 +23,7 @@ dbxSelect <- function(conn, statement, params=NULL) {
   unescape_blobs <- list()
   fix_timetz <- list()
   change_tz <- list()
+  check_bigint <- list()
 
   r <- fetchRecords(conn, statement, params)
   records <- r$records
@@ -38,6 +39,7 @@ dbxSelect <- function(conn, statement, params=NULL) {
 
     unescape_blobs <- which(sql_types == "bytea")
     fix_timetz <- which(sql_types == "timetzoid")
+    check_bigint <- which(sql_types == "bigint")
   } else if (isRPostgres(conn)) {
     sql_types <- column_info$`.typname`
 
@@ -46,12 +48,14 @@ dbxSelect <- function(conn, statement, params=NULL) {
     }
 
     stringify_json <- which(sql_types %in% c("json", "jsonb"))
+    check_bigint <- which(sql_types == "int8")
   } else if (isRMySQL(conn)) {
     sql_types <- tolower(column_info$type)
 
     cast_dates <- which(sql_types == "date")
     cast_datetimes <- which(sql_types %in% c("datetime", "timestamp"))
     cast_booleans <- which(sql_types == "tinyint" & column_info$length == 1)
+    check_bigint <- which(sql_types == "bigint")
   } else if (isRMariaDB(conn)) {
     # TODO cast booleans for RMariaDB
     # waiting on https://github.com/r-dbi/RMariaDB/issues/100
@@ -78,6 +82,15 @@ dbxSelect <- function(conn, statement, params=NULL) {
 
     for (i in unescape_blobs) {
       records[[colnames(records)[i]]] <- list()
+    }
+  }
+
+  for (i in check_bigint) {
+    # need to check class instead of is.numeric
+    # since integer64 type returns true for is.numeric
+    if (identical(class(records[, i]), "numeric") && any(records[, i] > 9007199254740991 | records[, i] < -9007199254740991, na.rm=TRUE)) {
+      # TODO raise error
+      warning("bigint value outside range of numeric")
     }
   }
 
