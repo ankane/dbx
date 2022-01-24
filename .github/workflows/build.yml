@@ -41,6 +41,11 @@ jobs:
         uses: ankane/setup-mysql@v1
         with:
           database: dbx_test
+      - if: ${{ startsWith(matrix.config.os, 'windows') }}
+        run: |
+          mysql -u root -e "CREATE USER 'runneradmin'@'localhost' IDENTIFIED BY ''"
+          mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'runneradmin'@'localhost'"
+          mysql -u root -e "FLUSH PRIVILEGES"
 
       - name: Install Postgres
         uses: ankane/setup-postgres@v1
