@@ -69,9 +69,7 @@ dbxSelect <- function(conn, statement, params=NULL) {
   }
 
   # fix for empty data frame
-  # until new RPostgreSQL version is published
-  # https://github.com/tomoakin/RPostgreSQL/commit/f93cb17cf584d57ced5045a46d16d2bfe05a2769
-  if (isRPostgreSQL(conn) && ncol(records) == 0) {
+  if (isRPostgreSQL(conn) && (ncol(records) == 0 || nrow(records) == 0)) {
     for (i in 1:nrow(column_info)) {
       row <- column_info[i, ]
       records[, i] <- emptyType(row$Sclass)

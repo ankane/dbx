@@ -1,3 +1,7 @@
+# 0.2.9 (unreleased)
+
+- Fixed typecasting for empty results with RPostgreSQL 0.7
+
 # 0.2.8 (2021-01-16)
 
 - Added support for `SQL` with `returning` option
