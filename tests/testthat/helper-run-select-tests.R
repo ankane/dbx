@@ -259,10 +259,13 @@ runSelectTests <- function(db) {
   })
 
   test_that("empty vector params works", {
+    # due to https://github.com/r-dbi/RPostgres/pull/370
+    skip_if(isRPostgres(db))
+
     events <- data.frame(counter=c(1, 2))
     dbxInsert(db, "events", events)
 
-    params <- list(as.integer(NA))
+    params <- list(c())
     sql <- "SELECT COUNT(*) AS count FROM events WHERE counter IN (?)"
     res <- dbxSelect(db, sql, params=params)
     expect_equal(res$count, 0)
