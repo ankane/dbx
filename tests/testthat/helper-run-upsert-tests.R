@@ -104,4 +104,15 @@ runUpsertTests <- function(db, redshift=FALSE) {
     res <- dbxSelect(db, "SELECT city FROM events ORDER BY id")
     expect_equal(res$city, c("San Francisco", "Chicago", "New York"))
   })
+
+  test_that("upsert NA works", {
+    skip_if_not(upsertSupported())
+
+    # https://github.com/ankane/dbx/issues/30
+    # https://github.com/r-dbi/RPostgres/issues/393
+    skip_if(isRPostgres(db))
+
+    events <- data.frame(id=c(1, 2), created_on=c("2022-01-01", NA), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+  })
 }
