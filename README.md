@@ -328,7 +328,7 @@ dbxUpdate(db, transaction=FALSE)
 
 ## Schemas
 
-To specify a schema in Postgres, use:
+To specify a schema, use:
 
 ```r
 table <- DBI::Id(schema="schema", table="table")
