@@ -178,6 +178,8 @@ Use `where_cols` to specify the columns used for lookup. Other columns are writt
 
 ### Upsert
 
+*Only available for PostgreSQL 9.5+, MySQL 5.5+, and SQLite 3.24+*
+
 *Atomically* insert if they don’t exist, otherwise update them
 
 ```r
@@ -186,8 +188,6 @@ dbxUpsert(db, table, records, where_cols=c("id"))
 ```
 
 Use `where_cols` to specify the columns used for lookup. There must be a unique index on them, or an error will be thrown.
-
-*Only available for PostgreSQL 9.5+, MySQL 5.5+, and SQLite 3.24+*
 
 To skip existing rows instead of updating them, use:
 
