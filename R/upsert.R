@@ -17,7 +17,7 @@
 #' records <- data.frame(id=c(3, 4), temperature=c(20, 25))
 #' dbxUpsert(db, table, records, where_cols=c("id"))
 #' }
-dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL, returning=NULL, skip_existing=FALSE) {
+dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL, returning=NULL, skip_existing=FALSE, conflict_condition=NULL) {
   cols <- colnames(records)
 
   if (!setequal(intersect(cols, where_cols), where_cols)) {
@@ -48,7 +48,15 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL, returni
     } else {
       conflict_target <- colsClause(quoted_where_cols)
       sql <- insertClause(conn, table, batch)
-      sql <- paste0(sql, " ON CONFLICT (", conflict_target, ") DO")
+      sql <- paste0(sql, " ON CONFLICT (", conflict_target, ")")
+      if(isPostgres(conn))
+      {
+        if(!is.null(conflict_condition)) 
+        { 
+          sql <- paste0(sql, " WHERE ", conflict_condition, " ") 
+        }
+      }
+      sql <- paste0(sql, " DO ")
       if (skip_existing) {
         sql <- paste(sql, "NOTHING")
       } else {
