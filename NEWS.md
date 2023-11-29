@@ -1,6 +1,7 @@
 ## 0.2.9 (unreleased)
 
 - Fixed typecasting for empty results with RPostgreSQL 0.7
+- Fixed warning with RPostgreSQL
 
 ## 0.2.8 (2021-01-16)
 

@@ -155,7 +155,7 @@ fetchRecords <- function(conn, statement, params) {
   ret <- list()
   column_info <- NULL
 
-  silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "(unknown (", "Decimal MySQL column"), {
+  silenceWarnings(c("length of NULL cannot be changed", "unrecognized MySQL field type", "unrecognized PostgreSQL field type", "unknown (", "Decimal MySQL column"), {
     statement <- addParams(conn, statement, params)
 
     res <- NULL
