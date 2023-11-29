@@ -14,7 +14,7 @@ Designed for both research and production environments
 
 Supports Postgres, MySQL, MariaDB, SQLite, and more
 
-[![Build Status](https://github.com/ankane/dbx/workflows/build/badge.svg?branch=master)](https://github.com/ankane/dbx/actions) [![CRAN status](https://www.r-pkg.org/badges/version/dbx)](https://cran.r-project.org/package=dbx)
+[![Build Status](https://github.com/ankane/dbx/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/ankane/dbx/actions) [![CRAN status](https://www.r-pkg.org/badges/version/dbx)](https://cran.r-project.org/package=dbx)
 
 ## Installation
 
