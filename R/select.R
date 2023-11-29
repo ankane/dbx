@@ -31,11 +31,7 @@ dbxSelect <- function(conn, statement, params=NULL) {
   # typecasting
   if (isRPostgreSQL(conn)) {
     sql_types <- tolower(column_info$type)
-
-    if (storageTimeZone(conn) != currentTimeZone()) {
-      convert_tz <- which(sql_types == "timestamp")
-    }
-
+    convert_tz <- which(sql_types == "timestamp")
     unescape_blobs <- which(sql_types == "bytea")
     fix_timetz <- which(sql_types == "timetzoid")
   } else if (isRPostgres(conn)) {

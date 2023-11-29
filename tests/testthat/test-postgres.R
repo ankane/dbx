@@ -20,7 +20,7 @@ test_that("datetimes with storage_tz works", {
     dbxInsert(db2, "events", events)
 
     # for R-devel
-    attr(events$updated_at, "tzone") <- Sys.timezone()
+    attr(events$updated_at, "tzone") <- currentTimeZone()
 
     # test returned time
     res <- dbxSelect(db2, "SELECT * FROM events ORDER BY id")
