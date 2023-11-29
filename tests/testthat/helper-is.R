@@ -15,7 +15,7 @@ isODBCPostgres <- function(conn) {
 }
 
 isRMySQL <- function(conn) {
-  inherits(conn, "MySQLConnection")
+  inherits(conn, "MySQLConnection") && !inherits(conn, "MariaDBConnection")
 }
 
 isMySQL <- function(conn) {

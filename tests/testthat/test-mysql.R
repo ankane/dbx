@@ -2,6 +2,9 @@ context("mysql")
 
 skip_on_cran()
 
+# prevent conflict with MySQLConnection
+unloadNamespace("RMariaDB")
+
 db <- dbxConnect(adapter="rmysql", dbname="dbx_test")
 
 dbxExecute(db, "DROP TABLE IF EXISTS events")

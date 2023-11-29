@@ -1,5 +1,6 @@
 ## 0.2.9 (unreleased)
 
+- Fixed issue with RMariaDB 1.3.0+
 - Fixed typecasting for empty results with RPostgreSQL 0.7
 - Fixed warning with RPostgreSQL
 

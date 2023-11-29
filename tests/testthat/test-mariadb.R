@@ -2,6 +2,9 @@ context("mariadb")
 
 skip_on_cran()
 
+# prevent conflict with MySQLConnection
+unloadNamespace("RMySQL")
+
 db <- dbxConnect(adapter="rmariadb", dbname="dbx_test")
 
 dbxExecute(db, "DROP TABLE IF EXISTS events")
