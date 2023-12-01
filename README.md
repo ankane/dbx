@@ -551,3 +551,10 @@ install.packages("devtools")
 devtools::install_deps(dependencies=TRUE)
 devtools::test()
 ```
+
+To test a single file, use:
+
+```r
+devtools::install() # to use latest updates
+devtools::test_active_file("tests/testthat/test-postgres.R")
+```
