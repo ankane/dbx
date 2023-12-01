@@ -518,26 +518,6 @@ To close a connection, use:
 dbxDisconnect(db)
 ```
 
-## Upgrading
-
-### 0.2.0
-
-Version 0.2.0 brings a number of fixes and improvements to data types.
-
-However, there a few breaking changes to be aware of:
-
-- The `dbxInsert` and `dbxUpsert` functions no longer return a data frame by default. For MySQL and SQLite, the data frame was just the `records` argument. For Postgres, if you use auto-incrementing primary keys, the data frame contained ids of the newly inserted/upserted records. To get the ids, pass name of the column as the `returning` argument:
-
-  ```r
-  dbxInsert(db, table, records, returning=c("id"))
-  ```
-
-- `timestamp without time zone` columns in Postgres are now stored in UTC instead of local time by default. This does not affect `timestamp with time zone` columns. To keep the previous behavior, use:
-
-  ```r
-  dbxConnect(adapter="postgres", storage_tz=Sys.timezone(), ...)
-  ```
-
 ## History
 
 View the [changelog](https://github.com/ankane/dbx/blob/master/NEWS.md)
