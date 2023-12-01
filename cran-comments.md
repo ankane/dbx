@@ -1,7 +1,7 @@
 ## Test environments
 
 * local OS X install, R 4.3.0
-* ubuntu 22.04 (on travis-ci), R 4.3.2
+* ubuntu 22.04 (on GitHub Actions), R 4.3.2
 * win-builder
 
 ## R CMD check results
