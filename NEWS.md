@@ -1,4 +1,4 @@
-## 0.2.9 (unreleased)
+## 0.3.0 (2023-11-30)
 
 - Fixed issue with RMariaDB 1.3.0+
 - Fixed typecasting for empty results with RPostgreSQL 0.7
