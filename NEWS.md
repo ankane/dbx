@@ -1,3 +1,7 @@
+## 0.3.1 (unreleased)
+
+- Fixed typecasting with ODBC
+
 ## 0.3.0 (2023-11-30)
 
 - Fixed issue with RMariaDB 1.3.0+

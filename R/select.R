@@ -159,11 +159,17 @@ fetchRecords <- function(conn, statement, params) {
       res <- DBI::dbSendQuery(conn, statement)
     })
 
+    if (!isSQLite(conn)) {
+      column_info <- DBI::dbColumnInfo(res)
+    }
+
     # always fetch at least once
     ret[[length(ret) + 1]] <- DBI::dbFetch(res)
 
     # must come after first fetch call for SQLite
-    column_info <- DBI::dbColumnInfo(res)
+    if (isSQLite(conn)) {
+      column_info <- DBI::dbColumnInfo(res)
+    }
 
     while (!DBI::dbHasCompleted(res)) {
       ret[[length(ret) + 1]] <- DBI::dbFetch(res)
