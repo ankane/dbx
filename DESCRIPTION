@@ -8,7 +8,7 @@ Description: Provides select, insert, update, upsert, and delete database operat
 URL: https://github.com/ankane/dbx
 BugReports: https://github.com/ankane/dbx/issues
 License: MIT + file LICENSE
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 Imports: DBI (>= 1.0.0)
 Suggests: testthat (>= 1.0.2), urltools (>= 1.7.0), RSQLite (>= 2.1.2), RMariaDB, RMySQL (>= 0.10.20), RPostgres, RPostgreSQL, hms, jsonlite, blob, odbc
