@@ -45,6 +45,17 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL, returni
       }
       sql <- paste(sql, "ON DUPLICATE KEY UPDATE", set_sql)
       selectOrExecute(conn, sql, batch, returning=returning)
+    } else if (isSQLServer(conn)) {
+      quoted_table <- quoteIdent(conn, table)
+      quoted_cols <- quoteIdent(conn, cols)
+      on_sql <- upsertOnClauseSQLServer(quoted_where_cols)
+
+      sql <- paste0("MERGE ", quoted_table, " WITH (HOLDLOCK) AS t USING (VALUES ", valuesClause(conn, batch), ") AS s (", colsClause(quoted_cols), ") ON (", on_sql, ") WHEN NOT MATCHED BY TARGET THEN INSERT (", colsClause(quoted_cols) , ") VALUES (", colsClause(quoted_cols), ")")
+      if (!skip_existing) {
+        set_sql <- upsertSetClauseSQLServer(quoted_update_cols)
+        sql <- paste(sql, "WHEN MATCHED THEN UPDATE SET", set_sql)
+      }
+      selectOrExecute(conn, paste0(sql, ";"), batch, returning=returning)
     } else {
       conflict_target <- colsClause(quoted_where_cols)
       sql <- insertClause(conn, table, batch)

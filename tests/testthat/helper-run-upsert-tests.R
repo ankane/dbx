@@ -1,6 +1,6 @@
 runUpsertTests <- function(db, redshift=FALSE) {
   upsertSupported <- function() {
-    !(redshift || isSQLServer(db))
+    !redshift
   }
 
   test_that("upsert works", {

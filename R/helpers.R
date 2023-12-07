@@ -58,6 +58,18 @@ upsertSetClausePostgres <- function(cols) {
   }), collapse=", ")
 }
 
+upsertSetClauseSQLServer <- function(cols) {
+  paste(lapply(cols, function(x) {
+    paste0("t.", x, " = s.", x)
+  }), collapse=", ")
+}
+
+upsertOnClauseSQLServer <- function(cols) {
+  paste(lapply(cols, function(x) {
+    paste0("t.", x, " = s.", x)
+  }), collapse=" AND ")
+}
+
 colsClause <- function(cols) {
   paste(cols, collapse=", ")
 }
