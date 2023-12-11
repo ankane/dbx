@@ -1,6 +1,6 @@
-## 0.3.1 (unreleased)
+## 0.3.1 (2023-12-11)
 
-- Added experimental support for `dbxUpsert` for SQL Server
+- Added support for `dbxUpsert` for SQL Server
 - Fixed typecasting with ODBC
 
 ## 0.3.0 (2023-11-30)

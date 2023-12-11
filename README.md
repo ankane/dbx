@@ -178,7 +178,7 @@ Use `where_cols` to specify the columns used for lookup. Other columns are writt
 
 ### Upsert
 
-*Only available for PostgreSQL 9.5+, MySQL 5.5+, and SQLite 3.24+*
+*Available for PostgreSQL 9.5+, MySQL 5.5+, SQLite 3.24+, and SQL Server 2008+*
 
 *Atomically* insert if they don’t exist, otherwise update them
 
