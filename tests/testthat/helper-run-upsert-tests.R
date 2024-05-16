@@ -58,7 +58,7 @@ runUpsertTests <- function(db, redshift=FALSE) {
   })
 
   test_that("upsert returning works", {
-    skip_if(!isPostgres(db) || redshift)
+    skip_if(!(isPostgres(db) || isMariaDB(db)) || redshift)
 
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     res <- dbxUpsert(db, "events", events, where_cols=c("id"), returning=c("id", "city"))

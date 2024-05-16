@@ -1,3 +1,7 @@
+## 0.3.2 (unreleased)
+
+- Added support for `returning` option for `dbxUpsert` for MariaDB 10.5+
+
 ## 0.3.1 (2023-12-11)
 
 - Added support for `dbxUpsert` for SQL Server

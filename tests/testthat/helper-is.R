@@ -26,6 +26,12 @@ isRMariaDB <- function(conn) {
   inherits(conn, "MariaDBConnection")
 }
 
+isMariaDB <- function(conn) {
+  # RMariaDB uses MySQLConnection for MySQL for 1.3+
+  # TODO add detection for other adapters
+  inherits(conn, "MariaDBConnection")
+}
+
 isSQLite <- function(conn) {
   inherits(conn, "SQLiteConnection")
 }

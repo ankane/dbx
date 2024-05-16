@@ -140,8 +140,10 @@ selectOrExecute <- function(conn, sql, records, returning) {
     execute(conn, sql)
     invisible()
   } else {
-    if (!isPostgres(conn)) {
-      stop("returning is only supported with Postgres")
+    # allow for any MySQL adapter for now
+    # TODO add detection for MariaDB
+    if (!isPostgres(conn) && !isMySQL(conn)) {
+      stop("returning is only supported with Postgres and MariaDB")
     }
 
     if (inherits(returning, "SQL")) {
