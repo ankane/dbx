@@ -37,7 +37,7 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - if: ${{ !matrix.mariadb }}
+      - if: ${{ !matrix.config.mariadb }}
         name: Install MySQL
         uses: ankane/setup-mysql@v1
         with:
@@ -48,7 +48,7 @@ jobs:
           mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'runneradmin'@'localhost'"
           mysql -u root -e "FLUSH PRIVILEGES"
 
-      - if: ${{ matrix.mariadb }}
+      - if: ${{ matrix.config.mariadb }}
         name: Install MariaDB
         uses: ankane/setup-mysql@v1
         with:
