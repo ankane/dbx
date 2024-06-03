@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest, r: 'release'}
+          - {os: macos-latest, r: 'release', mariadb: true}
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest, r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest, r: 'release'}
@@ -37,7 +37,8 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - name: Install MySQL
+      - if: ${{ !matrix.mariadb }}
+        name: Install MySQL
         uses: ankane/setup-mysql@v1
         with:
           database: dbx_test
@@ -46,6 +47,12 @@ jobs:
           mysql -u root -e "CREATE USER 'runneradmin'@'localhost' IDENTIFIED BY ''"
           mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'runneradmin'@'localhost'"
           mysql -u root -e "FLUSH PRIVILEGES"
+
+      - if: ${{ matrix.mariadb }}
+        name: Install MariaDB
+        uses: ankane/setup-mysql@v1
+        with:
+          database: dbx_test
 
       - name: Install Postgres
         uses: ankane/setup-postgres@v1
