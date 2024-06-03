@@ -50,7 +50,7 @@ jobs:
 
       - if: ${{ matrix.config.mariadb }}
         name: Install MariaDB
-        uses: ankane/setup-mysql@v1
+        uses: ankane/setup-mariadb@v1
         with:
           database: dbx_test
 
