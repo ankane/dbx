@@ -146,8 +146,8 @@ selectOrExecute <- function(conn, sql, records, returning) {
   } else {
     # allow for any MySQL adapter for now
     # TODO add detection for MariaDB
-    if (!isPostgres(conn) && !isMySQL(conn) && !isDuckDB(conn)) {
-      stop("returning is only supported with Postgres, MariaDB, and DuckDB")
+    if (!isPostgres(conn) && !isMySQL(conn) && !isSQLite(conn) && !isDuckDB(conn)) {
+      stop("returning is only supported with Postgres, MariaDB, SQLite, and DuckDB")
     }
 
     if (inherits(returning, "SQL")) {
