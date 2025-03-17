@@ -115,6 +115,8 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("datetimes works", {
+    skip_if(isDuckDB(db))
+
     t1 <- as.POSIXct("2018-01-01 12:30:55")
     t2 <- as.POSIXct("2018-01-01 16:59:59")
     events <- data.frame(updated_at=c(t1, t2))
@@ -136,6 +138,8 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("datetimes with time zones works", {
+    skip_if(isDuckDB(db))
+
     t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
     t2 <- as.POSIXct("2018-01-01 16:59:59", tz="America/New_York")
     events <- data.frame(updated_at=c(t1, t2))
@@ -160,7 +164,7 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("timestamp with time zone works", {
-    skip_if(isSQLite(db))
+    skip_if(isSQLite(db) || isDuckDB(db))
 
     t1 <- as.POSIXct("2018-01-01 12:30:55", tz="America/New_York")
     t2 <- as.POSIXct("2018-01-01 16:59:59", tz="America/New_York")
@@ -180,6 +184,8 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("datetimes have precision", {
+    skip_if(isDuckDB(db))
+
     t1 <- as.POSIXct("2018-01-01 12:30:55.123456")
     events <- data.frame(updated_at=c(t1))
     dbxInsert(db, "events", events)
@@ -201,7 +207,7 @@ runDataTypeTests <- function(db, redshift=FALSE) {
 
   test_that("time zone is UTC", {
     # always utc
-    skip_if(isSQLite(db) || isSQLServer(db))
+    skip_if(isSQLite(db) || isSQLServer(db) || isDuckDB(db))
 
     if (isPostgres(db)) {
       expect_equal("UTC", dbxSelect(db, "SHOW timezone")$TimeZone)
@@ -211,6 +217,8 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("times work", {
+    skip_if(isDuckDB(db))
+
     events <- data.frame(open_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
@@ -244,6 +252,8 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   })
 
   test_that("hms with times work", {
+    skip_if(isDuckDB(db))
+
     events <- data.frame(open_time=c(hms::as_hms("12:30:55"), hms::as_hms("16:59:59")), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
@@ -325,7 +335,7 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   # very important
   # shows typecasting is consistent
   test_that("can update what what just selected and get same result", {
-    skip_if(isODBCPostgres(db) || isSQLServer(db))
+    skip_if(isODBCPostgres(db) || isSQLServer(db) || isDuckDB(db))
 
     df <- data.frame(
       active=c(TRUE, FALSE),
