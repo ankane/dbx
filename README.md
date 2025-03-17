@@ -515,6 +515,12 @@ With Postgres, set a connect timeout with:
 db <- dbxConnect(connect_timeout=3) # sec
 ```
 
+With SQL Server, set a connect timeout with:
+
+```r
+db <- dbxConnect(timeout=3) # sec
+```
+
 ## Compatibility
 
 All connections are simply [DBI](https://cran.r-project.org/package=DBI) connections, so you can use them anywhere you use DBI.

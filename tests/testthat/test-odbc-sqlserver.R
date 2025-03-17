@@ -12,7 +12,7 @@ if (isMac()) {
 
 skip_if_not(file.exists(driver))
 
-db <- dbxConnect(adapter=odbc::odbc(), driver=driver, database="dbx_test", server="localhost", port=1433, uid="SA", pwd="YourStrong!Passw0rd")
+db <- dbxConnect(adapter=odbc::odbc(), driver=driver, database="dbx_test", server="localhost", port=1433, uid="SA", pwd="YourStrong!Passw0rd", timeout=1)
 
 dbxExecute(db, "DROP TABLE IF EXISTS events")
 dbxExecute(db, "DROP SEQUENCE IF EXISTS events_id_seq")
