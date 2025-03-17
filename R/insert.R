@@ -15,7 +15,7 @@
 #' dbxInsert(db, table, records)
 dbxInsert <- function(conn, table, records, batch_size=NULL, returning=NULL) {
   inBatches(records, batch_size, function(batch) {
-    sql <- insertClause(conn, table, batch)
+    sql <- insertClause(conn, table, batch, returning=returning)
     selectOrExecute(conn, sql, batch, returning=returning)
   })
 }

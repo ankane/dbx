@@ -174,7 +174,7 @@ records <- data.frame(temperature=c(32, 25))
 dbxInsert(db, table, records)
 ```
 
-If you use auto-incrementing ids in Postgres, MariaDB, SQLite, or DuckDB, you can get the ids of newly inserted rows by passing the column name:
+If you use auto-incrementing ids in Postgres, MariaDB, SQLite, SQL Server, or DuckDB, you can get the ids of newly inserted rows by passing the column name:
 
 ```r
 dbxInsert(db, table, records, returning=c("id"))
@@ -212,7 +212,7 @@ To skip existing rows instead of updating them, use:
 dbxUpsert(db, table, records, where_cols=c("id"), skip_existing=TRUE)
 ```
 
-If you use auto-incrementing ids in Postgres, MariaDB, SQLite, or DuckDB, you can get the ids of newly upserted rows by passing the column name:
+If you use auto-incrementing ids in Postgres, MariaDB, SQLite, SQL Server, or DuckDB, you can get the ids of newly upserted rows by passing the column name:
 
 ```r
 dbxUpsert(db, table, records, where_cols=c("id"), returning=c("id"))

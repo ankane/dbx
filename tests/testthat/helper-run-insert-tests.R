@@ -13,17 +13,21 @@ runInsertTests <- function(db, redshift=FALSE) {
   })
 
   test_that("insert returning works", {
-    skip_if(!(isPostgres(db) || isMariaDB(db) || isSQLite(db) || isDuckDB(db)) || redshift)
+    skip_if(!(isPostgres(db) || isMariaDB(db) || isSQLite(db) || isSQLServer(db) || isDuckDB(db)) || redshift)
 
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     res <- dbxInsert(db, "events", events, returning=c("id", "city"))
 
     expect_equal(res$id, c(1, 2))
     expect_equal(res$city, events$city)
+
+    events <- data.frame(city=c("Chicago", "New York"), stringsAsFactors=FALSE)
+    res <- dbxInsert(db, "events", events, returning=c("id"))
+    expect_equal(c(1, 2, res$id), dbxSelect(db, "SELECT id FROM events ORDER BY id")$id)
   })
 
   test_that("insert returning star works", {
-    skip_if(!(isPostgres(db) || isMariaDB(db) || isSQLite(db) || isDuckDB(db)) || redshift)
+    skip_if(!(isPostgres(db) || isMariaDB(db) || isSQLite(db) || isSQLServer(db) || isDuckDB(db)) || redshift)
 
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     res <- dbxInsert(db, "events", events, returning=c("*"))

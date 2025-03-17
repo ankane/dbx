@@ -1,7 +1,7 @@
 ## 0.4.0 (unreleased)
 
 - Added support for DuckDB
-- Added support for `returning` option for `dbxInsert` and `dbxUpsert` for SQLite 3.35.0+
+- Added support for `returning` option for `dbxInsert` and `dbxUpsert` for SQLite 3.35.0+ and SQL Server
 - Fixed typecasting with ODBC for MariaDB
 
 ## 0.3.2 (2024-06-02)

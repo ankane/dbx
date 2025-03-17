@@ -55,7 +55,13 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL, returni
         set_sql <- upsertSetClauseSQLServer(quoted_update_cols)
         sql <- paste(sql, "WHEN MATCHED THEN UPDATE SET", set_sql)
       }
-      selectOrExecute(conn, paste0(sql, ";"), batch, returning=returning)
+
+      output_sql <- ""
+      if (!is.null(returning)) {
+        output_sql <- outputClause(conn, returning)
+      }
+
+      selectOrExecute(conn, paste0(sql, output_sql, ";"), batch, returning=returning)
     } else {
       conflict_target <- colsClause(quoted_where_cols)
       sql <- insertClause(conn, table, batch)

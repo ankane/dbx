@@ -103,7 +103,17 @@ valuesClause <- function(conn, records) {
   paste0("(", rows, ")", collapse=", ")
 }
 
-insertClause <- function(conn, table, records) {
+outputClause <- function(conn, returning) {
+  if (inherits(returning, "SQL")) {
+    # should be a no-op, but quote for safety
+    quoted_cols <- quoteIdent(conn, returning)
+  } else {
+    quoted_cols <- lapply(returning, function(x) { if (x == "*") x else quoteIdent(conn, x) })
+  }
+  paste0(" OUTPUT ", paste(paste0("INSERTED.", quoted_cols), collapse=", "))
+}
+
+insertClause <- function(conn, table, records, returning=NULL) {
   cols <- colnames(records)
 
   # quote
@@ -112,7 +122,13 @@ insertClause <- function(conn, table, records) {
 
   cols_sql <- colsClause(quoted_cols)
   records_sql <- valuesClause(conn, records)
-  paste0("INSERT INTO ", quoted_table, " (", cols_sql, ") VALUES ", records_sql)
+
+  output_sql <- ""
+  if (!is.null(returning) && isSQLServer(conn)) {
+    output_sql <- outputClause(conn, returning)
+  }
+
+  paste0("INSERT INTO ", quoted_table, " (", cols_sql, ")", output_sql, " VALUES ", records_sql)
 }
 
 isDate <- function(col) {
@@ -143,11 +159,13 @@ selectOrExecute <- function(conn, sql, records, returning) {
   if (is.null(returning)) {
     execute(conn, sql)
     invisible()
+  } else if (isSQLServer(conn)) {
+    dbxSelect(conn, sql)
   } else {
     # allow for any MySQL adapter for now
     # TODO add detection for MariaDB
     if (!isPostgres(conn) && !isMySQL(conn) && !isSQLite(conn) && !isDuckDB(conn)) {
-      stop("returning is only supported with Postgres, MariaDB, SQLite, and DuckDB")
+      stop("returning is only supported with Postgres, MariaDB, SQLite, SQL Server, and DuckDB")
     }
 
     if (inherits(returning, "SQL")) {
