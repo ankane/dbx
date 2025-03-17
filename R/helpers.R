@@ -288,7 +288,7 @@ quoteRecords <- function(conn, records) {
 }
 
 castData <- function(conn, col) {
-  if (isMySQL(conn) || isSQLite(conn) || isSQLServer(conn)) {
+  if (isMySQL(conn) || isSQLite(conn) || isSQLServer(conn) || isDuckDB(conn)) {
     # since no standard for SQLite, store dates and datetimes in the same format as Rails
     # store times without dates as strings to keep things simple
     if (isDatetime(col)) {

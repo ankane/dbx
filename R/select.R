@@ -23,6 +23,7 @@ dbxSelect <- function(conn, statement, params=NULL) {
   unescape_blobs <- list()
   fix_timetz <- list()
   change_tz <- list()
+  uncast_difftimes <- list()
 
   r <- fetchRecords(conn, statement, params)
   records <- r$records
@@ -62,6 +63,10 @@ dbxSelect <- function(conn, statement, params=NULL) {
     sql_types <- column_info$type
     change_tz <- which(sql_types == 93)
     cast_booleans <- which(sql_types == -6)
+  } else if (isDuckDB(conn)) {
+    sql_types <- column_info$type
+    change_tz <- which(sql_types == "POSIXct")
+    uncast_difftimes <- which(sql_types == "difftime")
   }
 
   # fix for empty data frame
@@ -117,6 +122,10 @@ dbxSelect <- function(conn, statement, params=NULL) {
       records[, i] <- as.character(records[, i])
     }
 
+    for (i in uncast_difftimes) {
+      records[, i] <- format(as.POSIXct("2000-01-01") + records[, i], "%H:%M:%S")
+    }
+
     uncast_blobs <- which(sapply(records, isBlob))
     for (i in uncast_blobs) {
       col <- lapply(records[, i], as.raw)
@@ -135,6 +144,10 @@ dbxSelect <- function(conn, statement, params=NULL) {
 
     uncast_times <- which(sapply(records, isTime))
     for (i in uncast_times) {
+      records[, i] <- as.character()
+    }
+
+    for (i in uncast_difftimes) {
       records[, i] <- as.character()
     }
 
