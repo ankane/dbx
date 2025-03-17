@@ -53,10 +53,19 @@ jobs:
         uses: ankane/setup-mariadb@v1
         with:
           database: dbx_test
+      - if: ${{ matrix.config.mariadb }}
+        run: |
+          mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'runner'@'localhost' IDENTIFIED BY ''"
+          mysql -e "FLUSH PRIVILEGES"
 
       - name: Install Postgres
         uses: ankane/setup-postgres@v1
         with:
           database: dbx_test
+
+      - if: ${{ startsWith(matrix.config.os, 'ubuntu') }}
+        run: sudo apt-get install odbc-mariadb odbc-postgresql
+      - if: ${{ startsWith(matrix.config.os, 'macos') }}
+        run: brew install mariadb-connector-odbc psqlodbc
 
       - uses: r-lib/actions/check-r-package@v2
