@@ -31,7 +31,7 @@ isSQLite <- function(conn) {
 }
 
 isODBCMySQL <- function(conn) {
-  inherits(conn, "MySQL")
+  inherits(conn, "MySQL") || inherits(conn, "MariaDB")
 }
 
 isSQLServer <- function(conn) {
