@@ -2,6 +2,7 @@ context("odbc-sqlserver")
 
 skip("odbc")
 
+# brew install freetds
 db <- dbxConnect(adapter=odbc::odbc(), driver="/opt/homebrew/lib/libtdsodbc.so", database="dbx_test", server="localhost", port=1433, uid="SA", pwd="YourStrong!Passw0rd")
 
 dbxExecute(db, "DROP TABLE IF EXISTS events")

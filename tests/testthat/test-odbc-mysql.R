@@ -2,7 +2,8 @@ context("odbc-mysql")
 
 skip("odbc")
 
-db <- dbxConnect(adapter=odbc::odbc(), driver="/usr/local/lib/libmaodbc.dylib", database="dbx_test")
+# brew install mariadb-connector-odbc
+db <- dbxConnect(adapter=odbc::odbc(), driver="/opt/homebrew/lib/mariadb/libmaodbc.dylib", database="dbx_test")
 
 dbxExecute(db, "DROP TABLE IF EXISTS events")
 json_type <- if (Sys.getenv("TRAVIS") == "") "JSON" else "TEXT"
