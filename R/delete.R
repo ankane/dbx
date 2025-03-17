@@ -20,7 +20,7 @@ dbxDelete <- function(conn, table, where=NULL, batch_size=NULL) {
   quoted_table <- quoteIdent(conn, table)
 
   if (is.null(where)) {
-    if (isPostgres(conn) || isMySQL(conn)) {
+    if (isPostgres(conn) || isMySQL(conn) || isDuckDB(conn)) {
       sql <- paste("TRUNCATE", quoted_table)
     } else {
       sql <- paste("DELETE FROM", quoted_table)
