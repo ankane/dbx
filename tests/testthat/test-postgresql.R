@@ -2,8 +2,10 @@ context("postgresql")
 
 skip_on_cran()
 
-# https://github.com/tomoakin/RPostgreSQL/pull/119
-# TODO remove when released
+# https://github.com/tomoakin/RPostgreSQL/issues/126
+# SCRAM authentication requires libpq version 10 or above
+# error due to bundling old libpq
+# TODO remove when addressed
 skip_on_os("windows")
 
 db <- dbxConnect(adapter="rpostgresql", dbname="dbx_test")
