@@ -11,6 +11,8 @@ if (isMac()) {
   driver <- "/usr/lib/x86_64-linux-gnu/odbc/libmaodbc.so"
 }
 
+skip_if_not(file.exists(driver))
+
 db <- dbxConnect(adapter=odbc::odbc(), driver=driver, database="dbx_test")
 
 dbxExecute(db, "DROP TABLE IF EXISTS events")
