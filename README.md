@@ -585,3 +585,14 @@ brew install mariadb-connector-odbc psqlodbc
 # or
 sudo apt-get install odbc-mariadb odbc-postgresql
 ```
+
+To test SQL Server, use:
+
+```sh
+brew install freetds
+# or
+sudo apt-get install tdsodbc
+
+docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
+docker exec -it <container-id> /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P YourStrong\!Passw0rd -C -Q "CREATE DATABASE dbx_test"
+```

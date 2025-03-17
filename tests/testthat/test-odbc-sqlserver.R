@@ -1,6 +1,6 @@
 context("odbc-sqlserver")
 
-skip("odbc")
+skip_on_cran()
 
 if (isMac()) {
   # brew install freetds
@@ -9,6 +9,8 @@ if (isMac()) {
   # apt-get install tdsodbc
   driver <- "/usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so"
 }
+
+skip_if_not(file.exists(driver))
 
 db <- dbxConnect(adapter=odbc::odbc(), driver=driver, database="dbx_test", server="localhost", port=1433, uid="SA", pwd="YourStrong!Passw0rd")
 
