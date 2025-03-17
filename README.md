@@ -562,7 +562,7 @@ createdb dbx_test
 # create MySQL database
 mysqladmin create dbx_test
 
-# install ODBC drivers
+# install ODBC drivers (optional)
 brew install mariadb-connector-odbc psqlodbc
 # or
 sudo apt-get install odbc-mariadb odbc-postgresql
