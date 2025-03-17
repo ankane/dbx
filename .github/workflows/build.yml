@@ -15,7 +15,7 @@ jobs:
           - {os: macos-latest, r: 'release', mariadb: true}
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest, r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest, r: 'release'}
+          - {os: ubuntu-22.04, r: 'release', sqlserver: true}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -67,5 +67,14 @@ jobs:
         run: sudo apt-get install odbc-mariadb odbc-postgresql
       - if: ${{ startsWith(matrix.config.os, 'macos') }}
         run: brew install mariadb-connector-odbc psqlodbc
+
+      - if: ${{ matrix.config.sqlserver }}
+        uses: ankane/setup-sqlserver@v1
+        with:
+          accept-eula: true
+      - if: ${{ matrix.config.sqlserver }}
+        run: |
+          sqlcmd -U SA -P 'YourStrong!Passw0rd' -Q 'CREATE DATABASE dbx_test'
+          sudo apt-get install tdsodbc
 
       - uses: r-lib/actions/check-r-package@v2
