@@ -162,12 +162,6 @@ selectOrExecute <- function(conn, sql, records, returning) {
   } else if (isSQLServer(conn)) {
     dbxSelect(conn, sql)
   } else {
-    # allow for any MySQL adapter for now
-    # TODO add detection for MariaDB
-    if (!isPostgres(conn) && !isMySQL(conn) && !isSQLite(conn) && !isDuckDB(conn)) {
-      stop("returning is only supported with Postgres, MariaDB, SQLite, SQL Server, and DuckDB")
-    }
-
     if (inherits(returning, "SQL")) {
       # should be a no-op, but quote for safety
       returning_clause <- paste(quoteIdent(conn, returning), collapse=", ")

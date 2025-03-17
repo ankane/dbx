@@ -180,6 +180,8 @@ If you use auto-incrementing ids, you can get the ids of newly inserted rows by 
 dbxInsert(db, table, records, returning=c("id"))
 ```
 
+> `returning` is not available for MySQL or Redshift
+
 ### Update
 
 Update records
@@ -215,6 +217,8 @@ If you use auto-incrementing ids, you can get the ids of newly upserted rows by 
 ```r
 dbxUpsert(db, table, records, where_cols=c("id"), returning=c("id"))
 ```
+
+> `returning` is not available for MySQL or Redshift
 
 ### Delete
 
