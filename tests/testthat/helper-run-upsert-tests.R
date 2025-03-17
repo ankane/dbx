@@ -78,6 +78,9 @@ runUpsertTests <- function(db, redshift=FALSE) {
     upsert_events <- data.frame(id=c(2, 3), city=c("Chicago", "New York"))
     res <- dbxUpsert(db, "events", upsert_events, where_cols=c("id"), returning=DBI::SQL("(xmax = 0) AS inserted"))
 
+    if (isODBCPostgres(db)) {
+      res$inserted <- res$inserted != "0"
+    }
     expect_equal(res$inserted, c(FALSE, TRUE))
   })
 

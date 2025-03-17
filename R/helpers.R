@@ -303,7 +303,7 @@ castData <- function(conn, col) {
       col <- format(col, tz=storageTimeZone(conn), "%Y-%m-%d %H:%M:%OS6 %Z")
     } else if (isTime(col)) {
       col <- format(col)
-    } else if (is.logical(col) && isRPostgreSQL(conn)) {
+    } else if (is.logical(col) && (isRPostgreSQL(conn) || isODBCPostgres(conn))) {
       col <- as.character(col)
     } else if (isDate(col) && isRPostgreSQL(conn)) {
       col <- format(col)
