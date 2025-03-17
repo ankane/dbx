@@ -20,7 +20,6 @@ runUpsertTests <- function(db, redshift=FALSE) {
 
   test_that("upsert only where_cols works", {
     skip_if_not(upsertSupported())
-    skip_if(isDuckDB(db))
 
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
