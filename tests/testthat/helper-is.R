@@ -51,3 +51,7 @@ isODBC <- function(conn) {
 isDuckDB <- function(conn) {
   inherits(conn, "duckdb_connection")
 }
+
+isMac <- function() {
+  Sys.info()["sysname"] == "Darwin"
+}
