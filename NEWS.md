@@ -1,3 +1,7 @@
+## 0.3.3 (unreleased)
+
+- Fixed typecasting with ODBC for MariaDB
+
 ## 0.3.2 (2024-06-02)
 
 - Added support for `returning` option for `dbxUpsert` for MariaDB 10.5+
