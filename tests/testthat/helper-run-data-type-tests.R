@@ -219,22 +219,26 @@ runDataTypeTests <- function(db, redshift=FALSE) {
   test_that("times work", {
     skip_if(isDuckDB(db))
 
-    events <- data.frame(open_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
+    events <- data.frame(open_time=c("12:30:55.123", "16:59:59.999"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
     # test returned time
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-    expect_equal(res$open_time, events$open_time)
+    if (isODBC(db)) {
+      expect_equal(res$open_time, substring(events$open_time, 0, 8))
+    } else {
+      expect_equal(res$open_time, events$open_time)
+    }
 
     # test stored time
-    res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
+    res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55.123'")
     expect_equal(res$count, 1)
   })
 
   test_that("times with time zone work", {
     skip_if(!isPostgres(db))
 
-    events <- data.frame(close_time=c("12:30:55", "16:59:59"), stringsAsFactors=FALSE)
+    events <- data.frame(close_time=c("12:30:55.123", "16:59:59.999"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
     # test returned time
@@ -247,22 +251,26 @@ runDataTypeTests <- function(db, redshift=FALSE) {
     }
 
     # test stored time
-    res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE close_time = '12:30:55'")
+    res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE close_time = '12:30:55.123'")
     expect_equal(res$count, 1)
   })
 
   test_that("hms with times work", {
     skip_if(isDuckDB(db))
 
-    events <- data.frame(open_time=c(hms::as_hms("12:30:55"), hms::as_hms("16:59:59")), stringsAsFactors=FALSE)
+    events <- data.frame(open_time=c(hms::as_hms("12:30:55.123"), hms::as_hms("16:59:59.999")), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
     # test returned time
     res <- dbxSelect(db, "SELECT * FROM events ORDER BY id")
-    expect_equal(res$open_time, as.character(events$open_time))
+    if (isODBC(db)) {
+      expect_equal(res$open_time, substring(as.character(events$open_time), 0, 8))
+    } else {
+      expect_equal(res$open_time, as.character(events$open_time))
+    }
 
     # test stored time
-    res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55'")
+    res <- dbxSelect(db, "SELECT COUNT(*) AS count FROM events WHERE open_time = '12:30:55.123'")
     expect_equal(res$count, 1)
   })
 
