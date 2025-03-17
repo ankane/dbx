@@ -26,7 +26,7 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL, returni
 
   update_cols <- setdiff(cols, where_cols)
   if (length(update_cols) == 0) {
-    update_cols <- where_cols[1]
+    skip_existing <- TRUE
   }
 
   # quote
