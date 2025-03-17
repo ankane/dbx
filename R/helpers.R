@@ -123,9 +123,10 @@ insertClause <- function(conn, table, records, returning=NULL) {
   cols_sql <- colsClause(quoted_cols)
   records_sql <- valuesClause(conn, records)
 
-  output_sql <- ""
   if (!is.null(returning) && isSQLServer(conn)) {
     output_sql <- outputClause(conn, returning)
+  } else {
+    output_sql <- ""
   }
 
   paste0("INSERT INTO ", quoted_table, " (", cols_sql, ")", output_sql, " VALUES ", records_sql)
