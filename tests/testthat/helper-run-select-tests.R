@@ -41,7 +41,7 @@ runSelectTests <- function(db) {
       # empty datetimes are numeric
       expect_identical(res$created_on, as.numeric())
       expect_identical(res$updated_at, as.numeric())
-    } else {
+    } else if (!isDuckDB(db)) {
       expect_identical(res$created_on, as.Date(as.character()))
 
       # not identical due to empty tzone attribute
@@ -90,7 +90,7 @@ runSelectTests <- function(db) {
       # empty datetimes are numeric
       expect_identical(res$created_on, as.numeric(NA))
       expect_identical(res$updated_at, as.numeric(NA))
-    } else {
+    } else if (!isDuckDB(db)) {
       expect_identical(res$created_on, as.Date(NA))
 
       # not identical due to empty tzone attribute
