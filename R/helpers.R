@@ -103,14 +103,17 @@ valuesClause <- function(conn, records) {
   paste0("(", rows, ")", collapse=", ")
 }
 
-outputClause <- function(conn, returning) {
+quoteReturning <- function(conn, returning) {
   if (inherits(returning, "SQL")) {
     # should be a no-op, but quote for safety
-    quoted_cols <- quoteIdent(conn, returning)
+    quoteIdent(conn, returning)
   } else {
-    quoted_cols <- lapply(returning, function(x) { if (x == "*") x else quoteIdent(conn, x) })
+    lapply(returning, function(x) { if (x == "*") x else quoteIdent(conn, x) })
   }
-  paste0(" OUTPUT ", paste(paste0("INSERTED.", quoted_cols), collapse=", "))
+}
+
+outputClause <- function(conn, returning) {
+  paste0(" OUTPUT ", paste(paste0("INSERTED.", quoteReturning(conn, returning)), collapse=", "))
 }
 
 insertClause <- function(conn, table, records, returning=NULL) {
@@ -163,14 +166,7 @@ selectOrExecute <- function(conn, sql, records, returning) {
   } else if (isSQLServer(conn)) {
     dbxSelect(conn, sql)
   } else {
-    if (inherits(returning, "SQL")) {
-      # should be a no-op, but quote for safety
-      returning_clause <- paste(quoteIdent(conn, returning), collapse=", ")
-    } else {
-      returning_clause <- paste(lapply(returning, function(x) { if (x == "*") x else quoteIdent(conn, x) }), collapse=", ")
-    }
-    sql <- paste(sql, "RETURNING", returning_clause)
-
+    sql <- paste(sql, "RETURNING", paste(quoteReturning(conn, returning), collapse=","))
     dbxSelect(conn, sql)
   }
 }
