@@ -115,7 +115,7 @@ dbxConnect <- function(url=NULL, adapter=NULL, storage_tz=NULL, variables=list()
 
   if (inherits(obj, "PqDriver") && utils::packageVersion("RPostgres") >= "1.3.0") {
     if (is.null(params$timezone)) {
-      params$timezone <- if(is.null(storage_tz)) "UTC" else storage_tz
+      params$timezone <- if (is.null(storage_tz)) "UTC" else storage_tz
     }
     if (is.null(params$timezone_out)) {
       params$timezone_out <- currentTimeZone()

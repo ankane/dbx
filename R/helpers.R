@@ -47,7 +47,7 @@ isDuckDB <- function(conn) {
 }
 
 equalClause <- function(cols, row) {
-  lapply(1:length(cols), function (i) { paste(cols[i], "=", row[[i]]) })
+  lapply(seq_along(cols), function(i) { paste(cols[i], "=", row[[i]]) })
 }
 
 upsertSetClause <- function(cols) {
@@ -259,7 +259,7 @@ inBatches <- function(records, batch_size, f) {
         if (end > row_count) {
           end <- row_count
         }
-        ret[[length(ret) + 1]] <- f(records[start:end,, drop=FALSE])
+        ret[[length(ret) + 1]] <- f(records[start:end, , drop=FALSE])
       }
       combineResults(ret)
     }
@@ -292,8 +292,8 @@ quoteIdent <- function(conn, cols) {
 
 quoteRecords <- function(conn, records) {
   quoted_records <- data.frame(matrix(ncol=0, nrow=nrow(records)))
-  for (i in 1:ncol(records)) {
-    col <- castData(conn, records[, i, drop=T])
+  for (i in seq_len(ncol(records))) {
+    col <- castData(conn, records[, i, drop=TRUE])
     quoted_records[, i] <- DBI::dbQuoteLiteral(conn, col)
   }
   quoted_records

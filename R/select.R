@@ -71,7 +71,7 @@ dbxSelect <- function(conn, statement, params=NULL) {
 
   # fix for empty data frame
   if (isRPostgreSQL(conn) && (ncol(records) == 0 || nrow(records) == 0)) {
-    for (i in 1:nrow(column_info)) {
+    for (i in seq_len(nrow(column_info))) {
       row <- column_info[i, ]
       records[, i] <- emptyType(row$Sclass)
     }

@@ -11,7 +11,7 @@ runExecuteTests <- function(db) {
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
-    res <- dbxExecute(db, "UPDATE events SET city = ? WHERE id IN (?)", params=list('New York', 1:2))
+    res <- dbxExecute(db, "UPDATE events SET city = ? WHERE id IN (?)", params=list("New York", 1:2))
     expect_equal(res, 2)
   })
 }
