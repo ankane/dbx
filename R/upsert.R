@@ -26,7 +26,11 @@ dbxUpsert <- function(conn, table, records, where_cols, batch_size=NULL, returni
 
   update_cols <- setdiff(cols, where_cols)
   if (length(update_cols) == 0) {
-    skip_existing <- TRUE
+    if (is.null(returning) || isDuckDB(conn)) {
+      skip_existing <- TRUE
+    } else {
+      update_cols <- where_cols[1]
+    }
   }
 
   # quote

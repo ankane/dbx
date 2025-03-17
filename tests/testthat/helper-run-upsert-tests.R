@@ -31,6 +31,22 @@ runUpsertTests <- function(db, redshift=FALSE) {
     expect_equal(res$city, c("San Francisco", "Boston", NA))
   })
 
+  test_that("upsert only where_cols returning works", {
+    skip_if(!returningSupported(db) || redshift)
+
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+
+    upsert_events <- data.frame(id=c(2, 3))
+    res <- dbxUpsert(db, "events", upsert_events, where_cols=c("id"), returning=c("id"))
+
+    if (isDuckDB(db)) {
+      expect_equal(res$id, c(3))
+    } else {
+      expect_equal(res$id, c(2, 3))
+    }
+  })
+
   test_that("upsert skip_existing works", {
     skip_if_not(upsertSupported())
 
