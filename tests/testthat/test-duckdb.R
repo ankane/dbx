@@ -1,6 +1,6 @@
 context("duckdb")
 
-skip_on_cran()
+skip("duckdb")
 
 db <- dbxConnect(adapter=duckdb::duckdb(), dbdir=":memory:")
 
