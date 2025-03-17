@@ -13,7 +13,7 @@ runInsertTests <- function(db, redshift=FALSE) {
   })
 
   test_that("insert returning works", {
-    skip_if(!(isPostgres(db) || isMariaDB(db) || isSQLite(db) || isSQLServer(db) || isDuckDB(db)) || redshift)
+    skip_if(!returningSupported(db) || redshift)
 
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     res <- dbxInsert(db, "events", events, returning=c("id", "city"))
@@ -27,7 +27,7 @@ runInsertTests <- function(db, redshift=FALSE) {
   })
 
   test_that("insert returning star works", {
-    skip_if(!(isPostgres(db) || isMariaDB(db) || isSQLite(db) || isSQLServer(db) || isDuckDB(db)) || redshift)
+    skip_if(!returningSupported(db) || redshift)
 
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     res <- dbxInsert(db, "events", events, returning=c("*"))

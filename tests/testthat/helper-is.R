@@ -55,3 +55,7 @@ isDuckDB <- function(conn) {
 isMac <- function() {
   Sys.info()["sysname"] == "Darwin"
 }
+
+returningSupported <- function(conn) {
+  isPostgres(conn) || isMariaDB(conn) || isSQLite(conn) || isSQLServer(conn) || isDuckDB(conn)
+}

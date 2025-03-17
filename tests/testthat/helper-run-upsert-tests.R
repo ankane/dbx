@@ -60,7 +60,7 @@ runUpsertTests <- function(db, redshift=FALSE) {
   })
 
   test_that("upsert returning works", {
-    skip_if(!(isPostgres(db) || isMariaDB(db) || isSQLite(db) || isSQLServer(db) || isDuckDB(db)) || redshift)
+    skip_if(!returningSupported(db) || redshift)
 
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     res <- dbxUpsert(db, "events", events, where_cols=c("id"), returning=c("id", "city"))
@@ -76,7 +76,7 @@ runUpsertTests <- function(db, redshift=FALSE) {
   })
 
   test_that("upsert skip_existing returning works", {
-    skip_if(!(isPostgres(db) || isMariaDB(db) || isSQLite(db) || isSQLServer(db) || isDuckDB(db)) || redshift)
+    skip_if(!returningSupported(db) || redshift)
 
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     res <- dbxUpsert(db, "events", events, where_cols=c("id"), skip_existing=TRUE, returning=c("id", "city"))
