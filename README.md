@@ -561,11 +561,6 @@ createdb dbx_test
 
 # create MySQL database
 mysqladmin create dbx_test
-
-# install ODBC drivers (optional)
-brew install mariadb-connector-odbc psqlodbc
-# or
-sudo apt-get install odbc-mariadb odbc-postgresql
 ```
 
 In R, do:
@@ -581,4 +576,12 @@ To test a single file, use:
 ```r
 devtools::install() # to use latest updates
 devtools::test_active_file("tests/testthat/test-postgres.R")
+```
+
+To test the ODBC adapter, use:
+
+```sh
+brew install mariadb-connector-odbc psqlodbc
+# or
+sudo apt-get install odbc-mariadb odbc-postgresql
 ```
