@@ -195,8 +195,6 @@ Use `where_cols` to specify the columns used for lookup. Other columns are writt
 
 ### Upsert
 
-*Available for PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, and DuckDB*
-
 *Atomically* insert if they don’t exist, otherwise update them
 
 ```r
