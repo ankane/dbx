@@ -75,6 +75,27 @@ runUpsertTests <- function(db, redshift=FALSE) {
     expect_equal(res$city, upsert_events$city)
   })
 
+  test_that("upsert skip_existing returning works", {
+    skip_if(!(isPostgres(db) || isMariaDB(db) || isSQLite(db) || isSQLServer(db) || isDuckDB(db)) || redshift)
+
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
+    res <- dbxUpsert(db, "events", events, where_cols=c("id"), skip_existing=TRUE, returning=c("id", "city"))
+
+    expect_equal(res$id, c(1, 2))
+    expect_equal(res$city, events$city)
+
+    upsert_events <- data.frame(id=c(2, 3), city=c("Chicago", "New York"))
+    res <- dbxUpsert(db, "events", upsert_events, where_cols=c("id"), skip_existing=TRUE, returning=c("id", "city"))
+
+    if (isMariaDB(db)) {
+      expect_equal(res$id, c(2, 3))
+      expect_equal(res$city, c("Boston", "New York"))
+    } else {
+      expect_equal(res$id, c(3))
+      expect_equal(res$city, c("New York"))
+    }
+  })
+
   test_that("upsert returning inserted works", {
     skip_if(!isPostgres(db))
 
