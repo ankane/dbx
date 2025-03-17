@@ -42,6 +42,10 @@ isODBC <- function(conn) {
   !is.null(attr(conn, "info")$odbc.version)
 }
 
+isDuckDB <- function(conn) {
+  inherits(conn, "duckdb_connection")
+}
+
 equalClause <- function(cols, row) {
   lapply(1:length(cols), function (i) { paste(cols[i], "=", row[[i]]) })
 }
@@ -142,8 +146,8 @@ selectOrExecute <- function(conn, sql, records, returning) {
   } else {
     # allow for any MySQL adapter for now
     # TODO add detection for MariaDB
-    if (!isPostgres(conn) && !isMySQL(conn)) {
-      stop("returning is only supported with Postgres and MariaDB")
+    if (!isPostgres(conn) && !isMySQL(conn) && !isDuckDB(conn)) {
+      stop("returning is only supported with Postgres, MariaDB, and DuckDB")
     }
 
     if (inherits(returning, "SQL")) {
