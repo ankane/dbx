@@ -6,14 +6,16 @@ runUpsertTests <- function(db, redshift=FALSE) {
   test_that("upsert works", {
     skip_if_not(upsertSupported())
 
-    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), counter=c(4, 5), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
     upsert_events <- data.frame(id=c(2, 3), city=c("Chicago", "New York"))
     dbxUpsert(db, "events", upsert_events, where_cols=c("id"))
 
-    res <- dbxSelect(db, "SELECT city FROM events ORDER BY id")
+    res <- dbxSelect(db, "SELECT id, city, counter FROM events ORDER BY id")
+    expect_equal(res$id, c(1, 2, 3))
     expect_equal(res$city, c("San Francisco", "Chicago", "New York"))
+    expect_equal(res$counter, c(4, 5, NA))
   })
 
   test_that("upsert only where_cols works", {
