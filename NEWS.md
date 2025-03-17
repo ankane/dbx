@@ -6,7 +6,7 @@
 
 ## 0.3.2 (2024-06-02)
 
-- Added support for `returning` option for `dbxUpsert` for MariaDB 10.5+
+- Added support for `returning` option for `dbxInsert` and `dbxUpsert` for MariaDB 10.5+
 
 ## 0.3.1 (2023-12-11)
 
