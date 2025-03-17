@@ -47,7 +47,3 @@ isSQLServer <- function(conn) {
 isODBC <- function(conn) {
   !is.null(attr(conn, "info")$odbc.version)
 }
-
-isDuckDB <- function(conn) {
-  inherits(conn, "duckdb_connection")
-}
