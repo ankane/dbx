@@ -1,13 +1,10 @@
-## Test environments
-
-* local OS X install, R 4.4.3
-* ubuntu 22.04 (on GitHub Actions), R 4.4.3
-* win-builder
-
 ## R CMD check results
 
-There were no ERRORs, WARNINGs or NOTEs.
+0 errors | 0 warnings | 0 notes
 
-## Downstream dependencies
+## revdepcheck results
 
-There are currently no downstream dependencies for this package.
+We checked 1 reverse dependencies (0 from CRAN + 1 from Bioconductor), comparing R CMD check results across CRAN and dev versions of this package.
+
+* We saw 0 new problems
+* We failed to check 0 packages
