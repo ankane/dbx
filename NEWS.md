@@ -1,4 +1,4 @@
-## 0.4.0 (unreleased)
+## 0.4.0 (2025-03-17)
 
 - Added support for DuckDB
 - Added support for `returning` option for `dbxInsert` and `dbxUpsert` for SQLite 3.35.0+ and SQL Server

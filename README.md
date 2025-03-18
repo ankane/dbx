@@ -31,7 +31,7 @@ And follow the instructions for your database
 - [SQLite](#sqlite)
 - [SQL Server](#sql-server)
 - [Redshift](#redshift)
-- [DuckDB](#duckdb) [unreleased]
+- [DuckDB](#duckdb)
 - [Others](#others)
 
 To install with [Jetpack](https://github.com/ankane/jetpack), use:
