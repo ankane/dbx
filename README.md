@@ -206,6 +206,8 @@ dbxUpsert(db, table, records, where_cols=c("id"))
 
 Use `where_cols` to specify the columns used for lookup. There must be a unique index on them, or an error will be thrown.
 
+> Upsert is not available for Redshift
+
 To skip existing rows instead of updating them, use:
 
 ```r
@@ -218,7 +220,7 @@ If you use auto-incrementing ids, you can get the ids of newly upserted rows by 
 dbxUpsert(db, table, records, where_cols=c("id"), returning=c("id"))
 ```
 
-> `returning` is not available for MySQL or Redshift
+> `returning` is not available for MySQL
 
 ### Delete
 
