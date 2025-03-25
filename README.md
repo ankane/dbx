@@ -502,22 +502,20 @@ Set a statement timeout with:
 # Postgres
 db <- dbxConnect(variables=list(statement_timeout=1000)) # ms
 
-# MySQL 5.7.8+
+# MySQL
 db <- dbxConnect(variables=list(max_execution_time=1000)) # ms
 
-# MariaDB 10.1.1+
+# MariaDB
 db <- dbxConnect(variables=list(max_statement_time=1)) # sec
 ```
 
-With Postgres, set a connect timeout with:
+Set a connect timeout with:
 
 ```r
+# Postgres
 db <- dbxConnect(connect_timeout=3) # sec
-```
 
-With SQL Server, set a connect timeout with:
-
-```r
+# SQL Server
 db <- dbxConnect(timeout=3) # sec
 ```
 
