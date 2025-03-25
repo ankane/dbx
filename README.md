@@ -197,7 +197,7 @@ Use `where_cols` to specify the columns used for lookup. Other columns are writt
 
 ### Upsert
 
-*Atomically* insert if they don’t exist, otherwise update them
+*Atomically* insert records if they don’t exist, otherwise update them
 
 ```r
 records <- data.frame(id=c(2, 3), temperature=c(20, 25))
