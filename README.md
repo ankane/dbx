@@ -515,7 +515,7 @@ Set a connect timeout with:
 # Postgres
 db <- dbxConnect(connect_timeout=3) # sec
 
-# SQL Server
+# RMariaDB and SQL Server
 db <- dbxConnect(timeout=3) # sec
 ```
 
