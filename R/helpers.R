@@ -180,7 +180,7 @@ execute <- function(conn, statement) {
 
 addParams <- function(conn, statement, params) {
   if (!is.null(params)) {
-    # count number of occurences in base R
+    # count number of occurrences in base R
     expected <- lengths(regmatches(statement, gregexpr("?", statement, fixed=TRUE)))
     if (length(params) != expected) {
       stop("Wrong number of params")
