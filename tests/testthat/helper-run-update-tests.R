@@ -10,8 +10,8 @@ runUpdateTests <- function(db) {
     expect_equal(res$city, c("LA"))
   })
 
-  test_that("update fast works", {
-    skip_if(!updateFastSupported(db))
+  test_that("fast update works", {
+    skip_if(!fastUpdateSupported(db))
 
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
@@ -34,8 +34,8 @@ runUpdateTests <- function(db) {
     expect_equal(res$counter, c(10, 21))
   })
 
-  test_that("update fast multiple columns works", {
-    skip_if(!updateFastSupported(db))
+  test_that("fast update multiple columns works", {
+    skip_if(!fastUpdateSupported(db))
 
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), counter=c(10, 11), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
@@ -58,8 +58,8 @@ runUpdateTests <- function(db) {
     expect_equal(res$counter, c(10, 21))
   })
 
-  test_that("update fast multiple columns where_cols order not important", {
-    skip_if(!updateFastSupported(db))
+  test_that("fast update multiple columns where_cols order not important", {
+    skip_if(!fastUpdateSupported(db))
 
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), counter=c(10, 11), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
