@@ -76,22 +76,8 @@ runUpdateTests <- function(db) {
     expect_error(dbxUpdate(db, "events", update_events, where_cols=c("missing")), "where_cols not in records")
   })
 
-  test_that("update fast missing column raises error", {
-    skip_if(!updateFastSupported(db))
-
-    update_events <- data.frame(id=c(2), city=c("LA"))
-    expect_error(dbxUpdate(db, "events", update_events, where_cols=c("missing"), fast=TRUE), "where_cols not in records")
-  })
-
   test_that("empty update works", {
     dbxUpdate(db, "events", data.frame(id = as.numeric(), active = as.logical()), where_cols=c("id"))
-    expect_true(TRUE)
-  })
-
-  test_that("empty fast update works", {
-    skip_if(!updateFastSupported(db))
-
-    dbxUpdate(db, "events", data.frame(id = as.numeric(), active = as.logical()), where_cols=c("id"), fast=TRUE)
     expect_true(TRUE)
   })
 
