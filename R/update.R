@@ -30,8 +30,8 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL, transac
   quoted_update_cols <- quoteIdent(conn, update_cols)
 
   if (fast) {
-    if (!isPostgres(conn)) {
-      stop("fast is only supported with Postgres")
+    if (!isPostgres(conn) && !isSQLServer(conn)) {
+      stop("fast is only supported with Postgres and SQL Server")
     }
 
     quoted_cols <- quoteIdent(conn, cols)
@@ -40,7 +40,11 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL, transac
     where_sql <- fastUpdateWhereClausePostgres(quoted_where_cols)
 
     inBatches(records, batch_size, function(batch) {
-      sql <- paste0("UPDATE ", quoted_table, " AS t SET ", set_sql, " FROM (VALUES ", valuesClause(conn, batch), ") AS s (", cols_sql, ") WHERE ", where_sql)
+      if (isSQLServer(conn)) {
+        sql <- paste0("UPDATE t SET ", set_sql, " FROM ", quoted_table, " AS t, (VALUES ", valuesClause(conn, batch), ") AS s (", cols_sql, ") WHERE ", where_sql)
+      } else {
+        sql <- paste0("UPDATE ", quoted_table, " AS t SET ", set_sql, " FROM (VALUES ", valuesClause(conn, batch), ") AS s (", cols_sql, ") WHERE ", where_sql)
+      }
       execute(conn, sql)
     })
   } else {

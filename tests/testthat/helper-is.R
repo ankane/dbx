@@ -61,5 +61,5 @@ returningSupported <- function(conn) {
 }
 
 fastUpdateSupported <- function(conn) {
-  isPostgres(conn)
+  isPostgres(conn) || isSQLServer(conn)
 }
