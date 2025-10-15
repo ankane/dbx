@@ -6,8 +6,8 @@ runUpdateTests <- function(db) {
     update_events <- data.frame(id=c(2), city=c("LA"))
     dbxUpdate(db, "events", update_events, where_cols=c("id"))
 
-    res <- dbxSelect(db, "SELECT city FROM events WHERE id = 2")
-    expect_equal(res$city, c("LA"))
+    res <- dbxSelect(db, "SELECT city FROM events ORDER BY id")
+    expect_equal(res$city, c("San Francisco", "LA"))
   })
 
   test_that("update multiple columns works", {
@@ -17,7 +17,7 @@ runUpdateTests <- function(db) {
     update_events <- data.frame(id=c(1, 2), city=c("LA", "Boston"), counter=c(20, 21))
     dbxUpdate(db, "events", update_events, where_cols=c("id", "city"))
 
-    res <- dbxSelect(db, "SELECT counter FROM events")
+    res <- dbxSelect(db, "SELECT counter FROM events ORDER BY id")
     expect_equal(res$counter, c(10, 21))
   })
 
@@ -28,7 +28,7 @@ runUpdateTests <- function(db) {
     update_events <- data.frame(id=c(1, 2), city=c("LA", "Boston"), counter=c(20, 21))
     dbxUpdate(db, "events", update_events, where_cols=c("city", "id"))
 
-    res <- dbxSelect(db, "SELECT counter FROM events")
+    res <- dbxSelect(db, "SELECT counter FROM events ORDER BY id")
     expect_equal(res$counter, c(10, 21))
   })
 
@@ -51,8 +51,8 @@ runUpdateTests <- function(db) {
       dbxUpdate(db, "events", update_events, where_cols=c("id"), transaction=FALSE)
     })
 
-    res <- dbxSelect(db, "SELECT city FROM events WHERE id = 2")
-    expect_equal(res$city, c("LA"))
+    res <- dbxSelect(db, "SELECT city FROM events ORDER BY id")
+    expect_equal(res$city, c("San Francisco", "LA"))
   })
 
   test_that("update schema DBI::SQL works", {
@@ -64,8 +64,8 @@ runUpdateTests <- function(db) {
     update_events <- data.frame(id=c(2), city=c("LA"))
     dbxUpdate(db, DBI::SQL("public.events"), update_events, where_cols=c("id"))
 
-    res <- dbxSelect(db, "SELECT city FROM events WHERE id = 2")
-    expect_equal(res$city, c("LA"))
+    res <- dbxSelect(db, "SELECT city FROM events ORDER BY id")
+    expect_equal(res$city, c("San Francisco", "LA"))
   })
 
   test_that("update schema DBI:Id works", {
@@ -77,7 +77,7 @@ runUpdateTests <- function(db) {
     update_events <- data.frame(id=c(2), city=c("LA"))
     dbxUpdate(db, DBI::Id(schema="public", table="events"), update_events, where_cols=c("id"))
 
-    res <- dbxSelect(db, "SELECT city FROM events WHERE id = 2")
-    expect_equal(res$city, c("LA"))
+    res <- dbxSelect(db, "SELECT city FROM events ORDER BY id")
+    expect_equal(res$city, c("San Francisco", "LA"))
   })
 }
