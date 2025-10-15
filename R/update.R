@@ -35,9 +35,9 @@ dbxUpdate <- function(conn, table, records, where_cols, batch_size=NULL, transac
     }
 
     quoted_cols <- quoteIdent(conn, cols)
-    set_sql <- fastUpdateSetClausePostgres(quoted_update_cols)
+    set_sql <- fastUpdateSetClause(quoted_update_cols)
     cols_sql <- colsClause(quoted_cols)
-    where_sql <- fastUpdateWhereClausePostgres(quoted_where_cols)
+    where_sql <- fastUpdateWhereClause(quoted_where_cols)
 
     inBatches(records, batch_size, function(batch) {
       if (isSQLServer(conn)) {
