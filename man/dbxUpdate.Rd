@@ -10,7 +10,8 @@ dbxUpdate(
   records,
   where_cols,
   batch_size = NULL,
-  transaction = TRUE
+  transaction = TRUE,
+  fast = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ dbxUpdate(
 \item{batch_size}{The number of records to update in a single transaction (defaults to all)}
 
 \item{transaction}{Wrap the update in a transaction (defaults to true)}
+
+\item{fast}{Use a single query (defaults to false)}
 }
 \description{
 Update records

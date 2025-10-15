@@ -10,12 +10,38 @@ runUpdateTests <- function(db) {
     expect_equal(res$city, c("LA"))
   })
 
+  test_that("update fast works", {
+    skip_if(!updateFastSupported(db))
+
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+
+    update_events <- data.frame(id=c(2), city=c("LA"))
+    dbxUpdate(db, "events", update_events, where_cols=c("id"), fast=TRUE)
+
+    res <- dbxSelect(db, "SELECT city FROM events WHERE id = 2")
+    expect_equal(res$city, c("LA"))
+  })
+
   test_that("update multiple columns works", {
     events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), counter=c(10, 11), stringsAsFactors=FALSE)
     dbxInsert(db, "events", events)
 
     update_events <- data.frame(id=c(1, 2), city=c("LA", "Boston"), counter=c(20, 21))
     dbxUpdate(db, "events", update_events, where_cols=c("id", "city"))
+
+    res <- dbxSelect(db, "SELECT counter FROM events")
+    expect_equal(res$counter, c(10, 21))
+  })
+
+  test_that("update fast multiple columns works", {
+    skip_if(!updateFastSupported(db))
+
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), counter=c(10, 11), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+
+    update_events <- data.frame(id=c(1, 2), city=c("LA", "Boston"), counter=c(20, 21))
+    dbxUpdate(db, "events", update_events, where_cols=c("id", "city"), fast=TRUE)
 
     res <- dbxSelect(db, "SELECT counter FROM events")
     expect_equal(res$counter, c(10, 21))
@@ -32,13 +58,40 @@ runUpdateTests <- function(db) {
     expect_equal(res$counter, c(10, 21))
   })
 
+  test_that("update fast multiple columns where_cols order not important", {
+    skip_if(!updateFastSupported(db))
+
+    events <- data.frame(id=c(1, 2), city=c("San Francisco", "Boston"), counter=c(10, 11), stringsAsFactors=FALSE)
+    dbxInsert(db, "events", events)
+
+    update_events <- data.frame(id=c(1, 2), city=c("LA", "Boston"), counter=c(20, 21))
+    dbxUpdate(db, "events", update_events, where_cols=c("city", "id"), fast=TRUE)
+
+    res <- dbxSelect(db, "SELECT counter FROM events")
+    expect_equal(res$counter, c(10, 21))
+  })
+
   test_that("update missing column raises error", {
     update_events <- data.frame(id=c(2), city=c("LA"))
     expect_error(dbxUpdate(db, "events", update_events, where_cols=c("missing")), "where_cols not in records")
   })
 
+  test_that("update fast missing column raises error", {
+    skip_if(!updateFastSupported(db))
+
+    update_events <- data.frame(id=c(2), city=c("LA"))
+    expect_error(dbxUpdate(db, "events", update_events, where_cols=c("missing"), fast=TRUE), "where_cols not in records")
+  })
+
   test_that("empty update works", {
     dbxUpdate(db, "events", data.frame(id = as.numeric(), active = as.logical()), where_cols=c("id"))
+    expect_true(TRUE)
+  })
+
+  test_that("empty fast update works", {
+    skip_if(!updateFastSupported(db))
+
+    dbxUpdate(db, "events", data.frame(id = as.numeric(), active = as.logical()), where_cols=c("id"), fast=TRUE)
     expect_true(TRUE)
   })
 

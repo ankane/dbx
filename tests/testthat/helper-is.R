@@ -59,3 +59,7 @@ isMac <- function() {
 returningSupported <- function(conn) {
   isPostgres(conn) || isMariaDB(conn) || isSQLite(conn) || isSQLServer(conn) || isDuckDB(conn)
 }
+
+updateFastSupported <- function(conn) {
+  isPostgres(conn)
+}

@@ -1,3 +1,7 @@
+## 0.4.1 (unreleased)
+
+- Added `fast` option to `dbxUpdate`
+
 ## 0.4.0 (2025-03-17)
 
 - Added support for DuckDB

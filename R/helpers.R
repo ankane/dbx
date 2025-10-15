@@ -50,6 +50,18 @@ equalClause <- function(cols, row) {
   lapply(seq_along(cols), function(i) { paste(cols[i], "=", row[[i]]) })
 }
 
+updateFastSetClausePostgres <- function(cols) {
+  paste(lapply(cols, function(x) {
+    paste0(x, " = s.", x)
+  }), collapse=", ")
+}
+
+updateFastWhereClausePostgres <- function(cols) {
+  paste(lapply(cols, function(x) {
+    paste0("t.", x, " = s.", x)
+  }), collapse=" AND ")
+}
+
 upsertSetClause <- function(cols) {
   paste(lapply(cols, function(x) {
     paste0(x, " = VALUES(", x, ")")
