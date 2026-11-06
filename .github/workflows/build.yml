@@ -14,7 +14,7 @@ jobs:
         config:
           - {os: macos-latest, r: 'release', mariadb: true}
           - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest, r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-24.04, r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-22.04, r: 'release', sqlserver: true}
 
     env:
