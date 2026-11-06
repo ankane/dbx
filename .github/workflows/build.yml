@@ -76,7 +76,7 @@ jobs:
           accept-eula: true
       - if: ${{ matrix.config.sqlserver }}
         run: |
-          sqlcmd -U SA -P 'YourStrong!Passw0rd' -Q 'CREATE DATABASE dbx_test'
+          sqlcmd -U SA -P 'YourStrong!Passw0rd' -C -Q 'CREATE DATABASE dbx_test'
           sudo apt-get install tdsodbc
 
       - uses: r-lib/actions/check-r-package@v2
