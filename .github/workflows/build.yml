@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -56,8 +56,8 @@ jobs:
           database: dbx_test
       - if: ${{ matrix.config.mariadb }}
         run: |
-          mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'runner'@'localhost' IDENTIFIED BY ''"
-          mysql -e "FLUSH PRIVILEGES"
+          mariadb -e "GRANT ALL PRIVILEGES ON *.* TO 'runner'@'localhost' IDENTIFIED BY ''"
+          mariadb -e "FLUSH PRIVILEGES"
 
       - name: Install Postgres
         uses: ankane/setup-postgres@v1
